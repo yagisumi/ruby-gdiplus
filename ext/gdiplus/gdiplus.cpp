@@ -2,6 +2,7 @@
 
 VALUE mGdiplus;
 
+extern "C"
 void
 Init_gdiplus(void)
 {
