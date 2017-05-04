@@ -5,7 +5,8 @@ class GdiplusTest < Test::Unit::TestCase
     assert_not_nil(::Gdiplus::VERSION)
   end
 
-  def test_it_does_something_useful
+  def test_error
+    assert_not_nil(::Gdiplus::GdiplusError)
     #
   end
 end

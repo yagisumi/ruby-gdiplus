@@ -1,1 +1,3 @@
-gdiplus.o: gdiplus.cpp ruby_gdiplus.h
+gdiplus.o: gdiplus.cpp ruby_gdiplus.h ruby_compatible.h
+gdip_utils.o: gdip_utils.cpp ruby_gdiplus.h ruby_compatible.h
+
