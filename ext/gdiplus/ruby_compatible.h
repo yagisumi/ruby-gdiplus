@@ -20,6 +20,9 @@
 #ifndef RB_INT2NUM
 #define RB_INT2NUM(x) INT2NUM(x)
 #endif
+#ifndef RB_INT2FIX
+#define RB_INT2FIX(x) INT2FIX(x)
+#endif
 #ifndef RUBY_FIXNUM_MAX
 #define RUBY_FIXNUM_MAX FIXNUM_MAX
 #endif
@@ -257,7 +260,6 @@
       const rb_data_type_t *parent;
       void *data;        /* This area can be used for any purpose
                             by a programmer who define the type. */
-      VALUE flags;       /* RUBY_FL_WB_PROTECTED */
   };  
   static inline int rb_typeddata_is_kind_of(VALUE obj, const rb_data_type_t *data_type)
   {
@@ -274,8 +276,28 @@
 #else /* HAVE_TYPE_RB_DATA_TYPE_T */
 #define _DATA_PTR(v) RTYPEDDATA_DATA(v)
 #endif /* HAVE_TYPE_RB_DATA_TYPE_T */
+#if RUBY_API_VERSION_CODE < 20200
+#define _MAKE_DATA_TYPE(name, mark, free, size, parent_type_ptr, klass_ptr) {\
+    name,\
+    {mark, free, size,},\
+    parent_type_ptr, klass_ptr\
+  }
+#else
+#define _MAKE_DATA_TYPE(name, mark, free, size, parent_type_ptr, klass_ptr) {\
+    name,\
+    {mark, free, size,},\
+    parent_type_ptr, klass_ptr,\
+    RUBY_TYPED_FREE_IMMEDIATELY\
+  }
+#endif /* RUBY_API_VERSION_CODE < 20200 */
 #define _Data_Wrap_Struct(klass,data_type,sval) TypedData_Wrap_Struct(klass,data_type,sval)
 #define _Data_Get_Struct(obj,type,data_type,sval) TypedData_Get_Struct(obj,type,data_type,sval)
+#ifndef RUBY_DEFAULT_FREE
+#define RUBY_DEFAULT_FREE ((RUBY_DATA_FUNC)-1)
+#endif
+#ifndef RUBY_TYPED_DEFAULT_FREE
+#define RUBY_TYPED_DEFAULT_FREE RUBY_DEFAULT_FREE
+#endif
 
 #ifndef RB_ALLOC_N
 #define RB_ALLOC_N(type,n) ALLOC_N(type,n)
@@ -373,5 +395,23 @@
 #define ONIG_OPTION_FIND_LONGEST RE_OPTION_LONGEST
 #endif /* HAVE_RUBY_ONIGURUMA_H */
 
+#if RUBY_API_VERSION_CODE < 10900
+  typedef int st_index_t;
+  static inline st_index_t
+  rb_memhash(const void *ptr, long len)
+  {
+      VALUE str = rb_str_new((const char *)ptr, len);
+      return rb_str_hash(str);
+  }
+//#define _ST_INDEX2NUM(x) INT2NUM(x)
+#else
+/*
+#if SIZEOF_LONG == SIZEOF_VOIDP
+#define _ST_INDEX2NUM(x) LONG2NUM(x)
+#elif SIZEOF_LONG_LONG == SIZEOF_VOIDP
+#define _ST_INDEX2NUM(x) LL2NUM(x)
+#endif
+*/
+#endif /* RUBY_API_VERSION_CODE < 10900 */
 
 #endif /* RUBY_COMPATIBLE_H_ */

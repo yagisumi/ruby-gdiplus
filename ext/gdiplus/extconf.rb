@@ -9,4 +9,9 @@ end
 
 #$CPPFLAGS += " -DNDEBUG "
 
+if $warnflags
+  $warnflags = $warnflags.sub(/-Wdeclaration-after-statement/, '') # is valid for C/ObjC but not for C++
+  $warnflags = $warnflags.sub(/-Wimplicit-function-declaration/, '') # is valid for C/ObjC but not for C++
+end
+
 create_makefile("gdiplus/gdiplus")

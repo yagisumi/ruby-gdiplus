@@ -7,11 +7,12 @@ Rake::TestTask.new(:test) do |t|
   t.test_files = FileList['test/**/*_test.rb']
 end
 
+Rake::Task[:test].prerequisites << :clean
 Rake::Task[:test].prerequisites << :compile
 
 require "yard"
 YARD::Rake::YardocTask.new(:doc) do |t|
-  t.files = FileList['lib/**/*.rb', 'ext/**/*.c']
+  t.files = FileList['lib/**/*.rb', 'ext/**/*.cpp']
 end
 
 require "rake/extensiontask"

@@ -5,11 +5,36 @@
 #endif
 
 VALUE
-util_encode_to_utf8(VALUE str) {
+util_encode_to_utf8(VALUE str)
+{
     #ifdef HAVE_RUBY_ENCODING_H
     str = rb_str_conv_enc(str, rb_enc_get(str), rb_utf8_encoding());
     #endif
     return str;
+}
+
+VALUE
+util_associate_utf8(VALUE str)
+{
+    #ifdef HAVE_RUBY_ENCODING_H
+    str = rb_enc_associate_index(str, rb_utf8_encindex());
+    #endif
+    return str;
+}
+
+VALUE
+util_utf8_sprintf(const char* format, ...)
+{
+    va_list list;
+    va_start(list, format);
+
+    int len = _vscprintf(format, list);
+    char *buf = static_cast<char *>(ruby_xmalloc(len + 1));
+    vsprintf(buf, format, list);
+    VALUE r = rb_utf8_str_new_cstr(buf);
+    ruby_xfree(buf);
+    va_end(list);
+    return r;
 }
 
 VALUE

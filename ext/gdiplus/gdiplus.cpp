@@ -3,6 +3,10 @@
 VALUE mGdiplus;
 VALUE eGdiplus;
 
+VALUE cGuid;
+
+
+
 int gdip_refcount = 0;
 bool gdip_end_flag = false;
 static ULONG_PTR gdiplus_token = 0;
@@ -32,7 +36,7 @@ const char *GpStatusStrs[22] = {
     "ProfileNotFound"
 };
 
-#ifdef GDIPLUS_DEBUG
+#if GDIPLUS_DEBUG
 void
 dp(const char *fmt, ...)
 {
@@ -43,6 +47,20 @@ dp(const char *fmt, ...)
     OutputDebugString(buf);
     va_end(list);
 }
+
+class LastCheck {
+    public:
+    ~LastCheck() {
+        if (gdip_refcount != 0) {
+            dp("LastCheck Error: gdip_refcount = %d", gdip_refcount);
+        }
+        else {
+            dp("LastCheck: OK");
+        }
+    }
+};
+
+static LastCheck lastcheck;
 #endif
 
 static void
@@ -78,7 +96,7 @@ Init_gdiplus(void)
     mGdiplus = rb_define_module("Gdiplus");
     eGdiplus = rb_define_class_under(mGdiplus, "GdiplusError", rb_eException);
 
-
+    Init_codec();
 
     gdiplus_init();
     rb_set_end_proc(gdiplus_end, Qnil);
