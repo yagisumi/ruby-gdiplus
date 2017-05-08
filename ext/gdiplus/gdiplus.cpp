@@ -1,10 +1,15 @@
+/*
+ * gdiplus.cpp
+ * Copyright (c) 2017 Yagi Sumiya 
+ * Released under the MIT License.
+ */
 #include "ruby_gdiplus.h"
 
 VALUE mGdiplus;
 VALUE eGdiplus;
 
 VALUE cGuid;
-
+VALUE cImageCodecInfo;
 
 
 int gdip_refcount = 0;
@@ -66,9 +71,9 @@ static LastCheck lastcheck;
 static void
 gdiplus_init()
 {
-    dp("GdiplusStartup");
     GdiplusStartupInput gsi;
     Status status = GdiplusStartup(&gdiplus_token, &gsi, NULL);
+    dp("GdiplusStartup status: %d, gdiplus_token: %p", status, gdiplus_token);
     if (gdiplus_token == 0 || status != Ok) {
         rb_raise(eGdiplus, "GdiplusStartup error");
     }
@@ -96,8 +101,8 @@ Init_gdiplus(void)
     mGdiplus = rb_define_module("Gdiplus");
     eGdiplus = rb_define_class_under(mGdiplus, "GdiplusError", rb_eException);
 
-    Init_codec();
-
-    gdiplus_init();
     rb_set_end_proc(gdiplus_end, Qnil);
+    gdiplus_init();
+
+    Init_codec();
 }

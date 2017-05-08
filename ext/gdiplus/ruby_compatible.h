@@ -396,6 +396,7 @@
 #endif /* HAVE_RUBY_ONIGURUMA_H */
 
 #if RUBY_API_VERSION_CODE < 10900
+#include <st.h>
   typedef int st_index_t;
   static inline st_index_t
   rb_memhash(const void *ptr, long len)
@@ -403,15 +404,7 @@
       VALUE str = rb_str_new((const char *)ptr, len);
       return rb_str_hash(str);
   }
-//#define _ST_INDEX2NUM(x) INT2NUM(x)
-#else
-/*
-#if SIZEOF_LONG == SIZEOF_VOIDP
-#define _ST_INDEX2NUM(x) LONG2NUM(x)
-#elif SIZEOF_LONG_LONG == SIZEOF_VOIDP
-#define _ST_INDEX2NUM(x) LL2NUM(x)
-#endif
-*/
 #endif /* RUBY_API_VERSION_CODE < 10900 */
+#define _FOREACH_FUNC(func) ((int (*)(ANYARGS))(func))
 
 #endif /* RUBY_COMPATIBLE_H_ */

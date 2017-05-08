@@ -1,3 +1,8 @@
+/*
+ * ruby_gdiplus.h
+ * Copyright (c) 2017 Yagi Sumiya 
+ * Released under the MIT License.
+ */
 #ifndef RUBY_GDIPLUS_H
 #define RUBY_GDIPLUS_H 1
 
@@ -15,8 +20,11 @@ using namespace Gdiplus;
 extern VALUE mGdiplus;
 extern VALUE eGdiplus;
 
-extern const rb_data_type_t tGuid;
 extern VALUE cGuid;
+extern VALUE cImageCodecInfo;
+
+extern const rb_data_type_t tGuid;
+extern const rb_data_type_t tImageCodecInfo;
 
 void Init_codec();
 

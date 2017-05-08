@@ -1,3 +1,8 @@
+/*
+ * gdip_utils.cpp
+ * Copyright (c) 2017 Yagi Sumiya 
+ * Released under the MIT License.
+ */
 #include "ruby_gdiplus.h"
 #include <windows.h>
 #ifdef HAVE_RUBY_ENCODING_H
@@ -58,9 +63,15 @@ util_utf16_str_new(VALUE v)
 VALUE
 util_utf8_str_new_from_wstr(const wchar_t * wstr)
 {
-    int clen = lstrlenW(wstr);
-    int len = WideCharToMultiByte(CP_UTF8, 0, wstr, clen, NULL, 0, NULL, NULL);
-    VALUE src = rb_utf8_str_new(0, len);
-    WideCharToMultiByte(CP_UTF8, 0, wstr, clen, RSTRING_PTR(src), len, NULL, NULL);
-    return src;
+    if (wstr == NULL) {
+        return rb_utf8_str_new_cstr("");
+    }
+    int len = WideCharToMultiByte(CP_UTF8, 0, wstr, -1, NULL, 0, NULL, NULL);
+    //char *str = RB_ZALLOC_N(char, len);
+    VALUE r = rb_utf8_str_new(NULL, len - 1);
+    WideCharToMultiByte(CP_UTF8, 0, wstr, -1, RSTRING_PTR(r), len, NULL, NULL);
+    //VALUE r = rb_utf8_str_new_cstr(str);
+    //ruby_xfree(str);
+
+    return r;
 }
