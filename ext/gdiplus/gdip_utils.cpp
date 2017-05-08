@@ -51,11 +51,12 @@ util_utf16_str_new(VALUE v)
     #endif
     char *str = RSTRING_PTR(v);
     int len = MultiByteToWideChar(CP_UTF8, 0, str, -1, NULL, 0);
-    WCHAR *ptr = RB_ZALLOC_N(WCHAR, len);
-    MultiByteToWideChar(CP_UTF8, 0, str, -1, ptr, len);
+    //WCHAR *ptr = RB_ZALLOC_N(WCHAR, len);
+    VALUE r = rb_str_new(NULL, len * sizeof(WCHAR));
+    MultiByteToWideChar(CP_UTF8, 0, str, -1, RString_Ptr<WCHAR *>(r), len);
     RB_GC_GUARD(v);
-    VALUE r = rb_str_new((char *)(ptr), len * sizeof(WCHAR));
-    ruby_xfree(ptr);
+    //VALUE r = rb_str_new((char *)(ptr), len * sizeof(WCHAR));
+    //ruby_xfree(ptr);
     
     return r;
 }

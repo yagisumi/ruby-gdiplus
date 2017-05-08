@@ -61,6 +61,12 @@ Data_Ptr(VALUE obj)
     }
     return static_cast<T>(RTYPEDDATA_DATA(obj));
 }
+template<typename T>
+static inline T
+RString_Ptr(VALUE str)
+{
+    return reinterpret_cast<T>(RSTRING_PTR(str));
+}
 
 template<typename T>
 static inline void
