@@ -43,12 +43,49 @@ static inline void GdiplusRelease() {
 }
 
 /* Debug */
-#define GDIPLUS_DEBUG 1
+// #define GDIPLUS_DEBUG 1 // moved in extconf.rb
+
+#ifndef GDIPLUS_DEBUG
+#define GDIPLUS_DEBUG 0
+#endif
+#if GDIPLUS_DEBUG
+    #include <typeinfo>
+    #if defined(__MINGW32__) || defined(__MINGW64__)
+        #define GDIPLUS_MINGW 1
+        #include <cxxabi.h>
+    #else
+        #define GDIPLUS_MINGW 0
+    #endif
+    void dp(const char *fmt, ...);
+#else
+    #define dp(...)
+#endif
 
 #if GDIPLUS_DEBUG
-void dp(const char *fmt, ...);
+template <typename T>
+static inline void
+dp_type(const char *msg)
+{
+    #if GDIPLUS_MINGW
+        const std::type_info& id = typeid(T);
+        int status;
+        char *name = abi::__cxa_demangle(id.name(), NULL, 0, &status);
+        if (name != NULL) {
+            if (status == 0) {
+                dp("%s: %s", name, msg);
+            }
+            else {
+                dp("%s: %s", id.name(), msg);
+            }
+            free(name);
+        }
+    #else
+        dp("%s: %s", typeid(T).name(), msg);
+    #endif /* GDIPLUS_MINGW */
+}
+#define DPT(msg) dp_type<T>(msg);
 #else
-#define dp(...)
+#define DPT(msg)
 #endif
 
 /* Utils */
@@ -87,6 +124,7 @@ static VALUE
 typeddata_alloc(VALUE klass)
 {
     void *ptr = RB_ZALLOC(T);
+    DPT("alloc");
     return TypedData_Wrap_Struct(klass, type, ptr);
 }
 
@@ -96,6 +134,19 @@ typeddata_alloc_null(VALUE klass)
 {
     return TypedData_Wrap_Struct(klass, type, NULL);
 }
+
+template<typename T>
+static void
+gdip_default_free(void *ptr)
+{
+    DPT("free");
+    ruby_xfree(ptr);
+}
+#if GDIPLUS_DEBUG
+#define GDIP_DEFAULT_FREE(T) &gdip_default_free<T>
+#else
+#define GDIP_DEFAULT_FREE(T) RUBY_DEFAULT_FREE
+#endif
 
 /* gdip_utils.cpp */
 VALUE util_encode_to_utf8(VALUE str);

@@ -7,7 +7,7 @@
 
 
 const rb_data_type_t tGuid = _MAKE_DATA_TYPE(
-    "Guid", 0, RUBY_DEFAULT_FREE, &typeddata_size<GUID>, NULL, &cGuid);
+    "Guid", 0, GDIP_DEFAULT_FREE(GUID), &typeddata_size<GUID>, NULL, &cGuid);
 
 static VALUE
 gdip_guid_create(GUID *guid)
@@ -111,7 +111,7 @@ gdip_guid_hash(VALUE self)
 /* ImageCodecInfo*/
 
 const rb_data_type_t tImageCodecInfo = _MAKE_DATA_TYPE(
-    "ImageCodecInfo", 0, RUBY_DEFAULT_FREE, &typeddata_size<ImageCodecInfo>, NULL, &cImageCodecInfo);
+    "ImageCodecInfo", 0, GDIP_DEFAULT_FREE(ImageCodecInfo), &typeddata_size<ImageCodecInfo>, NULL, &cImageCodecInfo);
 
 static VALUE gdip_icinfo_codecname(VALUE);
 static VALUE gdip_icinfo_dllname(VALUE);

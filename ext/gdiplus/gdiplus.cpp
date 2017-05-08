@@ -55,6 +55,9 @@ dp(const char *fmt, ...)
 
 class LastCheck {
     public:
+    LastCheck() {
+        dp("===(%d)==================================================", RUBY_API_VERSION_CODE);
+    }
     ~LastCheck() {
         if (gdip_refcount != 0) {
             dp("LastCheck Error: gdip_refcount = %d", gdip_refcount);
@@ -62,6 +65,7 @@ class LastCheck {
         else {
             dp("LastCheck: OK");
         }
+        dp("--------------------------------------------------(%d)---", RUBY_API_VERSION_CODE);
     }
 };
 
