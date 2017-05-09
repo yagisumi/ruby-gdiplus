@@ -125,14 +125,14 @@ typeddata_alloc(VALUE klass)
 {
     void *ptr = RB_ZALLOC(T);
     DPT("alloc");
-    return TypedData_Wrap_Struct(klass, type, ptr);
+    return _Data_Wrap_Struct(klass, type, ptr);
 }
 
 template<const rb_data_type_t *type>
 static VALUE
 typeddata_alloc_null(VALUE klass)
 {
-    return TypedData_Wrap_Struct(klass, type, NULL);
+    return _Data_Wrap_Struct(klass, type, NULL);
 }
 
 template<typename T>

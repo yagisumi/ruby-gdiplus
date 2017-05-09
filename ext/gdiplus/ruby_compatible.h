@@ -1,3 +1,16 @@
+/*
+ * ruby_compatible.h
+ * Copyright (c) 2017 Yagi Sumiya 
+ * Released under the MIT License.
+ */
+/**********************************************************************
+  Ruby's license
+  ruby/ruby.h
+  Copyright (C) 1993-2008 Yukihiro Matsumoto
+  Copyright (C) 2000  Network Applied Communication Laboratory, Inc.
+  Copyright (C) 2000  Information-technology Promotion Agency, Japan
+**********************************************************************/
+
 #ifndef RUBY_COMPATIBLE_H_
 #define RUBY_COMPATIBLE_H_ 1
 
@@ -276,6 +289,8 @@
 #else /* HAVE_TYPE_RB_DATA_TYPE_T */
 #define _DATA_PTR(v) RTYPEDDATA_DATA(v)
 #endif /* HAVE_TYPE_RB_DATA_TYPE_T */
+#define _KIND_OF(obj, data_type) rb_typeddata_is_kind_of(obj, data_type)
+
 #if RUBY_API_VERSION_CODE < 20200
 #define _MAKE_DATA_TYPE(name, mark, free, size, parent_type_ptr, klass_ptr) {\
     name,\
@@ -312,10 +327,10 @@
 #define ZALLOC(type) (ZALLOC_N(type,1))
 #endif
 #ifndef RB_ZALLOC_N
-#define RB_ZALLOC_N ZALLOC_N
+#define RB_ZALLOC_N(type,n) ZALLOC_N(type,n)
 #endif
 #ifndef RB_ZALLOC
-#define RB_ZALLOC ZALLOC
+#define RB_ZALLOC(type) ZALLOC(type)
 #endif
 #ifndef RB_REALLOC_N
 #define RB_REALLOC_N(var,type,n) REALLOC_N(var,type,n)
@@ -407,4 +422,9 @@
 #endif /* RUBY_API_VERSION_CODE < 10900 */
 #define _FOREACH_FUNC(func) ((int (*)(ANYARGS))(func))
 
+
+
+
+
 #endif /* RUBY_COMPATIBLE_H_ */
+

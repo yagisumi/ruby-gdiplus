@@ -90,7 +90,7 @@ static VALUE
 gdip_guid_equal(VALUE self, VALUE other)
 {
     if (self == other) return Qtrue;
-    if (!rb_typeddata_is_kind_of(other, &tGuid)) return Qfalse;
+    if (!_KIND_OF(other, &tGuid)) return Qfalse;
     if (memcmp(_DATA_PTR(self), _DATA_PTR(other), sizeof(GUID)) == 0) return Qtrue;
     else return Qfalse;
 }
@@ -415,7 +415,6 @@ gdip_icinfo_s_image_decoders(VALUE self)
 
     return encoders;
 }
-
 
 
 /*

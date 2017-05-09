@@ -43,6 +43,7 @@ class GdiplusCodecTest < Test::Unit::TestCase
   def test_imagecodecinfo
     encoders = ImageCodecInfo.image_encoders
     decoders = ImageCodecInfo.image_decoders # 
+    # remains of memory check
 #    encoders = ImageCodecInfo.image_encoders
 #    decoders = ImageCodecInfo.image_decoders
 #    encoders = ImageCodecInfo.image_encoders
