@@ -113,6 +113,16 @@ gdip_guid_hash(VALUE self)
 const rb_data_type_t tImageCodecInfo = _MAKE_DATA_TYPE(
     "ImageCodecInfo", 0, GDIP_DEFAULT_FREE(ImageCodecInfo), &typeddata_size<ImageCodecInfo>, NULL, &cImageCodecInfo);
 
+static ID id_clsid;
+static ID id_format_id;
+static ID id_codec_name;
+static ID id_dll_name;
+static ID id_filename_ext;
+static ID id_format_desc;
+static ID id_mime_type;
+static ID id_sigpat;
+static ID id_sigmask;
+
 static VALUE gdip_icinfo_codecname(VALUE);
 static VALUE gdip_icinfo_dllname(VALUE);
 static VALUE gdip_icinfo_formatdesc(VALUE);
@@ -145,14 +155,14 @@ gdip_icinfo_create(ImageCodecInfo *icinfo)
 static VALUE
 gdip_icinfo_clsid(VALUE self)
 {
-    VALUE v = rb_iv_get(self, "clsid");
+    VALUE v = rb_attr_get(self, id_clsid);
     if (!RB_NIL_P(v))
         return v;
     
     ImageCodecInfo *icinfo = Data_Ptr<ImageCodecInfo *>(self);
     v = gdip_guid_create(&icinfo->Clsid);
     RB_OBJ_FREEZE(v);
-    rb_iv_set(self, "clsid", v);
+    rb_ivar_set(self, id_clsid, v);
     return v;
 }
 
@@ -163,14 +173,14 @@ gdip_icinfo_clsid(VALUE self)
 static VALUE
 gdip_icinfo_formatid(VALUE self)
 {
-    VALUE v = rb_iv_get(self, "format_id");
+    VALUE v = rb_attr_get(self, id_format_id);
     if (!RB_NIL_P(v))
         return v;
     
     ImageCodecInfo *icinfo = Data_Ptr<ImageCodecInfo *>(self);
     v = gdip_guid_create(&icinfo->FormatID);
     RB_OBJ_FREEZE(v);
-    rb_iv_set(self, "format_id", v);
+    rb_ivar_set(self, id_format_id, v);
     return v;
 }
 
@@ -181,14 +191,14 @@ gdip_icinfo_formatid(VALUE self)
 static VALUE
 gdip_icinfo_codecname(VALUE self)
 {
-    VALUE v = rb_iv_get(self, "codec_name");
+    VALUE v = rb_attr_get(self, id_codec_name);
     if (!RB_NIL_P(v))
         return v;
     
     ImageCodecInfo *icinfo = Data_Ptr<ImageCodecInfo *>(self);
     v = util_utf8_str_new_from_wstr(icinfo->CodecName);
     RB_OBJ_FREEZE(v);
-    rb_iv_set(self, "codec_name", v);
+    rb_ivar_set(self, id_codec_name, v);
     return v;
 }
 
@@ -199,14 +209,14 @@ gdip_icinfo_codecname(VALUE self)
 static VALUE
 gdip_icinfo_dllname(VALUE self)
 {
-    VALUE v = rb_iv_get(self, "dll_name");
+    VALUE v = rb_attr_get(self, id_dll_name);
     if (!RB_NIL_P(v))
         return v;
     
     ImageCodecInfo *icinfo = Data_Ptr<ImageCodecInfo *>(self);
     v = util_utf8_str_new_from_wstr(icinfo->DllName);
     RB_OBJ_FREEZE(v);
-    rb_iv_set(self, "dll_name", v);
+    rb_ivar_set(self, id_dll_name, v);
     return v;
 }
 
@@ -217,14 +227,14 @@ gdip_icinfo_dllname(VALUE self)
 static VALUE
 gdip_icinfo_formatdesc(VALUE self)
 {
-    VALUE v = rb_iv_get(self, "format_desc");
+    VALUE v = rb_attr_get(self, id_format_desc);
     if (!RB_NIL_P(v))
         return v;
     
     ImageCodecInfo *icinfo = Data_Ptr<ImageCodecInfo *>(self);
     v = util_utf8_str_new_from_wstr(icinfo->FormatDescription);
     RB_OBJ_FREEZE(v);
-    rb_iv_set(self, "format_desc", v);
+    rb_ivar_set(self, id_format_desc, v);
     return v;
 }
 
@@ -235,14 +245,14 @@ gdip_icinfo_formatdesc(VALUE self)
 static VALUE
 gdip_icinfo_filenameext(VALUE self)
 {
-    VALUE v = rb_iv_get(self, "filename_ext");
+    VALUE v = rb_attr_get(self, id_filename_ext);
     if (!RB_NIL_P(v))
         return v;
     
     ImageCodecInfo *icinfo = Data_Ptr<ImageCodecInfo *>(self);
     v = util_utf8_str_new_from_wstr(icinfo->FilenameExtension);
     RB_OBJ_FREEZE(v);
-    rb_iv_set(self, "filename_ext", v);
+    rb_ivar_set(self, id_filename_ext, v);
     return v;
 }
 
@@ -253,14 +263,14 @@ gdip_icinfo_filenameext(VALUE self)
 static VALUE
 gdip_icinfo_mimetype(VALUE self)
 {
-    VALUE v = rb_iv_get(self, "mime_type");
+    VALUE v = rb_attr_get(self, id_mime_type);
     if (!RB_NIL_P(v))
         return v;
     
     ImageCodecInfo *icinfo = Data_Ptr<ImageCodecInfo *>(self);
     v = util_utf8_str_new_from_wstr(icinfo->MimeType);
     RB_OBJ_FREEZE(v);
-    rb_iv_set(self, "mime_type", v);
+    rb_ivar_set(self, id_mime_type, v);
     return v;
 }
 
@@ -317,7 +327,7 @@ gdip_icinfo_inspect(VALUE self)
 static VALUE
 gdip_icinfo_sigpat(VALUE self)
 {
-    VALUE v = rb_iv_get(self, "sigpat");
+    VALUE v = rb_attr_get(self, id_sigpat);
     if (!RB_NIL_P(v))
         return v;
     
@@ -332,7 +342,7 @@ gdip_icinfo_sigpat(VALUE self)
         
     }
     RB_OBJ_FREEZE(v);
-    rb_iv_set(self, "sigpat", v);
+    rb_ivar_set(self, id_sigpat, v);
     return v;
 }
 
@@ -343,7 +353,7 @@ gdip_icinfo_sigpat(VALUE self)
 static VALUE
 gdip_icinfo_sigmask(VALUE self)
 {
-    VALUE v = rb_iv_get(self, "sigmask");
+    VALUE v = rb_attr_get(self, id_sigmask);
     if (!RB_NIL_P(v))
         return v;
     
@@ -358,7 +368,7 @@ gdip_icinfo_sigmask(VALUE self)
         
     }
     RB_OBJ_FREEZE(v);
-    rb_iv_set(self, "sigmask", v);
+    rb_ivar_set(self, id_sigmask, v);
     return v;
 }
 
@@ -447,6 +457,16 @@ Init_codec()
     rb_define_method(cGuid, "hash", RUBY_METHOD_FUNC(gdip_guid_hash), 0);
     
     // ImageCodecInfo
+    id_clsid = rb_intern("clsid");
+    id_format_id = rb_intern("format_id");
+    id_codec_name = rb_intern("codec_name");
+    id_dll_name = rb_intern("dll_name");
+    id_filename_ext = rb_intern("filename_ext");
+    id_format_desc = rb_intern("format_desc");
+    id_mime_type = rb_intern("mime_type");
+    id_sigpat = rb_intern("sigpat");
+    id_sigmask = rb_intern("sigmask");
+    
     cImageCodecInfo = rb_define_class_under(mGdiplus, "ImageCodecInfo", rb_cObject);
     //rb_define_alloc_func(cImageCodecInfo, &typeddata_alloc<ImageCodecInfo, &tImageCodecInfo>);
     rb_undef_alloc_func(cImageCodecInfo);
@@ -478,4 +498,6 @@ Init_codec()
     rb_define_singleton_method(cImageCodecInfo, "GetImageEncoders", RUBY_METHOD_FUNC(gdip_icinfo_s_image_encoders), 0);
     rb_define_singleton_method(cImageCodecInfo, "image_decoders", RUBY_METHOD_FUNC(gdip_icinfo_s_image_decoders), 0);
     rb_define_singleton_method(cImageCodecInfo, "GetImageDecoders", RUBY_METHOD_FUNC(gdip_icinfo_s_image_decoders), 0);
+
+
 }

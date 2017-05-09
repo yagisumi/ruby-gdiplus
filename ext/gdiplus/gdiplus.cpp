@@ -10,7 +10,10 @@ VALUE eGdiplus;
 
 VALUE cGuid;
 VALUE cImageCodecInfo;
-
+VALUE cImage;
+VALUE cBitmap;
+VALUE cEnumInt;
+VALUE cPixelFormat;
 
 int gdip_refcount = 0;
 bool gdip_end_flag = false;
@@ -109,4 +112,6 @@ Init_gdiplus(void)
     gdiplus_init();
 
     Init_codec();
+    Init_image();
+    Init_bitmap();
 }
