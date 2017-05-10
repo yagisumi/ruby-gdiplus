@@ -14,6 +14,7 @@ VALUE cImage;
 VALUE cBitmap;
 VALUE cEnumInt;
 VALUE cPixelFormat;
+VALUE cEncoderParameterValueType;
 
 int gdip_refcount = 0;
 bool gdip_end_flag = false;

@@ -59,7 +59,7 @@ gdip_enum_int_end(VALUE self)
 VALUE
 gdip_enum_const_get(VALUE self)
 {
-    return rb_const_get(self, rb_frame_callee());
+    return rb_const_get(self, rb_frame_this_func());
 }
 
 /*
@@ -68,10 +68,8 @@ gdip_enum_const_get(VALUE self)
 static VALUE
 gdip_enum_int_inspect(VALUE self)
 {
-    Check_Type(self, T_DATA);
-    GdipEnumInt *enumint;
-    Data_Get_Struct(self, GdipEnumInt, enumint);
-    return rb_sprintf("<%s.%s: 0x%08x>", rb_class2name(CLASS_OF(self)), rb_id2name(enumint->id), enumint->value);
+    GdipEnumInt *enumint = Data_Ptr<GdipEnumInt *>(self);
+    return util_utf8_sprintf("<%s.%s: 0x%08x>", rb_class2name(CLASS_OF(self)), rb_id2name(enumint->id), enumint->value);
 }
 
 /*
@@ -80,10 +78,8 @@ gdip_enum_int_inspect(VALUE self)
 static VALUE
 gdip_enum_int_to_int(VALUE self)
 {
-    Check_Type(self, T_DATA);
-    GdipEnumInt *enumint;
-    Data_Get_Struct(self, GdipEnumInt, enumint);
-    return INT2NUM(enumint->value);
+    GdipEnumInt *enumint = Data_Ptr<GdipEnumInt *>(self);
+    return RB_INT2NUM(enumint->value);
 }
 
 static VALUE
@@ -162,6 +158,25 @@ Init_PixelFormat()
     rb_undef_alloc_func(cPixelFormat);
 }
 
+static void
+Init_EncoderParameterValueType()
+{
+    cEncoderParameterValueType = rb_define_class_under(mGdiplus, "EncoderParameterValueType", cEnumInt);
+    st_table *table = gdip_enum_int_get_table(cEncoderParameterValueType);
+
+    gdip_enum_int_define(cEncoderParameterValueType, table, "ValueTypeByte", EncoderParameterValueTypeByte);
+    gdip_enum_int_define(cEncoderParameterValueType, table, "ValueTypeASCII", EncoderParameterValueTypeASCII);
+    gdip_enum_int_define(cEncoderParameterValueType, table, "ValueTypeShort", EncoderParameterValueTypeShort);
+    gdip_enum_int_define(cEncoderParameterValueType, table, "ValueTypeLong", EncoderParameterValueTypeLong);
+    gdip_enum_int_define(cEncoderParameterValueType, table, "ValueTypeRational", EncoderParameterValueTypeRational);
+    gdip_enum_int_define(cEncoderParameterValueType, table, "ValueTypeLongRange", EncoderParameterValueTypeLongRange);
+    gdip_enum_int_define(cEncoderParameterValueType, table, "ValueTypeUndefined", EncoderParameterValueTypeUndefined);
+    gdip_enum_int_define(cEncoderParameterValueType, table, "ValueTypeRationalRange", EncoderParameterValueTypeRationalRange);
+    gdip_enum_int_define(cEncoderParameterValueType, table, "ValueTypePointer", EncoderParameterValueTypePointer);
+
+    rb_undef_alloc_func(cEncoderParameterValueType);
+}
+
 
  void
  Init_enum()
@@ -175,6 +190,7 @@ Init_PixelFormat()
     rb_define_method(cEnumInt, "to_i", RUBY_METHOD_FUNC(gdip_enum_int_to_int), 0);
 
     Init_PixelFormat();
+    Init_EncoderParameterValueType();
 
 
     rb_set_end_proc(gdip_enum_int_end, Qnil);

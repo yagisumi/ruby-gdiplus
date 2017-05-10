@@ -411,7 +411,9 @@
 #endif /* HAVE_RUBY_ONIGURUMA_H */
 
 #if RUBY_API_VERSION_CODE < 10900
-#include <st.h>
+  extern "C" { 
+    #include <st.h>
+  }
   typedef int st_index_t;
   static inline st_index_t
   rb_memhash(const void *ptr, long len)
@@ -422,7 +424,7 @@
 #endif /* RUBY_API_VERSION_CODE < 10900 */
 #define _FOREACH_FUNC(func) ((int (*)(ANYARGS))(func))
 
-
+// rb_frame_callee is rb_frame_caller in 1.9
 
 
 

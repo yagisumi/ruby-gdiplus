@@ -15,7 +15,7 @@ class GdiplusEnumHandler < YARD::Handlers::C::Base
   
   def handle_enum_method(var_name, name)
     namespace = namespace_for_variable(var_name)
-    register MethodObject.new(namespace, name, :instance) do |obj|
+    register MethodObject.new(namespace, name, :class) do |obj|
       register_visibility(obj, :public)
       #find_method_body(obj, func_name)
       

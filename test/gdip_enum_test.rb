@@ -1,16 +1,14 @@
 # coding: utf-8
 require 'test_helper'
 
-class GdiplusBitmapTest < Test::Unit::TestCase
+class GdiplusEnumIntTest < Test::Unit::TestCase
   include Gdiplus
   
-  def test_bitmap
-    bmp = Bitmap.new(1, 1)
-    assert_kind_of(Bitmap, Bitmap.new(1, 1))
-    #assert_kind_of(Bitmap, Bitmap.new(1, 1, PixelFormat.Format24bppRGB))
-    assert_raise(GdiplusError) { Bitmap.new("") }
-    assert_kind_of(Bitmap, Bitmap.new("test/gdip_bitmap_test1.png", true))
-    assert_kind_of(Bitmap, Bitmap.new("test/gdip_bitmap_test2♥.png"))
+  def test_pixel_format
+    assert_equal(PixelFormat::Format32bppARGB, PixelFormat.Format32bppARGB)
+    # <Gdiplus::PixelFormat.Format32bppARGB: 0x0026200a>
+    assert_match(/Format32bppARGB/, PixelFormat::Format32bppARGB.inspect)
+    assert_match(/#{PixelFormat::Format32bppARGB.to_i.to_s(16)}/, PixelFormat::Format32bppARGB.inspect)
   end
   
 end

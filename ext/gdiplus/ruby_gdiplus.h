@@ -6,7 +6,7 @@
 #ifndef RUBY_GDIPLUS_H
 #define RUBY_GDIPLUS_H 1
 
-#include "ruby.h"
+#include <ruby.h>
 #include "ruby_compatible.h"
 #include <windows.h>
 #include <rpc.h>
@@ -26,6 +26,7 @@ extern VALUE cImage;
 extern VALUE cBitmap;
 extern VALUE cEnumInt;
 extern VALUE cPixelFormat;
+extern VALUE cEncoderParameterValueType;
 
 extern const rb_data_type_t tGuid;
 extern const rb_data_type_t tImageCodecInfo;
@@ -208,15 +209,16 @@ gdip_obj_create(T obj)
 
 template<typename T>
 static inline void
-gdip_obj_free(T obj)
+gdip_obj_free(void *ptr)
 {
+    T obj = static_cast<T>(ptr);
     if (obj != NULL) {
         delete obj;
         DPT("delete");
         GdiplusRelease();
     }
 }
-#define GDIP_OBJ_FREE(T) RUBY_DATA_FUNC(&gdip_obj_free<T>)
+#define GDIP_OBJ_FREE(T) (&gdip_obj_free<T>)
 
 #define NOT_IMPLEMENTED_ERROR rb_raise(rb_eNotImpError, "not implemented yet")
 
