@@ -114,4 +114,5 @@ Init_gdiplus(void)
     Init_codec();
     Init_image();
     Init_bitmap();
+    Init_enum();
 }

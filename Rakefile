@@ -12,7 +12,9 @@ Rake::Task[:test].prerequisites << :compile
 
 require "yard"
 YARD::Rake::YardocTask.new(:doc) do |t|
+  require_relative "lib/gdiplus/yard_gdiplus_handler"
   t.files = FileList['lib/**/*.rb', 'ext/**/*.cpp']
+  t.verifier = YARD::Verifier.new('!object.tag(:private) && (object.namespace.type == :proxy || !object.namespace.tag(:private))')
 end
 
 require "rake/extensiontask"

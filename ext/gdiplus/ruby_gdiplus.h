@@ -31,10 +31,12 @@ extern const rb_data_type_t tGuid;
 extern const rb_data_type_t tImageCodecInfo;
 extern const rb_data_type_t tImage;
 extern const rb_data_type_t tBitmap;
+extern const rb_data_type_t tEnumInt;
 
 void Init_codec();
 void Init_image();
 void Init_bitmap();
+void Init_enum();
 
 /* gdiplus.cpp */
 extern const char *GpStatusStrs[22];
@@ -49,6 +51,15 @@ static inline void GdiplusRelease() {
         gdiplus_shutdown();
     }
 }
+
+/* gdip_enum.cpp */
+VALUE gdip_enum_const_get(VALUE self);
+VALUE gdip_enum_int_num2value(VALUE klass, int num);
+int gdip_enum_int_value2num(VALUE v);
+
+#ifndef PixelFormat32bppCMYK
+#define PixelFormat32bppCMYK       (15 | (32 << 8))
+#endif
 
 /* Debug */
 // #define GDIPLUS_DEBUG 1 // moved in extconf.rb

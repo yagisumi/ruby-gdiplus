@@ -25,10 +25,7 @@ gdip_bitmap_init_by_size(VALUE width, VALUE height, VALUE format=Qnil)
     PixelFormat fmt = PixelFormat32bppARGB;
     if (!RB_NIL_P(format)) {
         if (rb_obj_is_kind_of(format, cPixelFormat)) {
-            //
-        }
-        else { // Integer
-            fmt = RB_NUM2INT(format);
+            fmt = gdip_enum_int_value2num(format);
         }
     }
     return gdip_obj_create<Bitmap *>(new Bitmap(w, h, fmt));
@@ -36,12 +33,12 @@ gdip_bitmap_init_by_size(VALUE width, VALUE height, VALUE format=Qnil)
 
 /*
  * @overload initialize(filename, use_ecm=false)
- *   @param filename [String]
+ *   @param filename [String] File name.
  *   @param use_ecm [Boolean] whether to use embedded color management.
- * @overload initialize(width, height, format=Gdiplus::PixelFormat::Format32bppARGB)
+ * @overload initialize(width, height, format=PixelFormat::Format32bppARGB)
  *   @param width [Integer]
  *   @param height [Integer]
- *   @param format [Gdiplus::PixelFormat]
+ *   @param format [PixelFormat]
  */
 static VALUE
 gdip_bitmap_init(int argc, VALUE *argv, VALUE self)
@@ -66,22 +63,30 @@ gdip_bitmap_init(int argc, VALUE *argv, VALUE self)
             NOT_IMPLEMENTED_ERROR;
         }
         else {
-            rb_raise(rb_eArgError, "wrong types of arguments");
+            rb_raise(rb_eArgError, "wrong arguments");
         }
     }
     else if (argc == 2) {
         if (RB_TYPE_P(argv[0], RUBY_T_STRING)) {
             _DATA_PTR(self) = gdip_bitmap_init_from_file(argv[0], RB_TEST(argv[1]));
         }
+        else if (RB_TYPE_P(argv[0], RUBY_T_FILE)) {
+            NOT_IMPLEMENTED_ERROR;
+        }
         else if (Integer_p(argv[0], argv[1])) {
             _DATA_PTR(self) = gdip_bitmap_init_by_size(argv[0], argv[1]);
         }
         else {
-            rb_raise(rb_eArgError, "wrong types of arguments");
+            rb_raise(rb_eArgError, "wrong arguments");
         }
     }
     if (argc == 3) {
-
+        if (Integer_p(argv[0], argv[1]) && rb_obj_is_kind_of(argv[2], cPixelFormat)) {
+            _DATA_PTR(self) = gdip_bitmap_init_by_size(argv[0], argv[1], argv[2]);
+        }
+        else {
+            rb_raise(rb_eArgError, "wrong arguments");
+        }
     }
 
     return self;
