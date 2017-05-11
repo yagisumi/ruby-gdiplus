@@ -9,7 +9,7 @@
 const rb_data_type_t tGuid = _MAKE_DATA_TYPE(
     "Guid", 0, GDIP_DEFAULT_FREE(GUID), &typeddata_size<GUID>, NULL, &cGuid);
 
-static VALUE
+VALUE
 gdip_guid_create(GUID *guid)
 {
     VALUE v = typeddata_alloc<GUID, &tGuid>(cGuid);
@@ -90,7 +90,7 @@ static VALUE
 gdip_guid_equal(VALUE self, VALUE other)
 {
     if (self == other) return Qtrue;
-    if (!_KIND_OF(other, &tGuid)) return Qfalse;
+    if (!_KIND_OF(other, tGuid)) return Qfalse;
     if (memcmp(_DATA_PTR(self), _DATA_PTR(other), sizeof(GUID)) == 0) return Qtrue;
     else return Qfalse;
 }
@@ -466,7 +466,7 @@ Init_codec()
     id_mime_type = rb_intern("mime_type");
     id_sigpat = rb_intern("sigpat");
     id_sigmask = rb_intern("sigmask");
-    
+
     cImageCodecInfo = rb_define_class_under(mGdiplus, "ImageCodecInfo", rb_cObject);
     //rb_define_alloc_func(cImageCodecInfo, &typeddata_alloc<ImageCodecInfo, &tImageCodecInfo>);
     rb_undef_alloc_func(cImageCodecInfo);

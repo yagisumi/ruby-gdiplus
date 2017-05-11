@@ -24,11 +24,19 @@ gdip_bitmap_init_by_size(VALUE width, VALUE height, VALUE format=Qnil)
     int h = RB_NUM2INT(height);
     PixelFormat fmt = PixelFormat32bppARGB;
     if (!RB_NIL_P(format)) {
-        if (rb_obj_is_kind_of(format, cPixelFormat)) {
-            fmt = gdip_enum_int_value2num(format);
+        if (_KIND_OF(format, tPixelFormat)) {
+            fmt = Data_Ptr_As<PixelFormat>(format);
         }
     }
     return gdip_obj_create<Bitmap *>(new Bitmap(w, h, fmt));
+}
+
+static VALUE
+gdip_bitmap_create_by_size(VALUE width, VALUE height, VALUE format=Qnil)
+{
+    VALUE bmp = TYPEDDATA_ALLOC_NULL(Bitmap, &tBitmap);
+    _DATA_PTR(bmp) = gdip_bitmap_init_by_size(width, height, format);
+    return bmp;
 }
 
 /*
@@ -81,7 +89,7 @@ gdip_bitmap_init(int argc, VALUE *argv, VALUE self)
         }
     }
     if (argc == 3) {
-        if (Integer_p(argv[0], argv[1]) && rb_obj_is_kind_of(argv[2], cPixelFormat)) {
+        if (Integer_p(argv[0], argv[1]) && _KIND_OF(argv[2], tPixelFormat)) {
             _DATA_PTR(self) = gdip_bitmap_init_by_size(argv[0], argv[1], argv[2]);
         }
         else {

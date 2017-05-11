@@ -289,7 +289,7 @@
 #else /* HAVE_TYPE_RB_DATA_TYPE_T */
 #define _DATA_PTR(v) RTYPEDDATA_DATA(v)
 #endif /* HAVE_TYPE_RB_DATA_TYPE_T */
-#define _KIND_OF(obj, data_type) rb_typeddata_is_kind_of(obj, data_type)
+#define _KIND_OF(obj, data_type) rb_typeddata_is_kind_of(obj, &data_type)
 
 #if RUBY_API_VERSION_CODE < 20200
 #define _MAKE_DATA_TYPE(name, mark, free, size, parent_type_ptr, klass_ptr) {\
@@ -312,6 +312,12 @@
 #endif
 #ifndef RUBY_TYPED_DEFAULT_FREE
 #define RUBY_TYPED_DEFAULT_FREE RUBY_DEFAULT_FREE
+#endif
+#ifndef RUBY_NEVER_FREE
+#define RUBY_NEVER_FREE   ((RUBY_DATA_FUNC)0)
+#endif
+#ifndef RUBY_TYPED_NEVER_FREE
+#define RUBY_TYPED_NEVER_FREE   RUBY_NEVER_FREE
 #endif
 
 #ifndef RB_ALLOC_N

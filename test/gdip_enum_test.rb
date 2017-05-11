@@ -11,6 +11,11 @@ class GdiplusEnumIntTest < Test::Unit::TestCase
     assert_match(/#{PixelFormat::Format32bppARGB.to_i.to_s(16)}/, PixelFormat::Format32bppARGB.inspect)
   end
   
+  def test_encoder
+    p Encoder.Quality
+  end
+  
+  
 end
 
 __END__

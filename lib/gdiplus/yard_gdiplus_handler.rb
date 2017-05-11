@@ -17,7 +17,6 @@ class GdiplusEnumHandler < YARD::Handlers::C::Base
     namespace = namespace_for_variable(var_name)
     register MethodObject.new(namespace, name, :class) do |obj|
       register_visibility(obj, :public)
-      #find_method_body(obj, func_name)
       
       klass = var_name.sub(/^c/, '')
       obj.add_tag(YARD::Tags::Tag.new(:return, "{Gdiplus::#{klass}::#{name}}", klass))

@@ -12,9 +12,9 @@ VALUE cGuid;
 VALUE cImageCodecInfo;
 VALUE cImage;
 VALUE cBitmap;
-VALUE cEnumInt;
 VALUE cPixelFormat;
 VALUE cEncoderParameterValueType;
+VALUE cEncoder;
 
 int gdip_refcount = 0;
 bool gdip_end_flag = false;

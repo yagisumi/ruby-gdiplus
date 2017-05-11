@@ -24,15 +24,16 @@ extern VALUE cGuid;
 extern VALUE cImageCodecInfo;
 extern VALUE cImage;
 extern VALUE cBitmap;
-extern VALUE cEnumInt;
 extern VALUE cPixelFormat;
 extern VALUE cEncoderParameterValueType;
+extern VALUE cEncoder;
 
 extern const rb_data_type_t tGuid;
 extern const rb_data_type_t tImageCodecInfo;
 extern const rb_data_type_t tImage;
 extern const rb_data_type_t tBitmap;
-extern const rb_data_type_t tEnumInt;
+extern const rb_data_type_t tPixelFormat;
+extern const rb_data_type_t tEncoderParameterValueType;
 
 void Init_codec();
 void Init_image();
@@ -53,10 +54,14 @@ static inline void GdiplusRelease() {
     }
 }
 
+/* gdip_codec.cpp */
+VALUE gdip_guid_create(GUID *guid);
+
 /* gdip_enum.cpp */
 VALUE gdip_enum_const_get(VALUE self);
-VALUE gdip_enum_int_num2value(VALUE klass, int num);
-int gdip_enum_int_value2num(VALUE v);
+VALUE gdip_pxlfmt_get(PixelFormat n);
+VALUE gdip_valuetype_get(int n);
+VALUE gdip_encoder_get(GUID *guid);
 
 #ifndef PixelFormat32bppCMYK
 #define PixelFormat32bppCMYK       (15 | (32 << 8))
@@ -109,6 +114,14 @@ dp_type(const char *msg)
 #endif
 
 /* Utils */
+static inline const char * __method__() { return rb_id2name(rb_frame_this_func()); }
+static inline const char * __class__(VALUE self) { return rb_class2name(CLASS_OF(self)); }
+
+static inline VALUE
+_KLASS(const rb_data_type_t *type)
+{
+    return *static_cast<VALUE *>(type->data);
+}
 
 template<typename T>
 static inline T 
@@ -117,8 +130,28 @@ Data_Ptr(VALUE obj)
     if (!RB_TYPE_P(obj, RUBY_T_DATA)) {
         rb_raise(rb_eTypeError, "wrong argument type");
     }
-    return static_cast<T>(RTYPEDDATA_DATA(obj));
+    return static_cast<T>(_DATA_PTR(obj));
 }
+
+template<typename T>
+union castunion {
+    T t;
+    void *ptr;
+};
+
+template<typename T>
+static inline T 
+Data_Ptr_As(VALUE obj)
+{
+    if (!RB_TYPE_P(obj, RUBY_T_DATA)) {
+        rb_raise(rb_eTypeError, "wrong argument type");
+    }
+    //return *reinterpret_cast<T *>(&_DATA_PTR(obj)); // warning: dereferencing type-punned pointer will break strict-aliasing rules
+    castunion<T> uni;
+    uni.ptr = _DATA_PTR(obj);
+    return uni.t;
+}
+
 template<typename T>
 static inline T
 RString_Ptr(VALUE str)
@@ -150,22 +183,22 @@ typeddata_alloc(VALUE klass)
 }
 
 #if GDIPLUS_DEBUG
-template<typename T, const rb_data_type_t *type>
-static VALUE
-typeddata_alloc_null(VALUE klass)
-{
-    DPT("alloc"); // T is used for debug
-    return _Data_Wrap_Struct(klass, type, NULL);
-}
-#define TYPEDDATA_ALLOC_NULL(T, type) &typeddata_alloc_null<T, type>
+    template<typename T, const rb_data_type_t *type>
+    static VALUE
+    typeddata_alloc_null(VALUE klass)
+    {
+        DPT("alloc"); // T is used for debug
+        return _Data_Wrap_Struct(klass, type, NULL);
+    }
+    #define TYPEDDATA_ALLOC_NULL(T, type) &typeddata_alloc_null<T, type>
 #else
-template<const rb_data_type_t *type>
-static VALUE
-typeddata_alloc_null(VALUE klass)
-{
-    return _Data_Wrap_Struct(klass, type, NULL);
-}
-#define TYPEDDATA_ALLOC_NULL(T, type) &typeddata_alloc_null<type>
+    template<const rb_data_type_t *type>
+    static VALUE
+    typeddata_alloc_null(VALUE klass)
+    {
+        return _Data_Wrap_Struct(klass, type, NULL);
+    }
+    #define TYPEDDATA_ALLOC_NULL(T, type) &typeddata_alloc_null<type>
 #endif /* GDIPLUS_DEBUG */
 
 template<typename T>
@@ -176,7 +209,7 @@ gdip_default_free(void *ptr)
     ruby_xfree(ptr);
 }
 #if GDIPLUS_DEBUG
-#define GDIP_DEFAULT_FREE(T) &gdip_default_free<T>
+#define GDIP_DEFAULT_FREE(T) (&gdip_default_free<T>)
 #else
 #define GDIP_DEFAULT_FREE(T) RUBY_DEFAULT_FREE
 #endif
