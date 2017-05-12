@@ -2,12 +2,21 @@
 
 # @private
 class GdiplusEnumHandler < YARD::Handlers::C::Base
-  MATCH = /gdip_enum_int_define\((\w+),\s*\w+,\s*"(\w+)",\s*(\w+)\)/
-  handles MATCH
+  MATCH1 = /define_enumint\((\w+), &\w+, "(\w+)", (\w+)\)/
+  MATCH2 = /gdip_enum_define<[^>]+>\((\w+), &\w+, "(\w+)"/
+  
+  handles MATCH1
+  handles MATCH2
   statement_class BodyStatement
 
   process do
-    statement.source.scan(MATCH) do |var_name, const_name, value|
+    statement.source.scan(MATCH1) do |tname, const_name, value|
+      handle_constants("const", "c#{tname}", const_name, value)
+      handle_enum_method("c#{tname}", const_name)
+    end
+    statement.source.scan(MATCH2) do |var_name, const_name|
+      klass = var_name.sub(/^c/, '')
+      value = "#{klass}#{const_name}"
       handle_constants("const", var_name, const_name, value)
       handle_enum_method(var_name, const_name)
     end

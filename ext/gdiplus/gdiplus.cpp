@@ -6,6 +6,7 @@
 #include "ruby_gdiplus.h"
 
 VALUE mGdiplus;
+VALUE mInternals;
 VALUE eGdiplus;
 
 VALUE cGuid;
@@ -15,6 +16,8 @@ VALUE cBitmap;
 VALUE cPixelFormat;
 VALUE cEncoderParameterValueType;
 VALUE cEncoder;
+VALUE cValueType;
+VALUE cEnumInt;
 
 int gdip_refcount = 0;
 bool gdip_end_flag = false;
@@ -108,6 +111,7 @@ Init_gdiplus(void)
 {
     mGdiplus = rb_define_module("Gdiplus");
     eGdiplus = rb_define_class_under(mGdiplus, "GdiplusError", rb_eException);
+    mInternals = rb_define_module_under(mGdiplus, "Internals");
 
     rb_set_end_proc(gdiplus_end, Qnil);
     gdiplus_init();

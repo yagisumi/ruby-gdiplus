@@ -10,8 +10,8 @@ static ID ID_UNKNOWN;
 template <typename KEY>
 class TableMapBase {
 public:
-    virtual bool append(KEY key, ID val) = 0;
-    virtual bool lookup(KEY key, ID& val) = 0;
+    virtual bool append(KEY key, ID id) = 0;
+    virtual bool lookup(KEY key, ID& id) = 0;
 };
 
 template <typename KEY>
@@ -85,6 +85,10 @@ gdip_enumint_create(const rb_data_type_t *type, int num)
     return _Data_Wrap_Struct(_KLASS(type), type, reinterpret_cast<void*>(num));
 }
 
+/*
+ * Returns a constant value.
+ * @return [Integer]
+ */
 static VALUE
 gdip_enumint_to_i(VALUE self)
 {
@@ -121,7 +125,7 @@ gdip_enumint_inspect(VALUE self, TableMap<int> *table)
 }
 
 const rb_data_type_t tPixelFormat = _MAKE_DATA_TYPE(
-    "PixelFormat", 0, RUBY_NEVER_FREE, &typeddata_size<int>, NULL, &cPixelFormat);
+    "PixelFormat", 0, RUBY_NEVER_FREE, NULL, NULL, &cPixelFormat);
 
 static TableMap<int> table_pxlfmt(25);
 
@@ -143,58 +147,58 @@ gdip_pxlfmt_get(PixelFormat n)
     }
 }
 
+#define define_enumint(_type_, table, name, num) gdip_enum_define<int>(c##_type_, table, name, num, gdip_enumint_create(&t##_type_, num))
+
 static void
 Init_PixelFormat()
 {
-    cPixelFormat = rb_define_class_under(mGdiplus, "PixelFormat", rb_cObject);
+    cPixelFormat = rb_define_class_under(mGdiplus, "PixelFormat", cEnumInt);
     rb_undef_alloc_func(cPixelFormat);
     rb_define_method(cPixelFormat, "inspect", RUBY_METHOD_FUNC(gdip_pxlfmt_inspect), 0);
-    rb_define_method(cPixelFormat, "to_i", RUBY_METHOD_FUNC(gdip_enumint_to_i), 0);
-    rb_define_method(cPixelFormat, "to_int", RUBY_METHOD_FUNC(gdip_enumint_to_i), 0);
 
-    gdip_enum_define<int>(cPixelFormat, &table_pxlfmt, "Format32bppARGB", PixelFormat32bppARGB, gdip_enumint_create(&tPixelFormat, PixelFormat32bppARGB));
-    gdip_enum_define<int>(cPixelFormat, &table_pxlfmt, "Format24bppRGB", PixelFormat24bppRGB, gdip_enumint_create(&tPixelFormat, PixelFormat24bppRGB));
-    gdip_enum_define<int>(cPixelFormat, &table_pxlfmt, "Format32bppRGB", PixelFormat32bppRGB, gdip_enumint_create(&tPixelFormat, PixelFormat32bppRGB));
-    gdip_enum_define<int>(cPixelFormat, &table_pxlfmt, "Format32bppPARGB", PixelFormat32bppPARGB, gdip_enumint_create(&tPixelFormat, PixelFormat32bppPARGB));
-    gdip_enum_define<int>(cPixelFormat, &table_pxlfmt, "Format48bppRGB", PixelFormat48bppRGB, gdip_enumint_create(&tPixelFormat, PixelFormat48bppRGB));
-    gdip_enum_define<int>(cPixelFormat, &table_pxlfmt, "Format64bppARGB", PixelFormat64bppARGB, gdip_enumint_create(&tPixelFormat, PixelFormat64bppARGB));
-    gdip_enum_define<int>(cPixelFormat, &table_pxlfmt, "Format64bppPARGB", PixelFormat64bppPARGB, gdip_enumint_create(&tPixelFormat, PixelFormat64bppPARGB));
-    gdip_enum_define<int>(cPixelFormat, &table_pxlfmt, "Format32bppCMYK", PixelFormat32bppCMYK, gdip_enumint_create(&tPixelFormat, PixelFormat32bppCMYK));
-    gdip_enum_define<int>(cPixelFormat, &table_pxlfmt, "Format1bppIndexed", PixelFormat1bppIndexed, gdip_enumint_create(&tPixelFormat, PixelFormat1bppIndexed));
-    gdip_enum_define<int>(cPixelFormat, &table_pxlfmt, "Format4bppIndexed", PixelFormat4bppIndexed, gdip_enumint_create(&tPixelFormat, PixelFormat4bppIndexed));
-    gdip_enum_define<int>(cPixelFormat, &table_pxlfmt, "Format8bppIndexed", PixelFormat8bppIndexed, gdip_enumint_create(&tPixelFormat, PixelFormat8bppIndexed));
-    gdip_enum_define<int>(cPixelFormat, &table_pxlfmt, "Format16bppGrayScale", PixelFormat16bppGrayScale, gdip_enumint_create(&tPixelFormat, PixelFormat16bppGrayScale));
-    gdip_enum_define<int>(cPixelFormat, &table_pxlfmt, "Format16bppRGB555", PixelFormat16bppRGB555, gdip_enumint_create(&tPixelFormat, PixelFormat16bppRGB555));
-    gdip_enum_define<int>(cPixelFormat, &table_pxlfmt, "Format16bppRGB565", PixelFormat16bppRGB565, gdip_enumint_create(&tPixelFormat, PixelFormat16bppRGB565));
-    gdip_enum_define<int>(cPixelFormat, &table_pxlfmt, "Format16bppARGB1555", PixelFormat16bppARGB1555, gdip_enumint_create(&tPixelFormat, PixelFormat16bppARGB1555));
-    gdip_enum_define<int>(cPixelFormat, &table_pxlfmt, "Undefined", PixelFormatUndefined, gdip_enumint_create(&tPixelFormat, PixelFormatUndefined));
-    gdip_enum_define<int>(cPixelFormat, &table_pxlfmt, "Indexed", PixelFormatIndexed, gdip_enumint_create(&tPixelFormat, PixelFormatIndexed));
-    gdip_enum_define<int>(cPixelFormat, &table_pxlfmt, "GDI", PixelFormatGDI, gdip_enumint_create(&tPixelFormat, PixelFormatGDI));
-    gdip_enum_define<int>(cPixelFormat, &table_pxlfmt, "Gdi", PixelFormatGDI, gdip_enumint_create(&tPixelFormat, PixelFormatGDI));
-    gdip_enum_define<int>(cPixelFormat, &table_pxlfmt, "Alpha", PixelFormatAlpha, gdip_enumint_create(&tPixelFormat, PixelFormatAlpha));
-    gdip_enum_define<int>(cPixelFormat, &table_pxlfmt, "PAlpha", PixelFormatPAlpha, gdip_enumint_create(&tPixelFormat, PixelFormatPAlpha));
-    gdip_enum_define<int>(cPixelFormat, &table_pxlfmt, "Extended", PixelFormatExtended, gdip_enumint_create(&tPixelFormat, PixelFormatExtended));
-    gdip_enum_define<int>(cPixelFormat, &table_pxlfmt, "Canonical", PixelFormatCanonical, gdip_enumint_create(&tPixelFormat, PixelFormatCanonical));
-    gdip_enum_define<int>(cPixelFormat, &table_pxlfmt, "Max", PixelFormatMax, gdip_enumint_create(&tPixelFormat, PixelFormatMax));
-    gdip_enum_define<int>(cPixelFormat, &table_pxlfmt, "DontCare", PixelFormatDontCare, gdip_enumint_create(&tPixelFormat, PixelFormatDontCare));
+    define_enumint(PixelFormat, &table_pxlfmt, "Format32bppARGB", PixelFormat32bppARGB);
+    define_enumint(PixelFormat, &table_pxlfmt, "Format24bppRGB", PixelFormat24bppRGB);
+    define_enumint(PixelFormat, &table_pxlfmt, "Format32bppRGB", PixelFormat32bppRGB);
+    define_enumint(PixelFormat, &table_pxlfmt, "Format32bppPARGB", PixelFormat32bppPARGB);
+    define_enumint(PixelFormat, &table_pxlfmt, "Format48bppRGB", PixelFormat48bppRGB);
+    define_enumint(PixelFormat, &table_pxlfmt, "Format64bppARGB", PixelFormat64bppARGB);
+    define_enumint(PixelFormat, &table_pxlfmt, "Format64bppPARGB", PixelFormat64bppPARGB);
+    define_enumint(PixelFormat, &table_pxlfmt, "Format32bppCMYK", PixelFormat32bppCMYK);
+    define_enumint(PixelFormat, &table_pxlfmt, "Format1bppIndexed", PixelFormat1bppIndexed);
+    define_enumint(PixelFormat, &table_pxlfmt, "Format4bppIndexed", PixelFormat4bppIndexed);
+    define_enumint(PixelFormat, &table_pxlfmt, "Format8bppIndexed", PixelFormat8bppIndexed);
+    define_enumint(PixelFormat, &table_pxlfmt, "Format16bppGrayScale", PixelFormat16bppGrayScale);
+    define_enumint(PixelFormat, &table_pxlfmt, "Format16bppRGB555", PixelFormat16bppRGB555);
+    define_enumint(PixelFormat, &table_pxlfmt, "Format16bppRGB565", PixelFormat16bppRGB565);
+    define_enumint(PixelFormat, &table_pxlfmt, "Format16bppARGB1555", PixelFormat16bppARGB1555);
+    define_enumint(PixelFormat, &table_pxlfmt, "Undefined", PixelFormatUndefined);
+    define_enumint(PixelFormat, &table_pxlfmt, "Indexed", PixelFormatIndexed);
+    define_enumint(PixelFormat, &table_pxlfmt, "GDI", PixelFormatGDI);
+    define_enumint(PixelFormat, &table_pxlfmt, "Gdi", PixelFormatGDI);
+    define_enumint(PixelFormat, &table_pxlfmt, "Alpha", PixelFormatAlpha);
+    define_enumint(PixelFormat, &table_pxlfmt, "PAlpha", PixelFormatPAlpha);
+    define_enumint(PixelFormat, &table_pxlfmt, "Extended", PixelFormatExtended);
+    define_enumint(PixelFormat, &table_pxlfmt, "Canonical", PixelFormatCanonical);
+    define_enumint(PixelFormat, &table_pxlfmt, "Max", PixelFormatMax);
+    define_enumint(PixelFormat, &table_pxlfmt, "DontCare", PixelFormatDontCare);
 }
 
 const rb_data_type_t tEncoderParameterValueType = _MAKE_DATA_TYPE(
-    "EncoderParameterValueType", 0, RUBY_NEVER_FREE, &typeddata_size<int>, NULL, &cEncoderParameterValueType);
+    "EncoderParameterValueType", 0, RUBY_NEVER_FREE, NULL, NULL, &cEncoderParameterValueType);
 
-static TableMap<int> table_valuetype(25);
+static TableMap<int> table_eprmvt(25);
 
 static VALUE
-gdip_valuetype_inspect(VALUE self)
+gdip_eprmvt_inspect(VALUE self)
 {
-    return gdip_enumint_inspect(self, &table_valuetype);
+    return gdip_enumint_inspect(self, &table_eprmvt);
 }
 
 VALUE 
-gdip_valuetype_get(int n)
+gdip_eprmvt_get(int n)
 {
     ID id;
-    if(table_valuetype.lookup(n, id)) {
+    if(table_eprmvt.lookup(n, id)) {
         return rb_const_get(cEncoderParameterValueType, id);
     }
     else {
@@ -205,24 +209,71 @@ gdip_valuetype_get(int n)
 static void
 Init_EncoderParameterValueType()
 {
-    cEncoderParameterValueType = rb_define_class_under(mGdiplus, "EncoderParameterValueType", rb_cObject);
+    cEncoderParameterValueType = rb_define_class_under(mGdiplus, "EncoderParameterValueType", cEnumInt);
     rb_undef_alloc_func(cEncoderParameterValueType);
-    rb_define_method(cEncoderParameterValueType, "inspect", RUBY_METHOD_FUNC(gdip_valuetype_inspect), 0);
-    rb_define_method(cEncoderParameterValueType, "to_i", RUBY_METHOD_FUNC(gdip_enumint_to_i), 0);
-    rb_define_method(cEncoderParameterValueType, "to_int", RUBY_METHOD_FUNC(gdip_enumint_to_i), 0);
+    rb_define_method(cEncoderParameterValueType, "inspect", RUBY_METHOD_FUNC(gdip_eprmvt_inspect), 0);
 
-    gdip_enum_define<int>(cEncoderParameterValueType, &table_valuetype, "ValueTypeByte", EncoderParameterValueTypeByte, gdip_enumint_create(&tEncoderParameterValueType, EncoderParameterValueTypeByte));
-    gdip_enum_define<int>(cEncoderParameterValueType, &table_valuetype, "ValueTypeASCII", EncoderParameterValueTypeASCII, gdip_enumint_create(&tEncoderParameterValueType, EncoderParameterValueTypeASCII));
-    gdip_enum_define<int>(cEncoderParameterValueType, &table_valuetype, "ValueTypeShort", EncoderParameterValueTypeShort, gdip_enumint_create(&tEncoderParameterValueType, EncoderParameterValueTypeShort));
-    gdip_enum_define<int>(cEncoderParameterValueType, &table_valuetype, "ValueTypeLong", EncoderParameterValueTypeLong, gdip_enumint_create(&tEncoderParameterValueType, EncoderParameterValueTypeLong));
-    gdip_enum_define<int>(cEncoderParameterValueType, &table_valuetype, "ValueTypeRational", EncoderParameterValueTypeRational, gdip_enumint_create(&tEncoderParameterValueType, EncoderParameterValueTypeRational));
-    gdip_enum_define<int>(cEncoderParameterValueType, &table_valuetype, "ValueTypeLongRange", EncoderParameterValueTypeLongRange, gdip_enumint_create(&tEncoderParameterValueType, EncoderParameterValueTypeLongRange));
-    gdip_enum_define<int>(cEncoderParameterValueType, &table_valuetype, "ValueTypeUndefined", EncoderParameterValueTypeUndefined, gdip_enumint_create(&tEncoderParameterValueType, EncoderParameterValueTypeUndefined));
-    gdip_enum_define<int>(cEncoderParameterValueType, &table_valuetype, "ValueTypeRationalRange", EncoderParameterValueTypeRationalRange, gdip_enumint_create(&tEncoderParameterValueType, EncoderParameterValueTypeRationalRange));
-    gdip_enum_define<int>(cEncoderParameterValueType, &table_valuetype, "ValueTypePointer", EncoderParameterValueTypePointer, gdip_enumint_create(&tEncoderParameterValueType, EncoderParameterValueTypePointer));
+    define_enumint(EncoderParameterValueType, &table_eprmvt, "ValueTypeByte", EncoderParameterValueTypeByte);
+    define_enumint(EncoderParameterValueType, &table_eprmvt, "ValueTypeASCII", EncoderParameterValueTypeASCII);
+    define_enumint(EncoderParameterValueType, &table_eprmvt, "ValueTypeShort", EncoderParameterValueTypeShort);
+    define_enumint(EncoderParameterValueType, &table_eprmvt, "ValueTypeLong", EncoderParameterValueTypeLong);
+    define_enumint(EncoderParameterValueType, &table_eprmvt, "ValueTypeRational", EncoderParameterValueTypeRational);
+    define_enumint(EncoderParameterValueType, &table_eprmvt, "ValueTypeLongRange", EncoderParameterValueTypeLongRange);
+    define_enumint(EncoderParameterValueType, &table_eprmvt, "ValueTypeUndefined", EncoderParameterValueTypeUndefined);
+    define_enumint(EncoderParameterValueType, &table_eprmvt, "ValueTypeRationalRange", EncoderParameterValueTypeRationalRange);
+    define_enumint(EncoderParameterValueType, &table_eprmvt, "ValueTypePointer", EncoderParameterValueTypePointer);
+}
+
+/* ValueType */
+const rb_data_type_t tValueType = _MAKE_DATA_TYPE(
+    "ValueType", 0, RUBY_NEVER_FREE, NULL, NULL, &cValueType);
+
+static TableMap<int> table_valtype(26);
+
+static VALUE
+gdip_valtype_inspect(VALUE self)
+{
+    return gdip_enumint_inspect(self, &table_valtype);
+}
+
+static void
+Init_ValueType()
+{
+    cValueType = rb_define_class_under(mGdiplus, "ValueType", cEnumInt);
+    rb_undef_alloc_func(cValueType);
+    rb_define_method(cValueType, "inspect", RUBY_METHOD_FUNC(gdip_valtype_inspect), 0);
+    
+    define_enumint(ValueType, &table_valtype, "ColorTypeCMYK", EncoderValueColorTypeCMYK);
+    define_enumint(ValueType, &table_valtype, "ColorTypeYCCK", EncoderValueColorTypeYCCK);
+    define_enumint(ValueType, &table_valtype, "CompressionLZW", EncoderValueCompressionLZW);
+    define_enumint(ValueType, &table_valtype, "CompressionCCITT3", EncoderValueCompressionCCITT3);
+    define_enumint(ValueType, &table_valtype, "CompressionCCITT4", EncoderValueCompressionCCITT4);
+    define_enumint(ValueType, &table_valtype, "CompressionRle", EncoderValueCompressionRle);
+    define_enumint(ValueType, &table_valtype, "CompressionNone", EncoderValueCompressionNone);
+    define_enumint(ValueType, &table_valtype, "ScanMethodInterlaced", EncoderValueScanMethodInterlaced);
+    define_enumint(ValueType, &table_valtype, "ScanMethodNonInterlaced", EncoderValueScanMethodNonInterlaced);
+    define_enumint(ValueType, &table_valtype, "VersionGif87", EncoderValueVersionGif87);
+    define_enumint(ValueType, &table_valtype, "VersionGif89", EncoderValueVersionGif89);
+    define_enumint(ValueType, &table_valtype, "RenderProgressive", EncoderValueRenderProgressive);
+    define_enumint(ValueType, &table_valtype, "RenderNonProgressive", EncoderValueRenderNonProgressive);
+    define_enumint(ValueType, &table_valtype, "TransformRotate90", EncoderValueTransformRotate90);
+    define_enumint(ValueType, &table_valtype, "TransformRotate180", EncoderValueTransformRotate180);
+    define_enumint(ValueType, &table_valtype, "TransformRotate270", EncoderValueTransformRotate270);
+    define_enumint(ValueType, &table_valtype, "TransformFlipHorizontal", EncoderValueTransformFlipHorizontal);
+    define_enumint(ValueType, &table_valtype, "TransformFlipVertical", EncoderValueTransformFlipVertical);
+    define_enumint(ValueType, &table_valtype, "MultiFrame", EncoderValueMultiFrame);
+    define_enumint(ValueType, &table_valtype, "LastFrame", EncoderValueLastFrame);
+    define_enumint(ValueType, &table_valtype, "Flush", EncoderValueFlush);
+    define_enumint(ValueType, &table_valtype, "FrameDimensionTime", EncoderValueFrameDimensionTime);
+    define_enumint(ValueType, &table_valtype, "FrameDimensionResolution", EncoderValueFrameDimensionResolution);
+    define_enumint(ValueType, &table_valtype, "FrameDimensionPage", EncoderValueFrameDimensionPage);
+    define_enumint(ValueType, &table_valtype, "ColorTypeGray", EncoderValueFrameDimensionPage + 1); // EncoderValueColorTypeGray
+    define_enumint(ValueType, &table_valtype, "ColorTypeRGB", EncoderValueFrameDimensionPage + 2); // EncoderValueColorTypeRGB
 }
 
 
+
+/* Encoder */
 static KeyPtrTableMap<GUID *> table_encoder(10);
 
 static VALUE
@@ -304,11 +355,19 @@ Init_Encoder()
     gdip_enum_define<GUID *>(cEncoder, &table_encoder, "SaveFlag", Data_Ptr<GUID *>(v), v);
 }
 
+const rb_data_type_t tEnumInt = _MAKE_DATA_TYPE(
+    "EnumInt", 0, RUBY_NEVER_FREE, NULL, NULL, &cEnumInt);
+
 void
 Init_enum() {
     ID_UNKNOWN = rb_intern("__UNKNOWN__");
 
+    cEnumInt = rb_define_class_under(mInternals, "EnumInt", rb_cObject);
+    rb_define_method(cEnumInt, "to_i", RUBY_METHOD_FUNC(gdip_enumint_to_i), 0);
+    rb_define_method(cEnumInt, "to_int", RUBY_METHOD_FUNC(gdip_enumint_to_i), 0);
+
     Init_PixelFormat();
     Init_EncoderParameterValueType();
+    Init_ValueType();
     Init_Encoder();
 }

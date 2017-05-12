@@ -4,18 +4,20 @@ require 'test_helper'
 class GdiplusEnumIntTest < Test::Unit::TestCase
   include Gdiplus
   
-  def test_pixel_format
+  def test_PixelFormat
     assert_equal(PixelFormat::Format32bppARGB, PixelFormat.Format32bppARGB)
     # <Gdiplus::PixelFormat.Format32bppARGB: 0x0026200a>
     assert_match(/Format32bppARGB/, PixelFormat::Format32bppARGB.inspect)
     assert_match(/#{PixelFormat::Format32bppARGB.to_i.to_s(16)}/, PixelFormat::Format32bppARGB.inspect)
   end
   
-  def test_encoder
+  def test_Encoder
     p Encoder.Quality
   end
   
-  
+  def test_ValueType
+    p ValueType.ColorTypeCMYK.to_i
+  end
 end
 
 __END__

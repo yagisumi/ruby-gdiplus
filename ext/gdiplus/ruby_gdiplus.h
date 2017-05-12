@@ -18,6 +18,7 @@
 using namespace Gdiplus;
 
 extern VALUE mGdiplus;
+extern VALUE mInternals;
 extern VALUE eGdiplus;
 
 extern VALUE cGuid;
@@ -27,6 +28,8 @@ extern VALUE cBitmap;
 extern VALUE cPixelFormat;
 extern VALUE cEncoderParameterValueType;
 extern VALUE cEncoder;
+extern VALUE cValueType;
+extern VALUE cEnumInt;
 
 extern const rb_data_type_t tGuid;
 extern const rb_data_type_t tImageCodecInfo;
@@ -34,6 +37,8 @@ extern const rb_data_type_t tImage;
 extern const rb_data_type_t tBitmap;
 extern const rb_data_type_t tPixelFormat;
 extern const rb_data_type_t tEncoderParameterValueType;
+extern const rb_data_type_t tValueType;
+extern const rb_data_type_t tEnumInt;
 
 void Init_codec();
 void Init_image();

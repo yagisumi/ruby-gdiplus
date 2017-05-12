@@ -34,7 +34,7 @@ gdip_bitmap_init_by_size(VALUE width, VALUE height, VALUE format=Qnil)
 static VALUE
 gdip_bitmap_create_by_size(VALUE width, VALUE height, VALUE format=Qnil)
 {
-    VALUE bmp = TYPEDDATA_ALLOC_NULL(Bitmap, &tBitmap);
+    VALUE bmp = rb_obj_alloc(cBitmap);
     _DATA_PTR(bmp) = gdip_bitmap_init_by_size(width, height, format);
     return bmp;
 }
