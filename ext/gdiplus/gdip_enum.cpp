@@ -79,6 +79,7 @@ gdip_enum_const_get(VALUE self)
     return rb_const_get(self, rb_frame_this_func());
 }
 
+
 static VALUE
 gdip_enumint_create(const rb_data_type_t *type, int num)
 {
@@ -94,6 +95,34 @@ static VALUE
 gdip_enumint_to_i(VALUE self)
 {
     return RB_INT2NUM(Data_Ptr_As<int>(self));
+}
+
+static VALUE
+gdip_enumint_or(VALUE self, VALUE other)
+{
+    VALUE v = rb_to_int(other);
+    int n_other = RB_NUM2INT(v);
+    int n_self = Data_Ptr_As<int>(self);
+    return RB_INT2NUM(n_self | n_other);
+}
+
+static VALUE
+gdip_enumint_and(VALUE self, VALUE other)
+{
+    VALUE v = rb_to_int(other);
+    int n_other = RB_NUM2INT(v);
+    int n_self = Data_Ptr_As<int>(self);
+    return RB_INT2NUM(n_self & n_other);
+}
+
+static VALUE
+gdip_enumint_coerce(VALUE self, VALUE other)
+{
+    if (RB_INTEGER_TYPE_P(other)) {
+        int n_self = Data_Ptr_As<int>(self);
+        self = RB_INT2NUM(n_self);
+    }
+    rb_assoc_new(other, self);
 }
 
 template <typename T>
@@ -367,6 +396,9 @@ Init_enum() {
     cEnumInt = rb_define_class_under(mInternals, "EnumInt", rb_cObject);
     rb_define_method(cEnumInt, "to_i", RUBY_METHOD_FUNC(gdip_enumint_to_i), 0);
     rb_define_method(cEnumInt, "to_int", RUBY_METHOD_FUNC(gdip_enumint_to_i), 0);
+    rb_define_method(cEnumInt, "|", RUBY_METHOD_FUNC(gdip_enumint_or), 1);
+    rb_define_method(cEnumInt, "&", RUBY_METHOD_FUNC(gdip_enumint_and), 1);
+    rb_define_method(cEnumInt, "coerce", RUBY_METHOD_FUNC(gdip_enumint_coerce), 1);
 
     Init_PixelFormat();
     Init_EncoderParameterValueType();

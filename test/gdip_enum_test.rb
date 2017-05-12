@@ -5,6 +5,10 @@ class GdiplusEnumIntTest < Test::Unit::TestCase
   include Gdiplus
   
   def test_PixelFormat
+    assert_equal(0, PixelFormat::Undefined.to_i)
+    assert_equal(1, 1 + PixelFormat::Undefined)
+    assert_equal(0x30000, PixelFormat.Indexed | PixelFormat.GDI)
+    assert_raise(TypeError) { "str" + PixelFormat::Undefined }
     assert_equal(PixelFormat::Format32bppARGB, PixelFormat.Format32bppARGB)
     # <Gdiplus::PixelFormat.Format32bppARGB: 0x0026200a>
     assert_match(/Format32bppARGB/, PixelFormat::Format32bppARGB.inspect)

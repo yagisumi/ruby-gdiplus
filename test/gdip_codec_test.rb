@@ -129,7 +129,11 @@ class GdiplusCodecTest < Test::Unit::TestCase
     assert_instance_of(Array, bmp_decoder.SignatureMasks)
     assert_instance_of(Array, bmp_decoder.signature_masks)
     assert_equal(true, bmp_decoder.signature_masks.frozen?)
-    assert_equal("\xFF\xFF".force_encoding("ASCII-8BIT"), bmp_decoder.SignatureMasks.first)
+    if Object.const_defined? :Encoding
+      assert_equal("\xFF\xFF".force_encoding("ASCII-8BIT"), bmp_decoder.SignatureMasks.first)
+    else
+      assert_equal("\xFF\xFF", bmp_decoder.SignatureMasks.first)
+    end
     assert_equal(true, bmp_decoder.signature_masks.first.frozen?)
   end
 end
