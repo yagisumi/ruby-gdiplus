@@ -43,53 +43,94 @@ class GdiplusCodecTest < Test::Unit::TestCase
   def test_imagecodecinfo
     encoders = ImageCodecInfo.image_encoders
     decoders = ImageCodecInfo.image_decoders # 
-    # remains of memory check
-#    encoders = ImageCodecInfo.image_encoders
-#    decoders = ImageCodecInfo.image_decoders
-#    encoders = ImageCodecInfo.image_encoders
-#    decoders = ImageCodecInfo.image_decoders
-#    encoders = ImageCodecInfo.image_encoders
-#    decoders = ImageCodecInfo.image_decoders
-#    encoders = ImageCodecInfo.image_encoders
-#    decoders = ImageCodecInfo.image_decoders
+    
     bmp_encoder = encoders.find {|icinfo|
       icinfo.FormatDescription == "BMP"
     }
-    #p bmp_encoder
+    
     assert_not_nil(bmp_encoder)
+    
+    assert_equal(bmp_encoder.Clsid.object_id, bmp_encoder.Clsid.object_id)
+    assert_instance_of(Guid, bmp_encoder.Clsid)
+    assert_equal("557cf400-1a04-11d3-9a73-0000f81ef32e", bmp_encoder.Clsid.to_s)
+    
+    assert_equal(bmp_encoder.FormatID.object_id, bmp_encoder.FormatID.object_id)
+    assert_instance_of(Guid, bmp_encoder.FormatID)
+    assert_equal("b96b3cab-0728-11d3-9d7b-0000f81ef32e", bmp_encoder.FormatID.to_s)
+    
+    assert_equal(bmp_encoder.MimeType.object_id, bmp_encoder.MimeType.object_id)
     assert_equal("image/bmp", bmp_encoder.mime_type)
     assert_equal("image/bmp", bmp_encoder.MimeType)
     assert_equal(true, bmp_encoder.MimeType.frozen?)
+    
+    assert_equal(bmp_encoder.FormatDescription.object_id, bmp_encoder.FormatDescription.object_id)
     assert_equal("BMP", bmp_encoder.format_description)
     assert_equal("BMP", bmp_encoder.FormatDescription)
     assert_equal(true, bmp_encoder.FormatDescription.frozen?)
+    
+    assert_equal(bmp_encoder.FilenameExtension.object_id, bmp_encoder.FilenameExtension.object_id)
     assert_equal("*.BMP;*.DIB;*.RLE", bmp_encoder.filename_extension)
     assert_equal("*.BMP;*.DIB;*.RLE", bmp_encoder.FilenameExtension)
     assert_equal(true, bmp_encoder.FilenameExtension.frozen?)
+    
+    assert_equal(bmp_encoder.SignaturePatterns.object_id, bmp_encoder.SignaturePatterns.object_id)
     assert_instance_of(Array, bmp_encoder.SignaturePatterns)
     assert_instance_of(Array, bmp_encoder.signature_patterns)
     assert_equal(true, bmp_encoder.signature_patterns.frozen?)
     assert_equal("BM", bmp_encoder.SignaturePatterns.first)
     assert_equal(true, bmp_encoder.signature_patterns.first.frozen?)
     
+    assert_equal(bmp_encoder.SignatureMasks.object_id, bmp_encoder.SignatureMasks.object_id)
+    assert_instance_of(Array, bmp_encoder.SignatureMasks)
+    assert_instance_of(Array, bmp_encoder.signature_masks)
+    assert_equal(true, bmp_encoder.signature_masks.frozen?)
+    assert_equal("\xFF\xFF".force_encoding("ASCII-8BIT"), bmp_encoder.SignatureMasks.first)
+    assert_equal(true, bmp_encoder.signature_masks.first.frozen?)
+    
+    
+    
     bmp_decoder = decoders.find {|icinfo|
       icinfo.FormatDescription == "BMP"
     }
+    
     assert_not_nil(bmp_decoder)
+    
+    assert_equal(bmp_encoder.Clsid.object_id, bmp_decoder.Clsid.object_id)
+    assert_instance_of(Guid, bmp_decoder.Clsid)
+    assert_equal("557cf400-1a04-11d3-9a73-0000f81ef32e", bmp_decoder.Clsid.to_s)
+    
+    assert_equal(bmp_encoder.FormatID.object_id, bmp_decoder.FormatID.object_id)
+    assert_instance_of(Guid, bmp_decoder.FormatID)
+    assert_equal("b96b3cab-0728-11d3-9d7b-0000f81ef32e", bmp_decoder.FormatID.to_s)
+    
+    assert_equal(bmp_encoder.MimeType.object_id, bmp_decoder.MimeType.object_id)
     assert_equal("image/bmp", bmp_decoder.mime_type)
     assert_equal("image/bmp", bmp_decoder.MimeType)
     assert_equal(true, bmp_decoder.MimeType.frozen?)
+    
+    assert_equal(bmp_encoder.FormatDescription.object_id, bmp_decoder.FormatDescription.object_id)
     assert_equal("BMP", bmp_decoder.format_description)
     assert_equal("BMP", bmp_decoder.FormatDescription)
     assert_equal(true, bmp_decoder.FormatDescription.frozen?)
+    
+    assert_equal(bmp_encoder.FilenameExtension.object_id, bmp_decoder.FilenameExtension.object_id)
     assert_equal("*.BMP;*.DIB;*.RLE", bmp_decoder.filename_extension)
     assert_equal("*.BMP;*.DIB;*.RLE", bmp_decoder.FilenameExtension)
     assert_equal(true, bmp_decoder.FilenameExtension.frozen?)
+    
+    assert_equal(bmp_encoder.SignaturePatterns.object_id, bmp_decoder.SignaturePatterns.object_id)
     assert_instance_of(Array, bmp_decoder.SignaturePatterns)
     assert_instance_of(Array, bmp_decoder.signature_patterns)
     assert_equal(true, bmp_decoder.signature_patterns.frozen?)
     assert_equal("BM", bmp_decoder.SignaturePatterns.first)
     assert_equal(true, bmp_decoder.signature_patterns.first.frozen?)
+    
+    assert_equal(bmp_encoder.SignatureMasks.object_id, bmp_decoder.SignatureMasks.object_id)
+    assert_instance_of(Array, bmp_decoder.SignatureMasks)
+    assert_instance_of(Array, bmp_decoder.signature_masks)
+    assert_equal(true, bmp_decoder.signature_masks.frozen?)
+    assert_equal("\xFF\xFF".force_encoding("ASCII-8BIT"), bmp_decoder.SignatureMasks.first)
+    assert_equal(true, bmp_decoder.signature_masks.first.frozen?)
   end
 end
 

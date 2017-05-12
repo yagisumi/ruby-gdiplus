@@ -82,7 +82,8 @@ gdip_enum_const_get(VALUE self)
 static VALUE
 gdip_enumint_create(const rb_data_type_t *type, int num)
 {
-    return _Data_Wrap_Struct(_KLASS(type), type, reinterpret_cast<void*>(num));
+    VALUE r = _Data_Wrap_Struct(_KLASS(type), type, reinterpret_cast<void*>(num));
+    return r;
 }
 
 /*
@@ -102,7 +103,8 @@ gdip_enumptr_create(const rb_data_type_t *type, T data, VALUE klass=Qnil)
     T ptr = static_cast<T>(ruby_xcalloc(1, sizeof(*data)));
     *ptr = *data;
     if (RB_NIL_P(klass)) klass = _KLASS(type);
-    return _Data_Wrap_Struct(klass, type, ptr);
+    VALUE r = _Data_Wrap_Struct(klass, type, ptr);
+    return r;
 }
 
 template <typename KEY>

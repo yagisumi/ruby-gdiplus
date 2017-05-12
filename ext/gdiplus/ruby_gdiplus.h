@@ -184,7 +184,8 @@ typeddata_alloc(VALUE klass)
 {
     void *ptr = RB_ZALLOC(T);
     DPT("alloc");
-    return _Data_Wrap_Struct(klass, type, ptr);
+    VALUE r = _Data_Wrap_Struct(klass, type, ptr);
+    return r;
 }
 
 #if GDIPLUS_DEBUG
@@ -193,7 +194,8 @@ typeddata_alloc(VALUE klass)
     typeddata_alloc_null(VALUE klass)
     {
         DPT("alloc"); // T is used for debug
-        return _Data_Wrap_Struct(klass, type, NULL);
+        VALUE r = _Data_Wrap_Struct(klass, type, NULL);
+        return r;
     }
     #define TYPEDDATA_ALLOC_NULL(T, type) &typeddata_alloc_null<T, type>
 #else
@@ -201,7 +203,8 @@ typeddata_alloc(VALUE klass)
     static VALUE
     typeddata_alloc_null(VALUE klass)
     {
-        return _Data_Wrap_Struct(klass, type, NULL);
+        VALUE r = _Data_Wrap_Struct(klass, type, NULL);
+        return r;
     }
     #define TYPEDDATA_ALLOC_NULL(T, type) &typeddata_alloc_null<type>
 #endif /* GDIPLUS_DEBUG */

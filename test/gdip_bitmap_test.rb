@@ -5,9 +5,9 @@ class GdiplusBitmapTest < Test::Unit::TestCase
   include Gdiplus
   
   def test_bitmap
-    bmp = Bitmap.new(1, 1)
+    #bmp = Bitmap.new(1, 1)
     assert_kind_of(Bitmap, Bitmap.new(1, 1))
-    #assert_kind_of(Bitmap, Bitmap.new(1, 1, PixelFormat.Format24bppRGB))
+    assert_kind_of(Bitmap, Bitmap.new(1, 1, PixelFormat.Format24bppRGB))
     assert_raise(GdiplusError) { Bitmap.new("") }
     assert_kind_of(Bitmap, Bitmap.new("test/gdip_bitmap_test1.png", true))
     assert_kind_of(Bitmap, Bitmap.new("test/gdip_bitmap_test2♥.png"))
