@@ -4,7 +4,7 @@
  * Released under the MIT License.
  */
 #ifndef RUBY_GDIPLUS_H
-#define RUBY_GDIPLUS_H 1
+#define RUBY_GDIPLUS_H
 
 #include <ruby.h>
 #include "ruby_compatible.h"
@@ -35,9 +35,6 @@ extern const rb_data_type_t tGuid;
 extern const rb_data_type_t tImageCodecInfo;
 extern const rb_data_type_t tImage;
 extern const rb_data_type_t tBitmap;
-extern const rb_data_type_t tPixelFormat;
-extern const rb_data_type_t tEncoderParameterValueType;
-extern const rb_data_type_t tValueType;
 extern const rb_data_type_t tEnumInt;
 
 void Init_codec();
@@ -121,12 +118,6 @@ dp_type(const char *msg)
 /* Utils */
 static inline const char * __method__() { return rb_id2name(rb_frame_this_func()); }
 static inline const char * __class__(VALUE self) { return rb_class2name(CLASS_OF(self)); }
-
-static inline VALUE
-_KLASS(const rb_data_type_t *type)
-{
-    return *static_cast<VALUE *>(type->data);
-}
 
 template<typename T>
 static inline T 

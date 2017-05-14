@@ -92,6 +92,11 @@
 #ifndef RB_FIX2SHORT
 #define RB_FIX2SHORT(x) FIX2SHORT(x)
 #endif
+#if SIZEOF_LONG == SIZEOF_VOIDP
+#define _RB_NUM2ID(x) RB_NUM2ULONG(x)
+#elif SIZEOF_LONG_LONG == SIZEOF_VOIDP
+#define _RB_NUM2ID(x) RB_NUM2ULL(x)
+#endif
 #endif /* RB_FIX2SHORT */
 #else
 /* comming soon */
@@ -305,6 +310,11 @@
     RUBY_TYPED_FREE_IMMEDIATELY\
   }
 #endif /* RUBY_API_VERSION_CODE < 20200 */
+  static inline VALUE
+  _KLASS(const rb_data_type_t *type)
+  {
+      return *static_cast<VALUE *>(type->data);
+  }
 #define _Data_Wrap_Struct(klass,data_type,sval) TypedData_Wrap_Struct(klass,data_type,sval)
 #define _Data_Get_Struct(obj,type,data_type,sval) TypedData_Get_Struct(obj,type,data_type,sval)
 #ifndef RUBY_DEFAULT_FREE

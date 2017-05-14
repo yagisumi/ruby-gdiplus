@@ -84,7 +84,11 @@ class GdiplusCodecTest < Test::Unit::TestCase
     assert_instance_of(Array, bmp_encoder.SignatureMasks)
     assert_instance_of(Array, bmp_encoder.signature_masks)
     assert_equal(true, bmp_encoder.signature_masks.frozen?)
-    assert_equal("\xFF\xFF".force_encoding("ASCII-8BIT"), bmp_encoder.SignatureMasks.first)
+    if "string".respond_to?(:force_encoding)
+      assert_equal("\xFF\xFF".force_encoding("ASCII-8BIT"), bmp_encoder.SignatureMasks.first)
+    else
+      assert_equal("\xFF\xFF", bmp_encoder.SignatureMasks.first)
+    end
     assert_equal(true, bmp_encoder.signature_masks.first.frozen?)
     
     
@@ -129,7 +133,7 @@ class GdiplusCodecTest < Test::Unit::TestCase
     assert_instance_of(Array, bmp_decoder.SignatureMasks)
     assert_instance_of(Array, bmp_decoder.signature_masks)
     assert_equal(true, bmp_decoder.signature_masks.frozen?)
-    if Object.const_defined? :Encoding
+    if "string".respond_to?(:force_encoding)
       assert_equal("\xFF\xFF".force_encoding("ASCII-8BIT"), bmp_decoder.SignatureMasks.first)
     else
       assert_equal("\xFF\xFF", bmp_decoder.SignatureMasks.first)
@@ -139,20 +143,20 @@ class GdiplusCodecTest < Test::Unit::TestCase
 end
 
 __END__
-assert_equal(expected, actual, message=nil)
-assert_raise(expected_exception_klass, message="") { ... }
-assert_not_equal(expected, actual, message="")
-assert_instance_of(klass, object, message="")
-assert_nil(object, message="")
-assert_not_nil(object, message="")
-assert_kind_of(klass, object, message="")
-assert_respond_to(object, method, message="")
-assert_match(regexp, string, message="")
-assert_no_match(regexp, string, message="")
-assert_same(expected, actual, message="")
-assert_not_same(expected, actual, message="")
-assert_operator(object1, operator, object2, message="")
-assert_nothing_raised(klass1, klass2, ..., message = "") { ... } # klass1, klass2, ... => fail / others => error
-assert_block(message="assert_block failed.") { ... } # (block -> true) => pass
-assert_throws(expected_symbol, message="") { ... }
-assert_nothing_thrown(message="") { ... }
+#assert_equal(expected, actual, message=nil)
+#assert_raise(expected_exception_klass, message="") { ... }
+#assert_not_equal(expected, actual, message="")
+#assert_instance_of(klass, object, message="")
+#assert_nil(object, message="")
+#assert_not_nil(object, message="")
+#assert_kind_of(klass, object, message="")
+#assert_respond_to(object, method, message="")
+#assert_match(regexp, string, message="")
+#assert_no_match(regexp, string, message="")
+#assert_same(expected, actual, message="")
+#assert_not_same(expected, actual, message="")
+#assert_operator(object1, operator, object2, message="")
+#assert_nothing_raised(klass1, klass2, ..., message = "") { ... } # klass1, klass2, ... => fail / others => error
+#assert_block(message="assert_block failed.") { ... } # (block -> true) => pass
+#assert_throws(expected_symbol, message="") { ... }
+#assert_nothing_thrown(message="") { ... }

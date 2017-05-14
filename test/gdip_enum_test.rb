@@ -15,11 +15,6 @@ class GdiplusEnumIntTest < Test::Unit::TestCase
     assert_match(/#{PixelFormat::Format32bppARGB.to_i.to_s(16)}/, PixelFormat::Format32bppARGB.inspect)
   end
   
-  def test_Encoder
-    assert_kind_of(Guid, Encoder.Quality)
-    assert_equal("1d5be4b5-fa4a-452d-9cdd-5db35105e7eb", Encoder.Quality.to_s)
-  end
-  
   def test_ValueType
     assert_equal(0, ValueType.ColorTypeCMYK.to_i)
     assert_match(/ColorTypeCMYK/, ValueType.ColorTypeCMYK.inspect)
@@ -96,23 +91,39 @@ class GdiplusEnumIntTest < Test::Unit::TestCase
     assert_match(/ValueTypePointer/, EncoderParameterValueType.ValueTypePointer.inspect)
   end
   
+  def test_Encoder
+    assert_kind_of(Guid, Encoder.Quality)
+    assert_equal("1d5be4b5-fa4a-452d-9cdd-5db35105e7eb", Encoder.Quality.to_s)
+    assert_match(/Compression/, Encoder.Compression.inspect)
+    assert_match(/ColorDepth/, Encoder.ColorDepth.inspect)
+    assert_match(/ScanMethod/, Encoder.ScanMethod.inspect)
+    assert_match(/Version/, Encoder.Version.inspect)
+    assert_match(/RenderMethod/, Encoder.RenderMethod.inspect)
+    assert_match(/Quality/, Encoder.Quality.inspect)
+    assert_match(/Transformation/, Encoder.Transformation.inspect)
+    assert_match(/LuminanceTable/, Encoder.LuminanceTable.inspect)
+    assert_match(/ChrominanceTable/, Encoder.ChrominanceTable.inspect)
+    assert_match(/SaveFlag/, Encoder.SaveFlag.inspect)
+  end
+  
+  
 end
 
 __END__
-assert_equal(expected, actual, message=nil)
-assert_raise(expected_exception_klass, message="") { ... }
-assert_not_equal(expected, actual, message="")
-assert_instance_of(klass, object, message="")
-assert_nil(object, message="")
-assert_not_nil(object, message="")
-assert_kind_of(klass, object, message="")
-assert_respond_to(object, method, message="")
-assert_match(regexp, string, message="")
-assert_no_match(regexp, string, message="")
-assert_same(expected, actual, message="")
-assert_not_same(expected, actual, message="")
-assert_operator(object1, operator, object2, message="")
-assert_nothing_raised(klass1, klass2, ..., message = "") { ... } # klass1, klass2, ... => fail / others => error
-assert_block(message="assert_block failed.") { ... } # (block -> true) => pass
-assert_throws(expected_symbol, message="") { ... }
-assert_nothing_thrown(message="") { ... }
+#assert_equal(expected, actual, message=nil)
+#assert_raise(expected_exception_klass, message="") { ... }
+#assert_not_equal(expected, actual, message="")
+#assert_instance_of(klass, object, message="")
+#assert_nil(object, message="")
+#assert_not_nil(object, message="")
+#assert_kind_of(klass, object, message="")
+#assert_respond_to(object, method, message="")
+#assert_match(regexp, string, message="")
+#assert_no_match(regexp, string, message="")
+#assert_same(expected, actual, message="")
+#assert_not_same(expected, actual, message="")
+#assert_operator(object1, operator, object2, message="")
+#assert_nothing_raised(klass1, klass2, ..., message = "") { ... } # klass1, klass2, ... => fail / others => error
+#assert_block(message="assert_block failed.") { ... } # (block -> true) => pass
+#assert_throws(expected_symbol, message="") { ... }
+#assert_nothing_thrown(message="") { ... }

@@ -434,6 +434,8 @@ gdip_icinfo_s_image_decoders(VALUE self)
     return encoders;
 }
 
+/**/
+
 
 /*
 Document-class: Gdiplus::Guid
