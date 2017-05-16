@@ -18,6 +18,8 @@ VALUE cEncoderParameterValueType;
 VALUE cEncoder;
 VALUE cValueType;
 VALUE cEnumInt;
+VALUE cEncoderParameter;
+VALUE cEncoderParameters;
 
 int gdip_refcount = 0;
 bool gdip_end_flag = false;

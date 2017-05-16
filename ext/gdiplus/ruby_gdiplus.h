@@ -30,12 +30,16 @@ extern VALUE cEncoderParameterValueType;
 extern VALUE cEncoder;
 extern VALUE cValueType;
 extern VALUE cEnumInt;
+extern VALUE cEncoderParameter;
+extern VALUE cEncoderParameters;
 
 extern const rb_data_type_t tGuid;
 extern const rb_data_type_t tImageCodecInfo;
 extern const rb_data_type_t tImage;
 extern const rb_data_type_t tBitmap;
 extern const rb_data_type_t tEnumInt;
+extern const rb_data_type_t tEncoderParameter;
+extern const rb_data_type_t tEncoderParameters;
 
 void Init_codec();
 void Init_image();
@@ -58,12 +62,29 @@ static inline void GdiplusRelease() {
 
 /* gdip_codec.cpp */
 VALUE gdip_guid_create(GUID *guid);
+VALUE gdip_encprms_create(EncoderParameters *encprms);
 
 /* gdip_enum.cpp */
-VALUE gdip_enum_const_get(VALUE self);
-VALUE gdip_pxlfmt_get(PixelFormat n);
-VALUE gdip_valuetype_get(int n);
+extern ID ID_UNKNOWN;
+extern ID ID_Compression;
+extern ID ID_ColorDepth;
+extern ID ID_ScanMethod;
+extern ID ID_Version;
+extern ID ID_RenderMethod;
+extern ID ID_Quality;
+extern ID ID_Transformation;
+extern ID ID_LuminanceTable;
+extern ID ID_ChrominanceTable;
+extern ID ID_SaveFlag;
+extern ID ID_ColorSpace;
+extern ID ID_ImageItems;
+extern ID ID_SaveAsCMYK;
+
+template <typename T> ID gdip_enum_get_id(VALUE klass, T data);
+template <typename T> VALUE gdip_enum_get(VALUE klass, T data);
 VALUE gdip_encoder_get(GUID *guid);
+
+
 
 #ifndef PixelFormat32bppCMYK
 #define PixelFormat32bppCMYK       (15 | (32 << 8))

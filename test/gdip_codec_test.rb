@@ -96,40 +96,43 @@ class GdiplusCodecTest < Test::Unit::TestCase
     bmp_decoder = decoders.find {|icinfo|
       icinfo.FormatDescription == "BMP"
     }
+    ico_decoder = decoders.find {|icinfo|
+      icinfo.FormatDescription == "ICO"
+    }
     
     assert_not_nil(bmp_decoder)
     
-    assert_equal(bmp_encoder.Clsid.object_id, bmp_decoder.Clsid.object_id)
+    assert_equal(bmp_decoder.Clsid.object_id, bmp_decoder.Clsid.object_id)
     assert_instance_of(Guid, bmp_decoder.Clsid)
     assert_equal("557cf400-1a04-11d3-9a73-0000f81ef32e", bmp_decoder.Clsid.to_s)
     
-    assert_equal(bmp_encoder.FormatID.object_id, bmp_decoder.FormatID.object_id)
+    assert_equal(bmp_decoder.FormatID.object_id, bmp_decoder.FormatID.object_id)
     assert_instance_of(Guid, bmp_decoder.FormatID)
     assert_equal("b96b3cab-0728-11d3-9d7b-0000f81ef32e", bmp_decoder.FormatID.to_s)
     
-    assert_equal(bmp_encoder.MimeType.object_id, bmp_decoder.MimeType.object_id)
+    assert_equal(bmp_decoder.MimeType.object_id, bmp_decoder.MimeType.object_id)
     assert_equal("image/bmp", bmp_decoder.mime_type)
     assert_equal("image/bmp", bmp_decoder.MimeType)
     assert_equal(true, bmp_decoder.MimeType.frozen?)
     
-    assert_equal(bmp_encoder.FormatDescription.object_id, bmp_decoder.FormatDescription.object_id)
+    assert_equal(bmp_decoder.FormatDescription.object_id, bmp_decoder.FormatDescription.object_id)
     assert_equal("BMP", bmp_decoder.format_description)
     assert_equal("BMP", bmp_decoder.FormatDescription)
     assert_equal(true, bmp_decoder.FormatDescription.frozen?)
     
-    assert_equal(bmp_encoder.FilenameExtension.object_id, bmp_decoder.FilenameExtension.object_id)
+    assert_equal(bmp_decoder.FilenameExtension.object_id, bmp_decoder.FilenameExtension.object_id)
     assert_equal("*.BMP;*.DIB;*.RLE", bmp_decoder.filename_extension)
     assert_equal("*.BMP;*.DIB;*.RLE", bmp_decoder.FilenameExtension)
     assert_equal(true, bmp_decoder.FilenameExtension.frozen?)
     
-    assert_equal(bmp_encoder.SignaturePatterns.object_id, bmp_decoder.SignaturePatterns.object_id)
+    assert_equal(bmp_decoder.SignaturePatterns.object_id, bmp_decoder.SignaturePatterns.object_id)
     assert_instance_of(Array, bmp_decoder.SignaturePatterns)
     assert_instance_of(Array, bmp_decoder.signature_patterns)
     assert_equal(true, bmp_decoder.signature_patterns.frozen?)
     assert_equal("BM", bmp_decoder.SignaturePatterns.first)
     assert_equal(true, bmp_decoder.signature_patterns.first.frozen?)
     
-    assert_equal(bmp_encoder.SignatureMasks.object_id, bmp_decoder.SignatureMasks.object_id)
+    assert_equal(bmp_decoder.SignatureMasks.object_id, bmp_decoder.SignatureMasks.object_id)
     assert_instance_of(Array, bmp_decoder.SignatureMasks)
     assert_instance_of(Array, bmp_decoder.signature_masks)
     assert_equal(true, bmp_decoder.signature_masks.frozen?)
@@ -140,6 +143,24 @@ class GdiplusCodecTest < Test::Unit::TestCase
     end
     assert_equal(true, bmp_decoder.signature_masks.first.frozen?)
   end
+  
+  def test_EncoderParameter
+    param = EncoderParameter.new(Encoder.Quality, 93)
+#    p param.Guid
+#    p param.Type
+#    p param.NumberOfValues
+#    p param.Value
+    assert_instance_of(EncoderParameter, param)
+    assert_instance_of(Encoder, param.Guid)
+    assert_kind_of(Guid, param.Guid)
+    assert_equal(Encoder.Quality, param.Guid)
+    assert_instance_of(EncoderParameterValueType, param.Type)
+    assert_equal(EncoderParameterValueType.ValueTypeLong, param.Type)
+    assert_instance_of(Array, param.Value)
+    assert_equal([93], param.Value)
+    assert(param.Value.frozen?)
+  end
+  
 end
 
 __END__

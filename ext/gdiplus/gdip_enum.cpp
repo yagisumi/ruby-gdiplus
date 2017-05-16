@@ -6,7 +6,20 @@
  #include "ruby_gdiplus.h"
  #include "simplemap.h"
 
-static ID ID_UNKNOWN;
+ID ID_UNKNOWN;
+ID ID_Compression;
+ID ID_ColorDepth;
+ID ID_ScanMethod;
+ID ID_Version;
+ID ID_RenderMethod;
+ID ID_Quality;
+ID ID_Transformation;
+ID ID_LuminanceTable;
+ID ID_ChrominanceTable;
+ID ID_SaveFlag;
+ID ID_ColorSpace;
+ID ID_ImageItems;
+ID ID_SaveAsCMYK;
 
 class KlassTableMap : public SortedArrayMap<VALUE, MapBase *> {
 public:
@@ -95,6 +108,39 @@ gdip_enumptr_create(const rb_data_type_t *type, T data, VALUE klass=Qnil)
     VALUE r = _Data_Wrap_Struct(klass, type, ptr);
     return r;
 }
+
+template <typename T>
+ID
+gdip_enum_get_id(VALUE klass, T data) {
+    IMap<T, ID> *table = gdip_enum_get_table<T>(klass);
+    ID id = ID_UNKNOWN;
+    if (table != NULL) {
+        table->get(data, id);
+    }
+    return id;
+}
+
+template ID gdip_enum_get_id<GUID *>(VALUE klass, GUID *data);
+template ID gdip_enum_get_id<int>(VALUE klass, int data);
+
+template <typename T>
+VALUE
+gdip_enum_get(VALUE klass, T data) {
+    IMap<T, ID> *table = gdip_enum_get_table<T>(klass);
+    VALUE v = Qnil;
+    ID id = ID_UNKNOWN;
+    if (table != NULL) {
+        table->get(data, id);
+    }
+    if (id != ID_UNKNOWN) {
+        v = rb_const_get(klass, id);
+    }
+    return v;
+}
+
+template ID gdip_enum_get<GUID *>(VALUE klass, GUID *data);
+template ID gdip_enum_get<int>(VALUE klass, int data);
+
 
 template <typename TKey>
 static void
@@ -257,50 +303,77 @@ Init_Encoder()
     cEncoder = rb_define_class_under(mGdiplus, "Encoder", cGuid);
     rb_undef_alloc_func(cEncoder);
     rb_define_method(cEncoder, "inspect", RUBY_METHOD_FUNC(gdip_encoder_inspect), 0);
-    MemPtrSortedArrayMap<GUID *, ID> *table = new MemPtrSortedArrayMap<GUID *, ID>(10);
+    MemPtrSortedArrayMap<GUID *, ID> *table = new MemPtrSortedArrayMap<GUID *, ID>(13);
     klass_table_map.set(cEncoder, table);
     
     VALUE v;
+    GUID guid;
 
-    GUID guid1 = {0xe09d739d,0xccd4,0x44ee,{0x8e,0xba,0x3f,0xbf,0x8b,0xe4,0xfc,0x58}};
-    v = gdip_enumptr_create<GUID *>(&tGuid, &guid1, cEncoder);
+    ID_Compression = rb_intern("Compression");
+    guid = EncoderCompression;
+    v = gdip_enumptr_create<GUID *>(&tGuid, &guid, cEncoder);
     gdip_enum_define<GUID *>(cEncoder, table, "Compression", Data_Ptr<GUID *>(v), v);
 
-    GUID guid2 = {0x66087055,0xad66,0x4c7c,{0x9a,0x18,0x38,0xa2,0x31,0x0b,0x83,0x37}};
-    v = gdip_enumptr_create<GUID *>(&tGuid, &guid2, cEncoder);
+    ID_ColorDepth = rb_intern("ColorDepth");
+    guid = EncoderColorDepth;
+    v = gdip_enumptr_create<GUID *>(&tGuid, &guid, cEncoder);
     gdip_enum_define<GUID *>(cEncoder, table, "ColorDepth", Data_Ptr<GUID *>(v), v);
 
-    GUID guid3 = {0x3a4e2661,0x3109,0x4e56,{0x85,0x36,0x42,0xc1,0x56,0xe7,0xdc,0xfa}};
-    v = gdip_enumptr_create<GUID *>(&tGuid, &guid3, cEncoder);
+    ID_ScanMethod = rb_intern("ScanMethod");
+    guid = EncoderScanMethod;
+    v = gdip_enumptr_create<GUID *>(&tGuid, &guid, cEncoder);
     gdip_enum_define<GUID *>(cEncoder, table, "ScanMethod", Data_Ptr<GUID *>(v), v);
 
-    GUID guid4 = {0x24d18c76,0x814a,0x41a4,{0xbf,0x53,0x1c,0x21,0x9c,0xcc,0xf7,0x97}};
-    v = gdip_enumptr_create<GUID *>(&tGuid, &guid4, cEncoder);
+    ID_Version = rb_intern("Version");
+    guid = EncoderVersion;
+    v = gdip_enumptr_create<GUID *>(&tGuid, &guid, cEncoder);
     gdip_enum_define<GUID *>(cEncoder, table, "Version", Data_Ptr<GUID *>(v), v);
 
-    GUID guid5 = {0x6d42c53a,0x229a,0x4825,{0x8b,0xb7,0x5c,0x99,0xe2,0xb9,0xa8,0xb8}};
-    v = gdip_enumptr_create<GUID *>(&tGuid, &guid5, cEncoder);
+    ID_RenderMethod = rb_intern("RenderMethod");
+    guid = EncoderRenderMethod;
+    v = gdip_enumptr_create<GUID *>(&tGuid, &guid, cEncoder);
     gdip_enum_define<GUID *>(cEncoder, table, "RenderMethod", Data_Ptr<GUID *>(v), v);
 
-    GUID guid6 = {0x1d5be4b5,0xfa4a,0x452d,{0x9c,0xdd,0x5d,0xb3,0x51,0x05,0xe7,0xeb}};
-    v = gdip_enumptr_create<GUID *>(&tGuid, &guid6, cEncoder);
+    ID_Quality = rb_intern("Quality");
+    guid = EncoderQuality;
+    v = gdip_enumptr_create<GUID *>(&tGuid, &guid, cEncoder);
     gdip_enum_define<GUID *>(cEncoder, table, "Quality", Data_Ptr<GUID *>(v), v);
 
-    GUID guid7 = {0x8d0eb2d1,0xa58e,0x4ea8,{0xaa,0x14,0x10,0x80,0x74,0xb7,0xb6,0xf9}};
-    v = gdip_enumptr_create<GUID *>(&tGuid, &guid7, cEncoder);
+    ID_Transformation = rb_intern("Transformation");
+    guid = EncoderTransformation;
+    v = gdip_enumptr_create<GUID *>(&tGuid, &guid, cEncoder);
     gdip_enum_define<GUID *>(cEncoder, table, "Transformation", Data_Ptr<GUID *>(v), v);
 
-    GUID guid8 = {0xedb33bce,0x0266,0x4a77,{0xb9,0x04,0x27,0x21,0x60,0x99,0xe7,0x17}};
-    v = gdip_enumptr_create<GUID *>(&tGuid, &guid8, cEncoder);
+    ID_LuminanceTable = rb_intern("LuminanceTable");
+    guid = EncoderLuminanceTable;
+    v = gdip_enumptr_create<GUID *>(&tGuid, &guid, cEncoder);
     gdip_enum_define<GUID *>(cEncoder, table, "LuminanceTable", Data_Ptr<GUID *>(v), v);
 
-    GUID guid9 = {0xf2e455dc,0x09b3,0x4316,{0x82,0x60,0x67,0x6a,0xda,0x32,0x48,0x1c}};
-    v = gdip_enumptr_create<GUID *>(&tGuid, &guid9, cEncoder);
+    ID_ChrominanceTable = rb_intern("ChrominanceTable");
+    guid = EncoderChrominanceTable;
+    v = gdip_enumptr_create<GUID *>(&tGuid, &guid, cEncoder);
     gdip_enum_define<GUID *>(cEncoder, table, "ChrominanceTable", Data_Ptr<GUID *>(v), v);
 
-    GUID guid10 = {0x292266fc,0xac40,0x47bf,{0x8c, 0xfc, 0xa8, 0x5b, 0x89, 0xa6, 0x55, 0xde}};
-    v = gdip_enumptr_create<GUID *>(&tGuid, &guid10, cEncoder);
+    ID_SaveFlag = rb_intern("SaveFlag");
+    guid = EncoderSaveFlag;
+    v = gdip_enumptr_create<GUID *>(&tGuid, &guid, cEncoder);
     gdip_enum_define<GUID *>(cEncoder, table, "SaveFlag", Data_Ptr<GUID *>(v), v);
+
+    ID_ColorSpace = rb_intern("ColorSpace");
+    GUID guid_cs = {0xae7a62a0,0xee2c,0x49d8,{0x9d,0x7,0x1b,0xa8,0xa9,0x27,0x59,0x6e}};
+    v = gdip_enumptr_create<GUID *>(&tGuid, &guid_cs, cEncoder);
+    gdip_enum_define<GUID *>(cEncoder, table, "ColorSpace", Data_Ptr<GUID *>(v), v);
+
+    ID_ImageItems = rb_intern("ImageItems");
+    GUID guid_ii = {0x63875e13,0x1f1d,0x45ab,{0x91, 0x95, 0xa2, 0x9b, 0x60, 0x66, 0xa6, 0x50}};
+    v = gdip_enumptr_create<GUID *>(&tGuid, &guid_ii, cEncoder);
+    gdip_enum_define<GUID *>(cEncoder, table, "ImageItems", Data_Ptr<GUID *>(v), v);
+
+    ID_SaveAsCMYK = rb_intern("SaveAsCMYK");
+    GUID guid_sac = {0xa219bbc9, 0xa9d, 0x4005, {0xa3, 0xee, 0x3a, 0x42, 0x1b, 0x8b, 0xb0, 0x6c}};
+    v = gdip_enumptr_create<GUID *>(&tGuid, &guid_sac, cEncoder);
+    gdip_enum_define<GUID *>(cEncoder, table, "SaveAsCMYK", Data_Ptr<GUID *>(v), v);
+
 }
 
 void

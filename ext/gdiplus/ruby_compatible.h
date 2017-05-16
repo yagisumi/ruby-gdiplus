@@ -82,7 +82,7 @@
 #define RB_SYM2ID(x) SYM2ID(x)
 #endif
 #ifdef FIX2SHORT
-#ifndef RB_FIX2SHORT
+  #ifndef RB_FIX2SHORT
 #ifndef RB_NUM2SHORT
 #define RB_NUM2SHORT(x) NUM2SHORT(x)
 #endif
@@ -92,15 +92,15 @@
 #ifndef RB_FIX2SHORT
 #define RB_FIX2SHORT(x) FIX2SHORT(x)
 #endif
+  #endif /* RB_FIX2SHORT */
+#else
+/* comming soon */
+#endif /* FIX2SHORT */
 #if SIZEOF_LONG == SIZEOF_VOIDP
 #define _RB_NUM2ID(x) RB_NUM2ULONG(x)
 #elif SIZEOF_LONG_LONG == SIZEOF_VOIDP
 #define _RB_NUM2ID(x) RB_NUM2ULL(x)
 #endif
-#endif /* RB_FIX2SHORT */
-#else
-/* comming soon */
-#endif /* FIX2SHORT */
 #ifndef RB_TEST
 #define RB_TEST(v) RTEST(v)
 #endif
@@ -294,7 +294,7 @@
 #else /* HAVE_TYPE_RB_DATA_TYPE_T */
 #define _DATA_PTR(v) RTYPEDDATA_DATA(v)
 #endif /* HAVE_TYPE_RB_DATA_TYPE_T */
-#define _KIND_OF(obj, data_type) rb_typeddata_is_kind_of(obj, &data_type)
+#define _KIND_OF(obj, data_type) rb_typeddata_is_kind_of(obj, data_type)
 
 #if RUBY_API_VERSION_CODE < 20200
 #define _MAKE_DATA_TYPE(name, mark, free, size, parent_type_ptr, klass_ptr) {\
@@ -313,7 +313,7 @@
   static inline VALUE
   _KLASS(const rb_data_type_t *type)
   {
-      return *static_cast<VALUE *>(type->data);
+      return *(VALUE *)(type->data);
   }
 #define _Data_Wrap_Struct(klass,data_type,sval) TypedData_Wrap_Struct(klass,data_type,sval)
 #define _Data_Get_Struct(obj,type,data_type,sval) TypedData_Get_Struct(obj,type,data_type,sval)
@@ -427,9 +427,13 @@
 #endif /* HAVE_RUBY_ONIGURUMA_H */
 
 #if RUBY_API_VERSION_CODE < 10900
+  #if defined(__cplusplus)
   extern "C" { 
+  #endif
     #include <st.h>
+  #if defined(__cplusplus)
   }
+  #endif
   typedef int st_index_t;
   static inline st_index_t
   rb_memhash(const void *ptr, long len)
@@ -440,9 +444,16 @@
 #endif /* RUBY_API_VERSION_CODE < 10900 */
 #define _FOREACH_FUNC(func) ((int (*)(ANYARGS))(func))
 
-// rb_frame_callee is rb_frame_caller in 1.9
+// rb_frame_callee is rb_frame_caller in 1.9 ( ? rb_frame_this_func)
 
-
+#if RUBY_API_VERSION_CODE < 10900
+  
+  static inline VALUE rb_rational_new(VALUE x, VALUE y)
+  {
+    rb_f_require(rb_mKernel, rb_str_new_cstr("rational"));
+    return rb_funcall(rb_mKernel, rb_intern("Rational"), 2, x, y);
+  }
+#endif
 
 #endif /* RUBY_COMPATIBLE_H_ */
 
