@@ -11,7 +11,7 @@ class GdiplusCodecTest < Test::Unit::TestCase
     assert_raise(ArgumentError) { Guid.new }
     g1 = nil
     assert_nothing_raised() { g1 = Guid.new("b96b3ca9-0728-11d3-9d7b-0000f81ef32e") }
-    assert_equal("<Gdiplus::Guid {b96b3ca9-0728-11d3-9d7b-0000f81ef32e}>", g1.inspect)
+    assert_equal("#<Gdiplus::Guid {b96b3ca9-0728-11d3-9d7b-0000f81ef32e}>", g1.inspect)
     assert_equal("b96b3ca9-0728-11d3-9d7b-0000f81ef32e", g1.to_s)
     assert_equal("{0xb96b3ca9, 0x0728, 0x11d3, {0x9d, 0x7b, 0x00, 0x00, 0xf8, 0x1e, 0xf3, 0x2e}}", g1.c_struct)
     assert_raise(GdiplusError) { Guid.new("{b96b3ca9-0728-11d3-9d7b-0000f81ef32e}") } # contains braces => error
@@ -96,9 +96,9 @@ class GdiplusCodecTest < Test::Unit::TestCase
     bmp_decoder = decoders.find {|icinfo|
       icinfo.FormatDescription == "BMP"
     }
-    ico_decoder = decoders.find {|icinfo|
-      icinfo.FormatDescription == "ICO"
-    }
+#    ico_decoder = decoders.find {|icinfo|
+#      icinfo.FormatDescription == "ICO"
+#    }
     
     assert_not_nil(bmp_decoder)
     
@@ -144,21 +144,52 @@ class GdiplusCodecTest < Test::Unit::TestCase
     assert_equal(true, bmp_decoder.signature_masks.first.frozen?)
   end
   
-  def test_EncoderParameter
+  def test_EncoderParameterQuality
+    
     param = EncoderParameter.new(Encoder.Quality, 93)
-#    p param.Guid
-#    p param.Type
-#    p param.NumberOfValues
-#    p param.Value
     assert_instance_of(EncoderParameter, param)
-    assert_instance_of(Encoder, param.Guid)
-    assert_kind_of(Guid, param.Guid)
-    assert_equal(Encoder.Quality, param.Guid)
+    assert_instance_of(Encoder, param.Encoder)
+    assert_kind_of(Guid, param.Encoder)
+    assert_equal(Encoder.Quality, param.Encoder)
     assert_instance_of(EncoderParameterValueType, param.Type)
     assert_equal(EncoderParameterValueType.ValueTypeLong, param.Type)
     assert_instance_of(Array, param.Value)
     assert_equal([93], param.Value)
     assert(param.Value.frozen?)
+    
+    verbose(true) {
+      assert_stderr(/Quality/) { EncoderParameter.new(Encoder.Quality, 101) }
+    }
+    verbose(false) {
+      assert_stderr_silent { EncoderParameter.new(Encoder.Quality, 101) }
+    }
+    
+    param = EncoderParameterQuality.new(93)
+    assert_instance_of(EncoderParameterQuality, param)
+    assert_kind_of(EncoderParameter, param)
+    assert_instance_of(Encoder, param.Encoder)
+    assert_kind_of(Guid, param.Encoder)
+    assert_equal(Encoder.Quality, param.Encoder)
+    assert_instance_of(EncoderParameterValueType, param.Type)
+    assert_equal(EncoderParameterValueType.ValueTypeLong, param.Type)
+    assert_instance_of(Array, param.Value)
+    assert_equal([93], param.Value)
+    assert(param.Value.frozen?)
+    
+    verbose(true) {
+      assert_stderr(/Quality/) { EncoderParameterQuality.new(101) }
+    }
+    verbose(false) {
+      assert_stderr_silent { EncoderParameterQuality.new(101) }
+    }
+  end
+  
+  
+  def test_EncoderParameters
+    #params = EncoderParameters.new
+    #p params
+    #p params.Param
+    #p params.add(EncoderParameter.new(Encoder.Quality, 93))
   end
   
 end
@@ -176,7 +207,7 @@ __END__
 #assert_no_match(regexp, string, message="")
 #assert_same(expected, actual, message="")
 #assert_not_same(expected, actual, message="")
-#assert_operator(object1, operator, object2, message="")
+#assert_operator(object1, operator, object2, message="") # assert_operator 5, :>=, 4
 #assert_nothing_raised(klass1, klass2, ..., message = "") { ... } # klass1, klass2, ... => fail / others => error
 #assert_block(message="assert_block failed.") { ... } # (block -> true) => pass
 #assert_throws(expected_symbol, message="") { ... }

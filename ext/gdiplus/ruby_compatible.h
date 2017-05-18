@@ -453,6 +453,40 @@
     rb_f_require(rb_mKernel, rb_str_new_cstr("rational"));
     return rb_funcall(rb_mKernel, rb_intern("Rational"), 2, x, y);
   }
+  #include <string.h>
+  static inline int _RB_RATIONAL_P(VALUE x)
+  {
+    VALUE path = rb_class_path(CLASS_OF(x));
+    if (strcmp("Rational", RSTRING_PTR(path)) == 0) {
+      return 1;
+    }
+    else {
+      return 0;
+    }
+  }
+  static inline VALUE rb_rational_den(VALUE x)
+  {
+    return rb_funcall(x, rb_intern("denominator"), 0);
+  }
+  static inline VALUE rb_rational_num(VALUE x)
+  {
+    return rb_funcall(x, rb_intern("numerator"), 0);
+  }
+#else
+  static inline int _RB_RATIONAL_P(VALUE x)
+  {
+    return rb_cRational == CLASS_OF(x);
+  }
+  #if RUBY_API_VERSION_CODE < 20200
+    static inline VALUE rb_rational_den(VALUE x)
+    {
+      return ((struct RRational *)(x))->den;
+    }
+    static inline VALUE rb_rational_num(VALUE x)
+    {
+      return ((struct RRational *)(x))->num;
+    }
+  #endif
 #endif
 
 #endif /* RUBY_COMPATIBLE_H_ */

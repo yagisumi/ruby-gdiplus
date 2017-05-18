@@ -21,6 +21,10 @@ ID ID_ColorSpace;
 ID ID_ImageItems;
 ID ID_SaveAsCMYK;
 
+GUID _EncoderColorSpace;
+GUID _EncoderImageItems;
+GUID _EncoderSaveAsCMYK;
+
 class KlassTableMap : public SortedArrayMap<VALUE, MapBase *> {
 public:
     KlassTableMap(int capa) : SortedArrayMap<VALUE, MapBase *>(capa) {}
@@ -98,6 +102,23 @@ gdip_enumint_coerce(VALUE self, VALUE other)
     return rb_assoc_new(other, self);
 }
 
+static VALUE
+gdip_enumint_equal(VALUE self, VALUE other)
+{
+    if (self == other) return Qtrue;
+    if (_KIND_OF(other, &tEnumInt)) {
+        int x = Data_Ptr_As<int>(self);
+        int y = Data_Ptr_As<int>(other);
+        return x == y ? Qtrue : Qfalse;
+    }
+    else if (_RB_INTEGER_P(other)) {
+        int x = Data_Ptr_As<int>(self);
+        int y = RB_NUM2INT(other);
+        return x == y ? Qtrue : Qfalse;
+    }
+    else return Qfalse;
+}
+
 template <typename T>
 static VALUE
 gdip_enumptr_create(const rb_data_type_t *type, T data, VALUE klass=Qnil)
@@ -160,10 +181,10 @@ gdip_enumint_inspect(VALUE self)
     if (table != NULL) {
         ID id;
         table->get(num, id, ID_UNKNOWN);
-        return util_utf8_sprintf("<%s.%s: %08x>", __class__(self), rb_id2name(id), num);
+        return util_utf8_sprintf("#<%s.%s: %08x>", __class__(self), rb_id2name(id), num);
     }
     else {
-        return util_utf8_sprintf("<%s: %08x>", __class__(self), num);
+        return util_utf8_sprintf("#<%s: %08x>", __class__(self), num);
     }
     
 }
@@ -282,21 +303,21 @@ gdip_encoder_inspect(VALUE self)
     }
     unsigned char *cstr; // RPC_CSTR
     if (RPC_S_OK == ::UuidToStringA(guid, &cstr)) {
-        r = util_utf8_sprintf("<%s.%s: {%s}>", __class__(self), rb_id2name(id), reinterpret_cast<char *>(cstr));
+        r = util_utf8_sprintf("#<%s.%s: {%s}>", __class__(self), rb_id2name(id), reinterpret_cast<char *>(cstr));
         RpcStringFree(&cstr);
     }
     else {
-        r = util_utf8_sprintf("<%s.%s>", __class__(self), rb_id2name(id));
+        r = util_utf8_sprintf("#<%s.%s>", __class__(self), rb_id2name(id));
     }
     return r;
 }
-
+/*
 VALUE 
 gdip_encoder_get(GUID *guid)
 {
     return gdip_enumptr_create<GUID *>(&tGuid, guid, cEncoder);
 }
-
+*/
 void
 Init_Encoder()
 {
@@ -361,17 +382,20 @@ Init_Encoder()
 
     ID_ColorSpace = rb_intern("ColorSpace");
     GUID guid_cs = {0xae7a62a0,0xee2c,0x49d8,{0x9d,0x7,0x1b,0xa8,0xa9,0x27,0x59,0x6e}};
-    v = gdip_enumptr_create<GUID *>(&tGuid, &guid_cs, cEncoder);
+    _EncoderColorSpace = guid_cs;
+    v = gdip_enumptr_create<GUID *>(&tGuid, &_EncoderColorSpace, cEncoder);
     gdip_enum_define<GUID *>(cEncoder, table, "ColorSpace", Data_Ptr<GUID *>(v), v);
 
     ID_ImageItems = rb_intern("ImageItems");
     GUID guid_ii = {0x63875e13,0x1f1d,0x45ab,{0x91, 0x95, 0xa2, 0x9b, 0x60, 0x66, 0xa6, 0x50}};
-    v = gdip_enumptr_create<GUID *>(&tGuid, &guid_ii, cEncoder);
+    _EncoderImageItems = guid_ii;
+    v = gdip_enumptr_create<GUID *>(&tGuid, &_EncoderImageItems, cEncoder);
     gdip_enum_define<GUID *>(cEncoder, table, "ImageItems", Data_Ptr<GUID *>(v), v);
 
     ID_SaveAsCMYK = rb_intern("SaveAsCMYK");
-    GUID guid_sac = {0xa219bbc9, 0xa9d, 0x4005, {0xa3, 0xee, 0x3a, 0x42, 0x1b, 0x8b, 0xb0, 0x6c}};
-    v = gdip_enumptr_create<GUID *>(&tGuid, &guid_sac, cEncoder);
+    GUID guid_sacmyk = {0xa219bbc9, 0xa9d, 0x4005, {0xa3, 0xee, 0x3a, 0x42, 0x1b, 0x8b, 0xb0, 0x6c}};
+    _EncoderSaveAsCMYK = guid_sacmyk;
+    v = gdip_enumptr_create<GUID *>(&tGuid, &_EncoderSaveAsCMYK, cEncoder);
     gdip_enum_define<GUID *>(cEncoder, table, "SaveAsCMYK", Data_Ptr<GUID *>(v), v);
 
 }
@@ -387,6 +411,7 @@ Init_enum() {
     rb_define_method(cEnumInt, "|", RUBY_METHOD_FUNC(gdip_enumint_or), 1);
     rb_define_method(cEnumInt, "&", RUBY_METHOD_FUNC(gdip_enumint_and), 1);
     rb_define_method(cEnumInt, "coerce", RUBY_METHOD_FUNC(gdip_enumint_coerce), 1);
+    rb_define_method(cEnumInt, "==", RUBY_METHOD_FUNC(gdip_enumint_equal), 1);
 
     Init_PixelFormat();
     Init_EncoderParameterValueType();

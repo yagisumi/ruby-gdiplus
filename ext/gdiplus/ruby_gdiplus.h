@@ -80,14 +80,18 @@ extern ID ID_ColorSpace;
 extern ID ID_ImageItems;
 extern ID ID_SaveAsCMYK;
 
+extern GUID _EncoderColorSpace;
+extern GUID _EncoderImageItems;
+extern GUID _EncoderSaveAsCMYK;
+
 template <typename T> ID gdip_enum_get_id(VALUE klass, T data);
 template <typename T> VALUE gdip_enum_get(VALUE klass, T data);
 VALUE gdip_encoder_get(GUID *guid);
 
-
-
 #ifndef PixelFormat32bppCMYK
 #define PixelFormat32bppCMYK       (15 | (32 << 8))
+#undef PixelFormatMax
+#define PixelFormatMax 16
 #endif
 
 /* Debug */
@@ -137,6 +141,12 @@ dp_type(const char *msg)
 #endif
 
 /* Utils */
+#define _VERBOSE(...) rb_warning(__VA_ARGS__)
+#define _WARNING(...) rb_warn(__VA_ARGS__)
+#define _RB_ARRAY_P(v) RB_TYPE_P(v, RUBY_T_ARRAY)
+#define _RB_STRING_P(v) RB_TYPE_P(v, RUBY_T_STRING)
+#define _RB_INTEGER_P(v) RB_INTEGER_TYPE_P(v)
+
 static inline const char * __method__() { return rb_id2name(rb_frame_this_func()); }
 static inline const char * __class__(VALUE self) { return rb_class2name(CLASS_OF(self)); }
 

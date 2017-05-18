@@ -56,7 +56,7 @@ gdip_bitmap_init(int argc, VALUE *argv, VALUE self)
 {
     Bitmap *bmp = Data_Ptr<Bitmap *>(self);
     if (bmp != NULL) {
-        rb_warn("Gdiplus::Bitmap already initialized");
+        _VERBOSE("Gdiplus::Bitmap already initialized");
         return self;
     }
 

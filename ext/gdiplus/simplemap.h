@@ -66,7 +66,7 @@ public:
             return true;
         }
         else {
-            rb_warning("ArrayMap: capacity over");
+            _WARNING("ArrayMap: capacity over");
             return false;
         }
     }
@@ -117,7 +117,7 @@ public:
             return true;
         }
         else {
-            rb_warning("IndexArrayMap: index over");
+            _WARNING("IndexArrayMap: index over");
             return false;
         }
     }
@@ -180,7 +180,7 @@ public:
             return true;
         }
         else {
-            rb_warning("SortedArrayMap: capacity over");
+            _WARNING("SortedArrayMap: capacity over");
             return false;
         }
     }
