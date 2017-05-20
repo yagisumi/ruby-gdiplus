@@ -473,7 +473,7 @@ gdip_icinfo_s_image_decoders(VALUE self)
 struct gdipEncoderParameter {
     GUID Guid; // Encoder
     ULONG Type; // EncoderParameterValueType
-    VALUE values; // Array or nil
+    VALUE values; // Array or String or nil
     ID _enc_id;
 };
 
@@ -613,16 +613,24 @@ gdip_encprm_get_int_ary(VALUE value)
     if (Integer_p(value)) {
         rb_ary_push(ary, value);
     }
+    else if (_KIND_OF(value, &tEnumInt)) {
+        DWORD x = Data_Ptr_As<DWORD>(value);
+        rb_ary_push(ary, RB_UINT2NUM(x));
+    }
     else if (_RB_ARRAY_P(value)) {
         for (int i = 0; i < RARRAY_LEN(value); ++i) {
             VALUE v = rb_ary_entry(value, i);
             if (Integer_p(v)) {
                 rb_ary_push(ary, v);
             }
+            else if (_KIND_OF(v, &tEnumInt)) {
+                DWORD x = Data_Ptr_As<DWORD>(v);
+                rb_ary_push(ary, RB_UINT2NUM(x));
+            }
         }
     }
     else {
-        rb_raise(rb_eTypeError, "ValueTypeRational requires Integer or Array<Integer>");
+        rb_raise(rb_eTypeError, "this ValueType requires Integer or Array<Integer>");
     }
     RB_OBJ_FREEZE(ary);
     return ary;
@@ -797,11 +805,11 @@ gdip_encprm_transformation_init(VALUE self, VALUE value)
     if (_RB_ARRAY_P(encprm->values) && RARRAY_LEN(encprm->values) == 1) {
         int q = RB_NUM2INT(rb_ary_entry(encprm->values, 0));
         if (q < 13 || 17 < q) {
-            _VERBOSE("Gdiplus::EncoderParameter Transformation must be ValueType.Transform***");
+            _VERBOSE("Gdiplus::EncoderParameter Transformation must be EncoderValue.Transform***");
         }
     }
     else {
-        _VERBOSE("Gdiplus::EncoderParameter Transformation must be ValueType.Transform***");
+        _VERBOSE("Gdiplus::EncoderParameter Transformation must be EncoderValue.Transform***");
     }
     return self;
 }
@@ -820,11 +828,11 @@ gdip_encprm_compression_init(VALUE self, VALUE value)
     if (_RB_ARRAY_P(encprm->values) && RARRAY_LEN(encprm->values) == 1) {
         int q = RB_NUM2INT(rb_ary_entry(encprm->values, 0));
         if (q < 2 || 2 < q) {
-            _VERBOSE("Gdiplus::EncoderParameter Compression must be ValueType.Compression***");
+            _VERBOSE("Gdiplus::EncoderParameter Compression must be EncoderValue.Compression***");
         }
     }
     else {
-        _VERBOSE("Gdiplus::EncoderParameter Compression must be ValueType.Compression***");
+        _VERBOSE("Gdiplus::EncoderParameter Compression must be EncoderValue.Compression***");
     }
     return self;
 }
@@ -865,12 +873,12 @@ gdip_encprm_saveflag_init(VALUE self, VALUE value)
 
     if (_RB_ARRAY_P(encprm->values) && RARRAY_LEN(encprm->values) == 1) {
         int q = RB_NUM2INT(rb_ary_entry(encprm->values, 0));
-        if (q != 18 && q != 19) {
-            _VERBOSE("Gdiplus::EncoderParameter ColorDepth must be ValueType.***Frame");
+        if (q < 18 || 20 < q) {
+            _VERBOSE("Gdiplus::EncoderParameter SaveFlag must be EncoderValue.***Frame or EncoderValue.Flush");
         }
     }
     else {
-        _VERBOSE("Gdiplus::EncoderParameter ColorDepth must be ValueType.***Frame");
+        _VERBOSE("Gdiplus::EncoderParameter SaveFlag must be EncoderValue.***Frame or EncoderValue.Flush");
     }
     return self;
 }
@@ -889,11 +897,11 @@ gdip_encprm_saveascmyk_init(VALUE self, VALUE value)
     if (_RB_ARRAY_P(encprm->values) && RARRAY_LEN(encprm->values) == 1) {
         int q = RB_NUM2INT(rb_ary_entry(encprm->values, 0));
         if (q != 0 && q != 1 && q != 24 && q != 25) {
-            _VERBOSE("Gdiplus::EncoderParameter ColorDepth must be ValueType.ColorType***");
+            _VERBOSE("Gdiplus::EncoderParameter ColorDepth must be EncoderValue.ColorType***");
         }
     }
     else {
-        _VERBOSE("Gdiplus::EncoderParameter ColorDepth must be ValueType.ColorType***");
+        _VERBOSE("Gdiplus::EncoderParameter ColorDepth must be EncoderValue.ColorType***");
     }
     return self;
 }
@@ -1118,7 +1126,33 @@ gdip_encprm_init(int argc, VALUE* argv, VALUE self)
 
 struct gdipEncoderParameters {
     VALUE params;
+    EncoderParameters *data;
 };
+
+static void
+gdip_encprms_free_data(EncoderParameters *ptr)
+{
+    if (ptr == NULL) return;
+    for (unsigned int i = 0; i < ptr->Count; ++i) {
+        if (ptr->Parameter[i].Value) {
+            dp("EncoderParameter.Value free (Type: %d, Num: %d)", ptr->Parameter[i].Type, ptr->Parameter[i].NumberOfValues);
+            ruby_xfree(ptr->Parameter[i].Value);
+        }
+    }
+    ruby_xfree(ptr);
+    dp("EncoderParameters: free");
+}
+
+static void
+gdip_encprms_free(gdipEncoderParameters *ptr)
+{
+    dp("gdipEncoderParameters: free");
+    if (ptr->data) {
+        gdip_encprms_free_data(ptr->data);
+        ptr->data = NULL;
+    }
+    ruby_xfree(ptr);
+}
 
 static void
 gdip_encprms_mark(gdipEncoderParameters *ptr)
@@ -1127,7 +1161,7 @@ gdip_encprms_mark(gdipEncoderParameters *ptr)
 }
 
 const rb_data_type_t tEncoderParameters = _MAKE_DATA_TYPE(
-    "EncoderParameters", RUBY_DATA_FUNC(gdip_encprms_mark), GDIP_DEFAULT_FREE(gdipEncoderParameters), &typeddata_size<gdipEncoderParameters>, NULL, &cEncoderParameters);
+    "EncoderParameters", RUBY_DATA_FUNC(gdip_encprms_mark), RUBY_DATA_FUNC(gdip_encprms_free), &typeddata_size<gdipEncoderParameters>, NULL, &cEncoderParameters);
 
 VALUE
 gdip_encprms_create(EncoderParameters *encprms)
@@ -1224,6 +1258,136 @@ gdip_encprms_param(VALUE self)
  }
 
 /**
+ *
+ * 
+ * 
+ */
+EncoderParameters *
+gdip_encprms_build_struct(VALUE v)
+{
+    if (!_KIND_OF(v, &tEncoderParameters)) {
+        rb_raise(rb_eTypeError, "invalid type");
+    }
+
+    gdipEncoderParameters *encprms = Data_Ptr<gdipEncoderParameters *>(v);
+    if (encprms->data) {
+        gdip_encprms_free_data(encprms->data);
+        encprms->data = NULL;
+    }
+
+    if (!_RB_ARRAY_P(encprms->params)) {
+        return NULL;
+    }
+
+    VALUE params = encprms->params;
+    if (RARRAY_LEN(params) == 0) {
+        return NULL;
+    }
+    EncoderParameters *data = static_cast<EncoderParameters *>(ruby_xcalloc(1, sizeof(UINT) + sizeof(EncoderParameter) * RARRAY_LEN(params)));
+    encprms->data = data;
+    dp("EncoderParameters: create");
+
+    data->Count = RARRAY_LEN(params);
+    for (int i = 0; i < RARRAY_LEN(params); ++i) {
+        VALUE param = rb_ary_entry(params, i);
+        gdipEncoderParameter *encprm = Data_Ptr<gdipEncoderParameter *>(param);
+
+        int size = gdip_encprm_size(encprm);
+        data->Parameter[i].Guid = encprm->Guid;
+        data->Parameter[i].NumberOfValues = size;
+        data->Parameter[i].Type = encprm->Type;
+
+        if (size == 0) continue;
+
+        VALUE values = encprm->values;
+        if (encprm->Type == EncoderParameterValueTypeByte || encprm->Type == EncoderParameterValueTypeUndefined) {
+            BYTE *param_v = static_cast<BYTE *>(RB_ZALLOC_N(BYTE, size));
+            data->Parameter[i].Value = param_v;
+            for (int j = 0; j < size; ++j) {
+                VALUE e = rb_ary_entry(values, j);
+                param_v[j] = static_cast<BYTE>(RB_NUM2UINT(e));
+            }
+        }
+        else if (encprm->Type == EncoderParameterValueTypeShort) {
+            WORD *param_v = static_cast<WORD *>(RB_ZALLOC_N(WORD, size));
+            data->Parameter[i].Value = param_v;
+            for (int j = 0; j < size; ++j) {
+                VALUE e = rb_ary_entry(values, j);
+                param_v[j] = static_cast<WORD>(RB_NUM2UINT(e));
+            }
+        }
+        else if (encprm->Type == EncoderParameterValueTypeLong) {
+            DWORD *param_v = static_cast<DWORD *>(RB_ZALLOC_N(DWORD, size));
+            data->Parameter[i].Value = param_v;
+            for (int j = 0; j < size; ++j) {
+                VALUE e = rb_ary_entry(values, j);
+                param_v[j] = static_cast<DWORD>(RB_NUM2UINT(e));
+            }
+        }
+        else if (encprm->Type == EncoderParameterValueTypeASCII) {
+            char *param_v = static_cast<char *>(RB_ZALLOC_N(char, size));
+            data->Parameter[i].Value = param_v;
+            memcpy(param_v, RSTRING_PTR(values), size - 1); // RSTRING_LEN
+        }
+        else if (encprm->Type == EncoderParameterValueTypeRational) {
+            DWORD *param_v = static_cast<DWORD *>(RB_ZALLOC_N(DWORD, size * 2));
+            data->Parameter[i].Value = param_v;
+            for (int j = 0; j < size; ++j) {
+                VALUE e = rb_ary_entry(values, j);
+                VALUE num = rb_rational_num(e);
+                VALUE den = rb_rational_den(e);
+                param_v[j * 2] = RB_NUM2UINT(num);
+                param_v[j * 2 + 1] = RB_NUM2UINT(den);
+            }
+        }
+        else if (encprm->Type == EncoderParameterValueTypeLongRange) {
+            DWORD *param_v = static_cast<DWORD *>(RB_ZALLOC_N(DWORD, size * 2));
+            data->Parameter[i].Value = param_v;
+            for (int j = 0; j < size; ++j) {
+                VALUE e = rb_ary_entry(values, j);
+                VALUE beg = rb_funcall(e, rb_intern("begin"), 0);
+                VALUE end = rb_funcall(e, rb_intern("end"), 0);
+                param_v[j * 2] = RB_NUM2UINT(beg);
+                param_v[j * 2 + 1] = RB_NUM2UINT(end);
+            }
+        }
+        else if (encprm->Type == EncoderParameterValueTypeRationalRange) {
+            DWORD *param_v = static_cast<DWORD *>(RB_ZALLOC_N(DWORD, size * 4));
+            data->Parameter[i].Value = param_v;
+            for (int j = 0; j < size; ++j) {
+                VALUE e = rb_ary_entry(values, j);
+                VALUE beg = rb_funcall(e, rb_intern("begin"), 0);
+                VALUE end = rb_funcall(e, rb_intern("end"), 0);
+                VALUE beg_num = rb_rational_num(beg);
+                VALUE beg_den = rb_rational_den(beg);
+                VALUE end_num = rb_rational_num(end);
+                VALUE end_den = rb_rational_den(end);
+                param_v[j * 4] = RB_NUM2UINT(beg_num);
+                param_v[j * 4 + 1] = RB_NUM2UINT(beg_den);
+                param_v[j * 4 + 2] = RB_NUM2UINT(end_num);
+                param_v[j * 4 + 3] = RB_NUM2UINT(end_den);
+            }
+        }
+        else if (encprm->Type == EncoderParameterValueTypePointer) {
+            _WARNING("Not Implemented for EncoderParameterValueTypePointer");
+        }
+        else {
+            _WARNING("Invalid Type");
+        }
+    }
+    return data;
+}
+
+#if GDIPLUS_DEBUG
+static VALUE
+gdip_encprms_build_and_create_for_debug(VALUE self)
+{
+    EncoderParameters *params = gdip_encprms_build_struct(self);
+    return gdip_encprms_create(params);
+}
+#endif
+
+/**
  * Document-class: Gdiplus::Guid
  * This class wraps a GUID structure.
  * @example
@@ -1307,6 +1471,40 @@ Init_codec()
     VALUE cEncoderParameterQuality = rb_define_class_under(mGdiplus, "EncoderParameterQuality", cEncoderParameter);
     rb_define_method(cEncoderParameterQuality, "initialize", RUBY_METHOD_FUNC(gdip_encprm_quality_init), 1);
 
+    VALUE cEncoderParameterCompression = rb_define_class_under(mGdiplus, "EncoderParameterCompression", cEncoderParameter);
+    rb_define_method(cEncoderParameterCompression, "initialize", RUBY_METHOD_FUNC(gdip_encprm_compression_init), 1);
+
+    VALUE cEncoderParameterTransformation = rb_define_class_under(mGdiplus, "EncoderParameterTransformation", cEncoderParameter);
+    rb_define_method(cEncoderParameterTransformation, "initialize", RUBY_METHOD_FUNC(gdip_encprm_transformation_init), 1);
+
+    VALUE cEncoderParameterSaveFlag = rb_define_class_under(mGdiplus, "EncoderParameterSaveFlag", cEncoderParameter);
+    rb_define_method(cEncoderParameterSaveFlag, "initialize", RUBY_METHOD_FUNC(gdip_encprm_saveflag_init), 1);
+
+    VALUE cEncoderParameterChrominanceTable = rb_define_class_under(mGdiplus, "EncoderParameterChrominanceTable", cEncoderParameter);
+    rb_define_method(cEncoderParameterChrominanceTable, "initialize", RUBY_METHOD_FUNC(gdip_encprm_chrominance_init), 1);
+
+    VALUE cEncoderParameterLuminanceTable = rb_define_class_under(mGdiplus, "EncoderParameterLuminanceTable", cEncoderParameter);
+    rb_define_method(cEncoderParameterLuminanceTable, "initialize", RUBY_METHOD_FUNC(gdip_encprm_luminance_init), 1);
+
+    VALUE cEncoderParameterVersion = rb_define_class_under(mGdiplus, "EncoderParameterVersion", cEncoderParameter);
+    rb_define_method(cEncoderParameterVersion, "initialize", RUBY_METHOD_FUNC(gdip_encprm_version_init), 1);
+
+    VALUE cEncoderParameterRenderMethod = rb_define_class_under(mGdiplus, "EncoderParameterRenderMethod", cEncoderParameter);
+    rb_define_method(cEncoderParameterRenderMethod, "initialize", RUBY_METHOD_FUNC(gdip_encprm_rendermethod_init), 1);
+
+    VALUE cEncoderParameterScanMethod = rb_define_class_under(mGdiplus, "EncoderParameterScanMethod", cEncoderParameter);
+    rb_define_method(cEncoderParameterScanMethod, "initialize", RUBY_METHOD_FUNC(gdip_encprm_scanmethod_init), 1);
+
+
+    VALUE cEncoderParameterColorSpace = rb_define_class_under(mGdiplus, "EncoderParameterColorSpace", cEncoderParameter);
+    rb_define_method(cEncoderParameterColorSpace, "initialize", RUBY_METHOD_FUNC(gdip_encprm_colorspace_init), 1);
+
+    VALUE cEncoderParameterSaveAsCMYK = rb_define_class_under(mGdiplus, "EncoderParameterSaveAsCMYK", cEncoderParameter);
+    rb_define_method(cEncoderParameterSaveAsCMYK, "initialize", RUBY_METHOD_FUNC(gdip_encprm_saveascmyk_init), 1);
+
+    VALUE cEncoderParameterImageItems = rb_define_class_under(mGdiplus, "EncoderParameterImageItems", cEncoderParameter);
+    rb_define_method(cEncoderParameterImageItems, "initialize", RUBY_METHOD_FUNC(gdip_encprm_imageitems_init), 1);
+
     cEncoderParameters = rb_define_class_under(mGdiplus, "EncoderParameters", rb_cObject);
     rb_define_alloc_func(cEncoderParameters, &typeddata_alloc<gdipEncoderParameters, &tEncoderParameters>);
     rb_define_method(cEncoderParameters, "initialize", RUBY_METHOD_FUNC(gdip_encprms_init), 0);
@@ -1315,4 +1513,7 @@ Init_codec()
     rb_define_method(cEncoderParameters, "param", RUBY_METHOD_FUNC(gdip_encprms_param), 0);
     rb_define_method(cEncoderParameters, "params", RUBY_METHOD_FUNC(gdip_encprms_param), 0);
     rb_define_method(cEncoderParameters, "add", RUBY_METHOD_FUNC(gdip_encprms_add), 1);
+    #if GDIPLUS_DEBUG
+    rb_define_method(cEncoderParameters, "build_and_create_for_debug", RUBY_METHOD_FUNC(gdip_encprms_build_and_create_for_debug), 0);
+    #endif
 }

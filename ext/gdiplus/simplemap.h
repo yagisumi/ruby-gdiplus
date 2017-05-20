@@ -7,9 +7,9 @@
 #define SIMPLEMAP_H
 
 #include "ruby_gdiplus.h"
-#include <cstring>
+#include <string.h>
 
-using namespace std;
+
 
 class MapBase {
 public:
@@ -226,5 +226,17 @@ public:
     MemPtrSortedArrayMap(int capa) : SortedArrayMap<TKey, TVal>(capa) {}
     virtual ~MemPtrSortedArrayMap() {}
 };
+
+template<typename TVal>
+class StrSortedArrayMap : public SortedArrayMap<const char *, TVal> {
+protected:
+    virtual int compare(const char *key1, const char *key2) {
+        return strcmp(key1, key2);
+    }
+public:
+    StrSortedArrayMap(int capa) : SortedArrayMap<const char *, TVal>(capa) {}
+    virtual ~StrSortedArrayMap() {}
+};
+
 
 #endif /* SIMPLEMAP_H */

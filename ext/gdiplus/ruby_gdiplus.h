@@ -28,8 +28,9 @@ extern VALUE cBitmap;
 extern VALUE cPixelFormat;
 extern VALUE cEncoderParameterValueType;
 extern VALUE cEncoder;
-extern VALUE cValueType;
+extern VALUE cEncoderValue;
 extern VALUE cEnumInt;
+extern VALUE cImageFormat;
 extern VALUE cEncoderParameter;
 extern VALUE cEncoderParameters;
 
@@ -63,6 +64,7 @@ static inline void GdiplusRelease() {
 /* gdip_codec.cpp */
 VALUE gdip_guid_create(GUID *guid);
 VALUE gdip_encprms_create(EncoderParameters *encprms);
+EncoderParameters *gdip_encprms_build_struct(VALUE v);
 
 /* gdip_enum.cpp */
 extern ID ID_UNKNOWN;
@@ -83,6 +85,9 @@ extern ID ID_SaveAsCMYK;
 extern GUID _EncoderColorSpace;
 extern GUID _EncoderImageItems;
 extern GUID _EncoderSaveAsCMYK;
+
+extern GUID _ImageFormatEXIF;
+extern GUID _ImageFormatUndefined;
 
 template <typename T> ID gdip_enum_get_id(VALUE klass, T data);
 template <typename T> VALUE gdip_enum_get(VALUE klass, T data);
@@ -283,6 +288,25 @@ gdip_obj_free(void *ptr)
 }
 #define GDIP_OBJ_FREE(T) (&gdip_obj_free<T>)
 
+static inline void
+Check_NULL(void *p, const char *msg)
+{
+    if (p == NULL) {
+        rb_raise(eGdiplus, msg);
+    }
+}
+
+static inline void
+Check_Status(GpStatus status) {
+    if (status == Ok) { return; }
+    if (status < 22) {
+        rb_raise(eGdiplus, "GpStatus.%s, Some error occurred.", GpStatusStrs[status]);
+    }
+    else {
+        rb_raise(eGdiplus, "Unknown error occurred. (GpStatus: %d)", status);
+    }
+}
+
 #define NOT_IMPLEMENTED_ERROR rb_raise(rb_eNotImpError, "not implemented yet")
 
 static inline bool
@@ -315,5 +339,7 @@ VALUE util_associate_utf8(VALUE str);
 VALUE util_utf8_sprintf(const char* format, ...);
 VALUE util_utf16_str_new(VALUE v);
 VALUE util_utf8_str_new_from_wstr(const wchar_t * wstr);
+bool util_extname(VALUE str, char (&ext)[6]);
+
 
 #endif /* RUBY_GDIPLUS_H */

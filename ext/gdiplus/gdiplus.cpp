@@ -16,8 +16,9 @@ VALUE cBitmap;
 VALUE cPixelFormat;
 VALUE cEncoderParameterValueType;
 VALUE cEncoder;
-VALUE cValueType;
+VALUE cEncoderValue;
 VALUE cEnumInt;
+VALUE cImageFormat;
 VALUE cEncoderParameter;
 VALUE cEncoderParameters;
 

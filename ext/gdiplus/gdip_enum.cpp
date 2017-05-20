@@ -25,6 +25,9 @@ GUID _EncoderColorSpace;
 GUID _EncoderImageItems;
 GUID _EncoderSaveAsCMYK;
 
+GUID _ImageFormatEXIF;
+GUID _ImageFormatUndefined;
+
 class KlassTableMap : public SortedArrayMap<VALUE, MapBase *> {
 public:
     KlassTableMap(int capa) : SortedArrayMap<VALUE, MapBase *>(capa) {}
@@ -124,6 +127,7 @@ static VALUE
 gdip_enumptr_create(const rb_data_type_t *type, T data, VALUE klass=Qnil)
 {
     T ptr = static_cast<T>(ruby_xcalloc(1, sizeof(*data)));
+    DPT("enum create");
     *ptr = *data;
     if (RB_NIL_P(klass)) klass = _KLASS(type);
     VALUE r = _Data_Wrap_Struct(klass, type, ptr);
@@ -241,7 +245,7 @@ Init_EncoderParameterValueType()
     klass_table_map.set(cEncoderParameterValueType, table);
 
     define_enumint(cEncoderParameterValueType, table, "ValueTypeByte", EncoderParameterValueTypeByte);
-    define_enumint(cEncoderParameterValueType, table, "ValueTypeASCII", EncoderParameterValueTypeASCII);
+    define_enumint(cEncoderParameterValueType, table, "ValueTypeAscii", EncoderParameterValueTypeASCII);
     define_enumint(cEncoderParameterValueType, table, "ValueTypeShort", EncoderParameterValueTypeShort);
     define_enumint(cEncoderParameterValueType, table, "ValueTypeLong", EncoderParameterValueTypeLong);
     define_enumint(cEncoderParameterValueType, table, "ValueTypeRational", EncoderParameterValueTypeRational);
@@ -256,43 +260,43 @@ Init_EncoderParameterValueType()
 static void
 Init_ValueType()
 {
-    cValueType = rb_define_class_under(mGdiplus, "ValueType", cEnumInt);
-    rb_undef_alloc_func(cValueType);
+    cEncoderValue = rb_define_class_under(mGdiplus, "EncoderValue", cEnumInt);
+    rb_undef_alloc_func(cEncoderValue);
     IndexArrayMap<ID> *table = new IndexArrayMap<ID>(26);
-    klass_table_map.set(cValueType, table);
+    klass_table_map.set(cEncoderValue, table);
     
-    define_enumint(cValueType, table, "ColorTypeCMYK", EncoderValueColorTypeCMYK);
-    define_enumint(cValueType, table, "ColorTypeYCCK", EncoderValueColorTypeYCCK);
-    define_enumint(cValueType, table, "CompressionLZW", EncoderValueCompressionLZW);
-    define_enumint(cValueType, table, "CompressionCCITT3", EncoderValueCompressionCCITT3);
-    define_enumint(cValueType, table, "CompressionCCITT4", EncoderValueCompressionCCITT4);
-    define_enumint(cValueType, table, "CompressionRle", EncoderValueCompressionRle);
-    define_enumint(cValueType, table, "CompressionNone", EncoderValueCompressionNone);
-    define_enumint(cValueType, table, "ScanMethodInterlaced", EncoderValueScanMethodInterlaced);
-    define_enumint(cValueType, table, "ScanMethodNonInterlaced", EncoderValueScanMethodNonInterlaced);
-    define_enumint(cValueType, table, "VersionGif87", EncoderValueVersionGif87);
-    define_enumint(cValueType, table, "VersionGif89", EncoderValueVersionGif89);
-    define_enumint(cValueType, table, "RenderProgressive", EncoderValueRenderProgressive);
-    define_enumint(cValueType, table, "RenderNonProgressive", EncoderValueRenderNonProgressive);
-    define_enumint(cValueType, table, "TransformRotate90", EncoderValueTransformRotate90);
-    define_enumint(cValueType, table, "TransformRotate180", EncoderValueTransformRotate180);
-    define_enumint(cValueType, table, "TransformRotate270", EncoderValueTransformRotate270);
-    define_enumint(cValueType, table, "TransformFlipHorizontal", EncoderValueTransformFlipHorizontal);
-    define_enumint(cValueType, table, "TransformFlipVertical", EncoderValueTransformFlipVertical);
-    define_enumint(cValueType, table, "MultiFrame", EncoderValueMultiFrame);
-    define_enumint(cValueType, table, "LastFrame", EncoderValueLastFrame);
-    define_enumint(cValueType, table, "Flush", EncoderValueFlush);
-    define_enumint(cValueType, table, "FrameDimensionTime", EncoderValueFrameDimensionTime);
-    define_enumint(cValueType, table, "FrameDimensionResolution", EncoderValueFrameDimensionResolution);
-    define_enumint(cValueType, table, "FrameDimensionPage", EncoderValueFrameDimensionPage);
-    define_enumint(cValueType, table, "ColorTypeGray", EncoderValueFrameDimensionPage + 1); // EncoderValueColorTypeGray
-    define_enumint(cValueType, table, "ColorTypeRGB", EncoderValueFrameDimensionPage + 2); // EncoderValueColorTypeRGB
+    define_enumint(cEncoderValue, table, "ColorTypeCMYK", EncoderValueColorTypeCMYK);
+    define_enumint(cEncoderValue, table, "ColorTypeYCCK", EncoderValueColorTypeYCCK);
+    define_enumint(cEncoderValue, table, "CompressionLZW", EncoderValueCompressionLZW);
+    define_enumint(cEncoderValue, table, "CompressionCCITT3", EncoderValueCompressionCCITT3);
+    define_enumint(cEncoderValue, table, "CompressionCCITT4", EncoderValueCompressionCCITT4);
+    define_enumint(cEncoderValue, table, "CompressionRle", EncoderValueCompressionRle);
+    define_enumint(cEncoderValue, table, "CompressionNone", EncoderValueCompressionNone);
+    define_enumint(cEncoderValue, table, "ScanMethodInterlaced", EncoderValueScanMethodInterlaced);
+    define_enumint(cEncoderValue, table, "ScanMethodNonInterlaced", EncoderValueScanMethodNonInterlaced);
+    define_enumint(cEncoderValue, table, "VersionGif87", EncoderValueVersionGif87);
+    define_enumint(cEncoderValue, table, "VersionGif89", EncoderValueVersionGif89);
+    define_enumint(cEncoderValue, table, "RenderProgressive", EncoderValueRenderProgressive);
+    define_enumint(cEncoderValue, table, "RenderNonProgressive", EncoderValueRenderNonProgressive);
+    define_enumint(cEncoderValue, table, "TransformRotate90", EncoderValueTransformRotate90);
+    define_enumint(cEncoderValue, table, "TransformRotate180", EncoderValueTransformRotate180);
+    define_enumint(cEncoderValue, table, "TransformRotate270", EncoderValueTransformRotate270);
+    define_enumint(cEncoderValue, table, "TransformFlipHorizontal", EncoderValueTransformFlipHorizontal);
+    define_enumint(cEncoderValue, table, "TransformFlipVertical", EncoderValueTransformFlipVertical);
+    define_enumint(cEncoderValue, table, "MultiFrame", EncoderValueMultiFrame);
+    define_enumint(cEncoderValue, table, "LastFrame", EncoderValueLastFrame);
+    define_enumint(cEncoderValue, table, "Flush", EncoderValueFlush);
+    define_enumint(cEncoderValue, table, "FrameDimensionTime", EncoderValueFrameDimensionTime);
+    define_enumint(cEncoderValue, table, "FrameDimensionResolution", EncoderValueFrameDimensionResolution);
+    define_enumint(cEncoderValue, table, "FrameDimensionPage", EncoderValueFrameDimensionPage);
+    define_enumint(cEncoderValue, table, "ColorTypeGray", EncoderValueFrameDimensionPage + 1); // EncoderValueColorTypeGray
+    define_enumint(cEncoderValue, table, "ColorTypeRGB", EncoderValueFrameDimensionPage + 2); // EncoderValueColorTypeRGB
 }
 
 /* Encoder */
 
 static VALUE
-gdip_encoder_inspect(VALUE self)
+gdip_enumguid_inspect(VALUE self)
 {
     ID id = ID_UNKNOWN;
     VALUE r;
@@ -311,19 +315,13 @@ gdip_encoder_inspect(VALUE self)
     }
     return r;
 }
-/*
-VALUE 
-gdip_encoder_get(GUID *guid)
-{
-    return gdip_enumptr_create<GUID *>(&tGuid, guid, cEncoder);
-}
-*/
+
 void
 Init_Encoder()
 {
     cEncoder = rb_define_class_under(mGdiplus, "Encoder", cGuid);
     rb_undef_alloc_func(cEncoder);
-    rb_define_method(cEncoder, "inspect", RUBY_METHOD_FUNC(gdip_encoder_inspect), 0);
+    rb_define_method(cEncoder, "inspect", RUBY_METHOD_FUNC(gdip_enumguid_inspect), 0);
     MemPtrSortedArrayMap<GUID *, ID> *table = new MemPtrSortedArrayMap<GUID *, ID>(13);
     klass_table_map.set(cEncoder, table);
     
@@ -400,6 +398,66 @@ Init_Encoder()
 
 }
 
+static void
+Init_imageformat()
+{
+    cImageFormat = rb_define_class_under(mGdiplus, "ImageFormat", cGuid);
+    rb_undef_alloc_func(cImageFormat);
+    rb_define_method(cImageFormat, "inspect", RUBY_METHOD_FUNC(gdip_enumguid_inspect), 0);
+    MemPtrSortedArrayMap<GUID *, ID> *table = new MemPtrSortedArrayMap<GUID *, ID>(11);
+    klass_table_map.set(cImageFormat, table);
+    
+    VALUE v;
+    GUID guid;
+
+    GUID guid_undef = {0xb96b3ca9,0x0728,0x11d3,{0x9d,0x7b,0x00,0x00,0xf8,0x1e,0xf3,0x2e}};
+    _ImageFormatUndefined = guid_undef;
+    v = gdip_enumptr_create<GUID *>(&tGuid, &_ImageFormatUndefined, cImageFormat);
+    gdip_enum_define<GUID *>(cImageFormat, table, "Undefined", Data_Ptr<GUID *>(v), v);
+
+    guid = ImageFormatMemoryBMP;
+    v = gdip_enumptr_create<GUID *>(&tGuid, &guid, cImageFormat);
+    gdip_enum_define<GUID *>(cImageFormat, table, "MemoryBmp", Data_Ptr<GUID *>(v), v);
+
+    guid = ImageFormatBMP;
+    v = gdip_enumptr_create<GUID *>(&tGuid, &guid, cImageFormat);
+    gdip_enum_define<GUID *>(cImageFormat, table, "Bmp", Data_Ptr<GUID *>(v), v);
+
+    guid = ImageFormatEMF;
+    v = gdip_enumptr_create<GUID *>(&tGuid, &guid, cImageFormat);
+    gdip_enum_define<GUID *>(cImageFormat, table, "Emf", Data_Ptr<GUID *>(v), v);
+
+    guid = ImageFormatWMF;
+    v = gdip_enumptr_create<GUID *>(&tGuid, &guid, cImageFormat);
+    gdip_enum_define<GUID *>(cImageFormat, table, "Wmf", Data_Ptr<GUID *>(v), v);
+
+    guid = ImageFormatJPEG;
+    v = gdip_enumptr_create<GUID *>(&tGuid, &guid, cImageFormat);
+    gdip_enum_define<GUID *>(cImageFormat, table, "Jpeg", Data_Ptr<GUID *>(v), v);
+
+    guid = ImageFormatPNG;
+    v = gdip_enumptr_create<GUID *>(&tGuid, &guid, cImageFormat);
+    gdip_enum_define<GUID *>(cImageFormat, table, "Png", Data_Ptr<GUID *>(v), v);
+
+    guid = ImageFormatGIF;
+    v = gdip_enumptr_create<GUID *>(&tGuid, &guid, cImageFormat);
+    gdip_enum_define<GUID *>(cImageFormat, table, "Gif", Data_Ptr<GUID *>(v), v);
+
+    guid = ImageFormatTIFF;
+    v = gdip_enumptr_create<GUID *>(&tGuid, &guid, cImageFormat);
+    gdip_enum_define<GUID *>(cImageFormat, table, "Tiff", Data_Ptr<GUID *>(v), v);
+
+
+    GUID guid_exif = {0xb96b3cb2,0x0728,0x11d3,{0x9d,0x7b,0x00,0x00,0xf8,0x1e,0xf3,0x2e}};
+    _ImageFormatEXIF = guid_exif;
+    v = gdip_enumptr_create<GUID *>(&tGuid, &_ImageFormatEXIF, cImageFormat);
+    gdip_enum_define<GUID *>(cImageFormat, table, "Exif", Data_Ptr<GUID *>(v), v);
+
+    guid = ImageFormatIcon;
+    v = gdip_enumptr_create<GUID *>(&tGuid, &guid, cImageFormat);
+    gdip_enum_define<GUID *>(cImageFormat, table, "Icon", Data_Ptr<GUID *>(v), v);
+}
+
 void
 Init_enum() {
     ID_UNKNOWN = rb_intern("__UNKNOWN__");
@@ -417,4 +475,5 @@ Init_enum() {
     Init_EncoderParameterValueType();
     Init_ValueType();
     Init_Encoder();
+    Init_imageformat();
 }

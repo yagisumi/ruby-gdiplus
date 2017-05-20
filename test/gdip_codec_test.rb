@@ -1,6 +1,10 @@
 # coding: utf-8
 require 'test_helper'
 
+unless Object.const_defined? :Rational
+  require 'rational'
+end
+
 class Guid2 < Gdiplus::Guid
 end
 
@@ -47,6 +51,10 @@ class GdiplusCodecTest < Test::Unit::TestCase
     bmp_encoder = encoders.find {|icinfo|
       icinfo.FormatDescription == "BMP"
     }
+    
+#    encoders.each {|icinfo|
+#      p [icinfo.FormatDescription, icinfo.FilenameExtension]
+#    }
     
     assert_not_nil(bmp_encoder)
     
@@ -157,12 +165,8 @@ class GdiplusCodecTest < Test::Unit::TestCase
     assert_equal([93], param.Value)
     assert(param.Value.frozen?)
     
-    verbose(true) {
-      assert_stderr(/Quality/) { EncoderParameter.new(Encoder.Quality, 101) }
-    }
-    verbose(false) {
-      assert_stderr_silent { EncoderParameter.new(Encoder.Quality, 101) }
-    }
+    _assert_stderr(/Quality/, true) { EncoderParameter.new(Encoder.Quality, 101) }
+    _assert_stderr_silent(false) { EncoderParameter.new(Encoder.Quality, 101) }
     
     param = EncoderParameterQuality.new(93)
     assert_instance_of(EncoderParameterQuality, param)
@@ -176,12 +180,8 @@ class GdiplusCodecTest < Test::Unit::TestCase
     assert_equal([93], param.Value)
     assert(param.Value.frozen?)
     
-    verbose(true) {
-      assert_stderr(/Quality/) { EncoderParameterQuality.new(101) }
-    }
-    verbose(false) {
-      assert_stderr_silent { EncoderParameterQuality.new(101) }
-    }
+    _assert_stderr(/Quality/, true) { EncoderParameterQuality.new(101) }
+    _assert_stderr_silent(false) { EncoderParameterQuality.new(101) }
   end
   
   
@@ -190,6 +190,42 @@ class GdiplusCodecTest < Test::Unit::TestCase
     #p params
     #p params.Param
     #p params.add(EncoderParameter.new(Encoder.Quality, 93))
+    params = EncoderParameters.new
+    if params.respond_to? :build_and_create_for_debug # debug mode
+      params.add(EncoderParameter.new(Encoder.Quality, 93))
+      params2 = params.build_and_create_for_debug
+      assert_equal(params.inspect, params2.inspect)
+      
+      params.add(EncoderParameter.new(Encoder.SaveFlag, EncoderValue.MultiFrame))
+      params2 = params.build_and_create_for_debug
+      assert_equal(params.inspect, params2.inspect)
+      
+      params.add(EncoderParameter.new(Encoder.Transformation, EncoderValue.TransformRotate90))
+      params2 = params.build_and_create_for_debug
+      assert_equal(params.inspect, params2.inspect)
+      
+      params.add(EncoderParameter.new(Encoder.Compression, EncoderValue.CompressionLZW))
+      params2 = params.build_and_create_for_debug
+      assert_equal(params.inspect, params2.inspect)
+      
+      params.add(EncoderParameter.new(Encoder.Quality, 0..100, EncoderParameterValueType.ValueTypeLongRange))
+      params2 = params.build_and_create_for_debug
+      assert_equal(params.inspect, params2.inspect)
+      
+      params.add(EncoderParameter.new(Encoder.Quality, Rational(1, 3), EncoderParameterValueType.ValueTypeRational))
+      params2 = params.build_and_create_for_debug
+      assert_equal(params.inspect, params2.inspect)
+      
+      params.add(EncoderParameter.new(Encoder.Quality, Rational(1, 3)..Rational(4, 3), EncoderParameterValueType.ValueTypeRationalRange))
+      params2 = params.build_and_create_for_debug
+      assert_equal(params.inspect, params2.inspect)
+      
+      params.add(EncoderParameter.new(Encoder.Quality, "test", EncoderParameterValueType.ValueTypeAscii))
+      params2 = params.build_and_create_for_debug
+      assert_equal(params.inspect, params2.inspect)
+      
+    end
+    
   end
   
 end

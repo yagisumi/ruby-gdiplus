@@ -6,8 +6,7 @@ require 'test/unit'
 require 'stringio'
 
 module Test::Unit::Assertions
-  VERBOSE_ = []
-  def verbose(v)
+  def _verbose(v)
     _v = $VERBOSE
     $VERBOSE = v
     begin
@@ -17,7 +16,12 @@ module Test::Unit::Assertions
     end
   end
   
-  def capture_output
+  def _capture_output(verbose=nil, &block)
+    _v = $VERBOSE
+    unless verbose.nil?
+      $VERBOSE = verbose
+    end
+    
     sio_out = StringIO.new
     sio_err = StringIO.new
     _stdout = $stdout
@@ -25,16 +29,17 @@ module Test::Unit::Assertions
     $stdout = sio_out
     $stderr = sio_err
     begin
-      yield
+      block.call
       [sio_out.string, sio_err.string]
     ensure
       $stdout = _stdout
       $stderr = _stderr
+      $VERBOSE = _v
     end
   end
   
-  def assert_output(stdout=nil, stderr=nil, &block)
-    out, err = capture_output(&block)
+  def _assert_output(stdout=nil, stderr=nil, verbose=nil, &block)
+    out, err = _capture_output(verbose, &block)
     
     x = true
     case stdout
@@ -55,12 +60,12 @@ module Test::Unit::Assertions
     x && y
   end
   
-  def assert_silent
-    assert_output("", "") { yield }
+  def _assert_silent(verbose=nil)
+    _assert_output("", "", verbose) { yield }
   end
   
-  def assert_stderr(stderr, &block)
-    err = capture_output(&block).last
+  def _assert_stderr(stderr, verbose=nil, &block)
+    err = _capture_output(verbose, &block).last
     
     y = true
     case stderr
@@ -73,12 +78,12 @@ module Test::Unit::Assertions
     y
   end
   
-  def assert_stderr_silent
-    assert_stderr("") { yield }
+  def _assert_stderr_silent(verbose=nil)
+    _assert_stderr("", verbose) { yield }
   end
   
-  def assert_stdout(stdout, &block)
-    out = capture_output(&block).first
+  def _assert_stdout(stdout, verbose=nil, &block)
+    out = _capture_output(verbose, &block).first
     
     x = true
     case stdout
@@ -91,8 +96,8 @@ module Test::Unit::Assertions
     x
   end
   
-  def assert_stdout_silent
-    assert_stdout("") { yield }
+  def _assert_stdout_silent(verbose=nil)
+    _assert_stdout("", verbose) { yield }
   end
   
 end

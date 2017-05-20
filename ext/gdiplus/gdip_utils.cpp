@@ -76,3 +76,34 @@ util_utf8_str_new_from_wstr(const wchar_t * wstr)
 
     return r;
 }
+
+bool
+util_extname(VALUE str, char (&ext)[6])
+{
+    if (!RB_TYPE_P(str, RUBY_T_STRING)) {
+        return false;
+    }
+    str = util_encode_to_utf8(str);
+    char *ptr = RSTRING_PTR(str);
+    memset(ext, 0, 6);
+
+    int len = RSTRING_LEN(str);
+    for (int i = len - 1; i >= 0; i--) {
+        if (ptr[i] == '.') {
+            for (int j = i; j < len; j ++) {
+                if(ptr[j] >= 65 && ptr[j] <= 90) {
+                    ext[j - i] = ptr[j] + 32;
+                }
+                else {
+                    ext[j - i] = ptr[j];
+                }
+            }
+            return true;
+        }
+        if (len - i > 4) {
+            break;
+        }
+    }
+    RB_GC_GUARD(str);
+    return false;
+}
