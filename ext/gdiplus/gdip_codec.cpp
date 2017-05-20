@@ -79,7 +79,9 @@ static VALUE
 gdip_guid_inspect(VALUE self)
 {
     VALUE to_s = gdip_guid_to_s(self);
-    return util_utf8_sprintf("#<%s {%s}>", rb_obj_classname(self), RSTRING_PTR(to_s));
+    VALUE r = util_utf8_sprintf("#<%s {%s}>", rb_obj_classname(self), RSTRING_PTR(to_s));
+    RB_GC_GUARD(to_s);
+    return r;
 }
 
 /*
@@ -318,11 +320,13 @@ gdip_icinfo_inspect(VALUE self)
     VALUE ext = gdip_icinfo_filenameext(self);
     VALUE mime = gdip_icinfo_mimetype(self);
 
-    return util_utf8_sprintf(
+    VALUE r = util_utf8_sprintf(
         "#<%s Clsid={%s} FormatID={%s} CodecName=\"%s\" DllName=\"%s\" FormatDescription=\"%s\" FilenameExtension=\"%s\" MimeType=\"%s\" Flags=0x%08lx, Version=%d>", 
         rb_obj_classname(self), RSTRING_PTR(clsid_str), RSTRING_PTR(formatid_str),
         RSTRING_PTR(codecname), RSTRING_PTR(dllname), RSTRING_PTR(formatdesc), RSTRING_PTR(ext), RSTRING_PTR(mime),
         icinfo->Flags, icinfo->Version);
+    
+    return r;
 }
 
 /*
@@ -601,6 +605,7 @@ gdip_encprm_inspect(VALUE self)
     VALUE v_inspect = rb_funcall(encprm->values, rb_intern("inspect"), 0);
     VALUE r = util_utf8_sprintf("#<%s Guid=%s NumberOfValues=%d Type=%s Value=%s>", 
         __class__(self), rb_id2name(encprm->_enc_id), num, rb_id2name(id_type), RSTRING_PTR(v_inspect));
+    RB_GC_GUARD(v_inspect);
     return r;
 }
 
@@ -1239,6 +1244,7 @@ gdip_encprms_inspect(VALUE self)
     VALUE v_inspect = rb_funcall(gpencprms->params, rb_intern("inspect"), 0);
     VALUE r = util_utf8_sprintf("#<%s Count=%d Parameter=%s>", 
         __class__(self), count, RSTRING_PTR(v_inspect));
+    RB_GC_GUARD(v_inspect);
     return r;
 }
 
