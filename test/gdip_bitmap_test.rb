@@ -12,16 +12,6 @@ class GdiplusBitmapTest < Test::Unit::TestCase
     assert_kind_of(Bitmap, Bitmap.new("test/gdip_bitmap_test1.png", true))
     assert_kind_of(Bitmap, Bitmap.new("test/gdip_bitmap_test2♥.png"))
   end
-  
-#  def test_image_save
-#    bmp = Bitmap.new(1, 1)
-#    %w!Png bmp Jpeg X XXX jpgn!.each {|ext|
-#      filename = "foooooo.#{ext}"
-#      p [filename, bmp.save(filename)]
-#    }
-#  end
-  
-  
 end
 
 __END__

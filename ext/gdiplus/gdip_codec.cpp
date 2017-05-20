@@ -827,7 +827,7 @@ gdip_encprm_compression_init(VALUE self, VALUE value)
 
     if (_RB_ARRAY_P(encprm->values) && RARRAY_LEN(encprm->values) == 1) {
         int q = RB_NUM2INT(rb_ary_entry(encprm->values, 0));
-        if (q < 2 || 2 < q) {
+        if (q < 2 || 6 < q) {
             _VERBOSE("Gdiplus::EncoderParameter Compression must be EncoderValue.Compression***");
         }
     }
@@ -873,12 +873,12 @@ gdip_encprm_saveflag_init(VALUE self, VALUE value)
 
     if (_RB_ARRAY_P(encprm->values) && RARRAY_LEN(encprm->values) == 1) {
         int q = RB_NUM2INT(rb_ary_entry(encprm->values, 0));
-        if (q < 18 || 20 < q) {
-            _VERBOSE("Gdiplus::EncoderParameter SaveFlag must be EncoderValue.***Frame or EncoderValue.Flush");
+        if (q < EncoderValueMultiFrame || EncoderValueFrameDimensionPage < q) {
+            _VERBOSE("Gdiplus::EncoderParameter SaveFlag must be EncoderValue.***Frame ,EncoderValue.Flush or EncoderValue.FrameDimension***");
         }
     }
     else {
-        _VERBOSE("Gdiplus::EncoderParameter SaveFlag must be EncoderValue.***Frame or EncoderValue.Flush");
+        _VERBOSE("Gdiplus::EncoderParameter SaveFlag must be EncoderValue.***Frame ,EncoderValue.Flush or EncoderValue.FrameDimension***");
     }
     return self;
 }
@@ -951,6 +951,16 @@ gdip_encprm_version_init(VALUE self, VALUE value)
 
     gdip_encprm_init_type_value(self, EncoderParameterValueTypeLong, value);
     
+    if (_RB_ARRAY_P(encprm->values) && RARRAY_LEN(encprm->values) == 1) {
+        int q = RB_NUM2INT(rb_ary_entry(encprm->values, 0));
+        if (q < 9 || 10 < q) {
+            _VERBOSE("Gdiplus::EncoderParameter Version must be EncoderValue.Version***");
+        }
+    }
+    else {
+        _VERBOSE("Gdiplus::EncoderParameter Version must be EncoderValue.Version***");
+    }
+    
     return self;
 }
 
@@ -964,6 +974,15 @@ gdip_encprm_scanmethod_init(VALUE self, VALUE value)
     encprm->values = Qnil;
 
     gdip_encprm_init_type_value(self, EncoderParameterValueTypeLong, value);
+    if (_RB_ARRAY_P(encprm->values) && RARRAY_LEN(encprm->values) == 1) {
+        int q = RB_NUM2INT(rb_ary_entry(encprm->values, 0));
+        if (q < EncoderValueScanMethodInterlaced || EncoderValueScanMethodNonInterlaced < q) {
+            _VERBOSE("Gdiplus::EncoderParameter ScanMethod must be EncoderValue.ScanMethod***");
+        }
+    }
+    else {
+        _VERBOSE("Gdiplus::EncoderParameter ScanMethod must be EncoderValue.ScanMethod***");
+    }
     
     return self;
 }
@@ -978,7 +997,16 @@ gdip_encprm_rendermethod_init(VALUE self, VALUE value)
     encprm->values = Qnil;
 
     gdip_encprm_init_type_value(self, EncoderParameterValueTypeLong, value);
-    
+    if (_RB_ARRAY_P(encprm->values) && RARRAY_LEN(encprm->values) == 1) {
+        int q = RB_NUM2INT(rb_ary_entry(encprm->values, 0));
+        if (q < EncoderValueRenderProgressive || EncoderValueRenderNonProgressive < q) {
+            _VERBOSE("Gdiplus::EncoderParameter RenderMethod must be EncoderValue.Render***");
+        }
+    }
+    else {
+        _VERBOSE("Gdiplus::EncoderParameter RenderMethod must be EncoderValue.Render***");
+    }
+
     return self;
 }
 
@@ -1008,6 +1036,7 @@ gdip_encprm_imageitems_init(VALUE self, VALUE value)
     VALUE ary = rb_ary_new();
     rb_ary_push(ary, value);
     encprm->values = ary;
+    // NOTIMPLEMENTED
     
     return self;
 }
@@ -1473,6 +1502,9 @@ Init_codec()
 
     VALUE cEncoderParameterCompression = rb_define_class_under(mGdiplus, "EncoderParameterCompression", cEncoderParameter);
     rb_define_method(cEncoderParameterCompression, "initialize", RUBY_METHOD_FUNC(gdip_encprm_compression_init), 1);
+
+    VALUE cEncoderParameterColorDepth = rb_define_class_under(mGdiplus, "EncoderParameterColorDepth", cEncoderParameter);
+    rb_define_method(cEncoderParameterColorDepth, "initialize", RUBY_METHOD_FUNC(gdip_encprm_colordepth_init), 1);
 
     VALUE cEncoderParameterTransformation = rb_define_class_under(mGdiplus, "EncoderParameterTransformation", cEncoderParameter);
     rb_define_method(cEncoderParameterTransformation, "initialize", RUBY_METHOD_FUNC(gdip_encprm_transformation_init), 1);

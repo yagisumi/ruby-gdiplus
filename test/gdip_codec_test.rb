@@ -165,9 +165,6 @@ class GdiplusCodecTest < Test::Unit::TestCase
     assert_equal([93], param.Value)
     assert(param.Value.frozen?)
     
-    _assert_stderr(/Quality/, true) { EncoderParameter.new(Encoder.Quality, 101) }
-    _assert_stderr_silent(false) { EncoderParameter.new(Encoder.Quality, 101) }
-    
     param = EncoderParameterQuality.new(93)
     assert_instance_of(EncoderParameterQuality, param)
     assert_kind_of(EncoderParameter, param)
@@ -180,10 +177,168 @@ class GdiplusCodecTest < Test::Unit::TestCase
     assert_equal([93], param.Value)
     assert(param.Value.frozen?)
     
-    _assert_stderr(/Quality/, true) { EncoderParameterQuality.new(101) }
-    _assert_stderr_silent(false) { EncoderParameterQuality.new(101) }
   end
   
+  def test_EncoderParameter_verbose
+    _assert_stderr(/Quality/, true) { EncoderParameterQuality.new(101) } # out of range
+    _assert_stderr_silent(false) { EncoderParameterQuality.new(101) } # out of range, silent if $VERBOSE == false
+    _assert_stderr_silent(true) { EncoderParameterQuality.new(0) } # in range
+    _assert_stderr_silent(true) { EncoderParameterQuality.new(100) } # in range
+    
+    _assert_stderr(/Quality/, true) { EncoderParameter.new(Encoder.Quality, 101) }
+    _assert_stderr_silent(false) { EncoderParameter.new(Encoder.Quality, 101) }
+    _assert_stderr_silent(true) { EncoderParameter.new(Encoder.Quality, 0) }
+    _assert_stderr_silent(true) { EncoderParameter.new(Encoder.Quality, 100) }
+    
+    _assert_stderr_silent(true) { EncoderParameterVersion.new(EncoderValue.VersionGif87) }
+    _assert_stderr_silent(true) { EncoderParameterVersion.new(EncoderValue.VersionGif89) }
+    _assert_stderr(/Version/, true) { EncoderParameterVersion.new(1) }
+    _assert_stderr(/Version/, true) { EncoderParameterVersion.new(100) }
+    _assert_stderr_silent(false) { EncoderParameterVersion.new(1) }
+    
+    _assert_stderr_silent(true) { EncoderParameter.new(Encoder.Version, EncoderValue.VersionGif87) }
+    _assert_stderr_silent(true) { EncoderParameter.new(Encoder.Version, EncoderValue.VersionGif89) }
+    _assert_stderr(/Version/, true) { EncoderParameter.new(Encoder.Version, 1) }
+    _assert_stderr(/Version/, true) { EncoderParameter.new(Encoder.Version, 100) }
+    _assert_stderr_silent(false) { EncoderParameter.new(Encoder.Version, 1) }
+    
+    _assert_stderr_silent(true) { EncoderParameterCompression.new(EncoderValue.CompressionLZW) }
+    _assert_stderr_silent(true) { EncoderParameterCompression.new(EncoderValue.CompressionCCITT3) }
+    _assert_stderr_silent(true) { EncoderParameterCompression.new(EncoderValue.CompressionCCITT4) }
+    _assert_stderr_silent(true) { EncoderParameterCompression.new(EncoderValue.CompressionRle) }
+    _assert_stderr_silent(true) { EncoderParameterCompression.new(EncoderValue.CompressionNone) }
+    _assert_stderr(/Compression/, true) { EncoderParameterCompression.new(0) }
+    _assert_stderr(/Compression/, true) { EncoderParameterCompression.new(100) }
+    _assert_stderr_silent(false) { EncoderParameterCompression.new(0) }
+    _assert_stderr_silent(false) { EncoderParameterCompression.new(100) }
+    
+    _assert_stderr_silent(true) { EncoderParameter.new(Encoder.Compression, EncoderValue.CompressionLZW) }
+    _assert_stderr_silent(true) { EncoderParameter.new(Encoder.Compression, EncoderValue.CompressionCCITT3) }
+    _assert_stderr_silent(true) { EncoderParameter.new(Encoder.Compression, EncoderValue.CompressionCCITT4) }
+    _assert_stderr_silent(true) { EncoderParameter.new(Encoder.Compression, EncoderValue.CompressionRle) }
+    _assert_stderr_silent(true) { EncoderParameter.new(Encoder.Compression, EncoderValue.CompressionNone) }
+    _assert_stderr(/Compression/, true) { EncoderParameter.new(Encoder.Compression, 0) }
+    _assert_stderr(/Compression/, true) { EncoderParameter.new(Encoder.Compression, 100) }
+    _assert_stderr_silent(false) { EncoderParameter.new(Encoder.Compression, 0) }
+    _assert_stderr_silent(false) { EncoderParameter.new(Encoder.Compression, 100) }
+    
+    [1, 4, 8, 24, 32].each {|c|
+      _assert_stderr_silent(true) { EncoderParameterColorDepth.new(c) }
+    }
+    _assert_stderr(/ColorDepth/, true) { EncoderParameterColorDepth.new(0) }
+    _assert_stderr(/ColorDepth/, true) { EncoderParameterColorDepth.new(100) }
+    _assert_stderr_silent(false) { EncoderParameterColorDepth.new(0) }
+    _assert_stderr_silent(false) { EncoderParameterColorDepth.new(100) }
+    
+    [1, 4, 8, 24, 32].each {|c|
+      _assert_stderr_silent(true) { EncoderParameter.new(Encoder.ColorDepth, c) }
+    }
+    _assert_stderr(/ColorDepth/, true) { EncoderParameter.new(Encoder.ColorDepth, 0) }
+    _assert_stderr(/ColorDepth/, true) { EncoderParameter.new(Encoder.ColorDepth, 100) }
+    _assert_stderr_silent(false) { EncoderParameter.new(Encoder.ColorDepth, 0) }
+    _assert_stderr_silent(false) { EncoderParameter.new(Encoder.ColorDepth, 100) }
+    
+    _assert_stderr_silent(true) { EncoderParameterTransformation.new(EncoderValue.TransformRotate90) }
+    _assert_stderr_silent(true) { EncoderParameterTransformation.new(EncoderValue.TransformRotate180) }
+    _assert_stderr_silent(true) { EncoderParameterTransformation.new(EncoderValue.TransformRotate270) }
+    _assert_stderr_silent(true) { EncoderParameterTransformation.new(EncoderValue.TransformFlipHorizontal) }
+    _assert_stderr_silent(true) { EncoderParameterTransformation.new(EncoderValue.TransformFlipVertical) }
+    _assert_stderr(/Transformation/, true) { EncoderParameterTransformation.new(0) }
+    _assert_stderr(/Transformation/, true) { EncoderParameterTransformation.new(100) }
+    _assert_stderr_silent(false) { EncoderParameterTransformation.new(0) }
+    _assert_stderr_silent(false) { EncoderParameterTransformation.new(100) }
+    
+    _assert_stderr_silent(true) { EncoderParameter.new(Encoder.Transformation, EncoderValue.TransformRotate90) }
+    _assert_stderr_silent(true) { EncoderParameter.new(Encoder.Transformation, EncoderValue.TransformRotate180) }
+    _assert_stderr_silent(true) { EncoderParameter.new(Encoder.Transformation, EncoderValue.TransformRotate270) }
+    _assert_stderr_silent(true) { EncoderParameter.new(Encoder.Transformation, EncoderValue.TransformFlipHorizontal) }
+    _assert_stderr_silent(true) { EncoderParameter.new(Encoder.Transformation, EncoderValue.TransformFlipVertical) }
+    _assert_stderr(/Transformation/, true) { EncoderParameter.new(Encoder.Transformation, 0) }
+    _assert_stderr(/Transformation/, true) { EncoderParameter.new(Encoder.Transformation, 100) }
+    _assert_stderr_silent(false) { EncoderParameter.new(Encoder.Transformation, 0) }
+    _assert_stderr_silent(false) { EncoderParameter.new(Encoder.Transformation, 100) }
+    
+    _assert_stderr_silent(true) { EncoderParameterSaveFlag.new(EncoderValue.MultiFrame) }
+    _assert_stderr_silent(true) { EncoderParameterSaveFlag.new(EncoderValue.LastFrame) }
+    _assert_stderr_silent(true) { EncoderParameterSaveFlag.new(EncoderValue.Flush) }
+    _assert_stderr_silent(true) { EncoderParameterSaveFlag.new(EncoderValue.FrameDimensionTime) }
+    _assert_stderr_silent(true) { EncoderParameterSaveFlag.new(EncoderValue.FrameDimensionResolution) }
+    _assert_stderr_silent(true) { EncoderParameterSaveFlag.new(EncoderValue.FrameDimensionPage) }
+    _assert_stderr(/SaveFlag/, true) { EncoderParameterSaveFlag.new(0) }
+    _assert_stderr(/SaveFlag/, true) { EncoderParameterSaveFlag.new(100) }
+    _assert_stderr_silent(false) { EncoderParameterSaveFlag.new(0) }
+    _assert_stderr_silent(false) { EncoderParameterSaveFlag.new(100) }
+    
+    _assert_stderr_silent(true) { EncoderParameter.new(Encoder.SaveFlag, EncoderValue.MultiFrame) }
+    _assert_stderr_silent(true) { EncoderParameter.new(Encoder.SaveFlag, EncoderValue.LastFrame) }
+    _assert_stderr_silent(true) { EncoderParameter.new(Encoder.SaveFlag, EncoderValue.Flush) }
+    _assert_stderr_silent(true) { EncoderParameter.new(Encoder.SaveFlag, EncoderValue.FrameDimensionTime) }
+    _assert_stderr_silent(true) { EncoderParameter.new(Encoder.SaveFlag, EncoderValue.FrameDimensionResolution) }
+    _assert_stderr_silent(true) { EncoderParameter.new(Encoder.SaveFlag, EncoderValue.FrameDimensionPage) }
+    _assert_stderr(/SaveFlag/, true) { EncoderParameter.new(Encoder.SaveFlag, 0) }
+    _assert_stderr(/SaveFlag/, true) { EncoderParameter.new(Encoder.SaveFlag, 100) }
+    _assert_stderr_silent(false) { EncoderParameter.new(Encoder.SaveFlag, 0) }
+    _assert_stderr_silent(false) { EncoderParameter.new(Encoder.SaveFlag, 100) }
+    
+    
+    table64 = []
+    64.times { table64 << 8 }
+    table63 = []
+    63.times { table63 << 8 }
+    table65 = []
+    65.times { table65 << 8 }
+    _assert_stderr_silent(true) { EncoderParameterLuminanceTable.new(table64) }
+    _assert_stderr(/LuminanceTable/, true) { EncoderParameterLuminanceTable.new(table63) }
+    _assert_stderr(/LuminanceTable/, true) { EncoderParameterLuminanceTable.new(table65) }
+    _assert_stderr(/LuminanceTable/, true) { EncoderParameterLuminanceTable.new(0) }
+    _assert_stderr_silent(false) { EncoderParameterLuminanceTable.new(table63) }
+    _assert_stderr_silent(false) { EncoderParameterLuminanceTable.new(table65) }
+    _assert_stderr_silent(false) { EncoderParameterLuminanceTable.new(0) }
+
+    _assert_stderr_silent(true) { EncoderParameter.new(Encoder.LuminanceTable, table64) }
+    _assert_stderr(/LuminanceTable/, true) { EncoderParameter.new(Encoder.LuminanceTable, table63) }
+    _assert_stderr(/LuminanceTable/, true) { EncoderParameter.new(Encoder.LuminanceTable, table65) }
+    _assert_stderr(/LuminanceTable/, true) { EncoderParameter.new(Encoder.LuminanceTable, 0) }
+    _assert_stderr_silent(false) { EncoderParameter.new(Encoder.LuminanceTable, table63) }
+    _assert_stderr_silent(false) { EncoderParameter.new(Encoder.LuminanceTable, table65) }
+    _assert_stderr_silent(false) { EncoderParameter.new(Encoder.LuminanceTable, 0) }
+    
+    _assert_stderr_silent(true) { EncoderParameterChrominanceTable.new(table64) }
+    _assert_stderr(/ChrominanceTable/, true) { EncoderParameterChrominanceTable.new(table63) }
+    _assert_stderr(/ChrominanceTable/, true) { EncoderParameterChrominanceTable.new(table65) }
+    _assert_stderr(/ChrominanceTable/, true) { EncoderParameterChrominanceTable.new(0) }
+    _assert_stderr_silent(false) { EncoderParameterChrominanceTable.new(table63) }
+    _assert_stderr_silent(false) { EncoderParameterChrominanceTable.new(table65) }
+    _assert_stderr_silent(false) { EncoderParameterChrominanceTable.new(0) }
+
+    _assert_stderr_silent(true) { EncoderParameter.new(Encoder.ChrominanceTable, table64) }
+    _assert_stderr(/ChrominanceTable/, true) { EncoderParameter.new(Encoder.ChrominanceTable, table63) }
+    _assert_stderr(/ChrominanceTable/, true) { EncoderParameter.new(Encoder.ChrominanceTable, table65) }
+    _assert_stderr(/ChrominanceTable/, true) { EncoderParameter.new(Encoder.ChrominanceTable, 0) }
+    _assert_stderr_silent(false) { EncoderParameter.new(Encoder.ChrominanceTable, table63) }
+    _assert_stderr_silent(false) { EncoderParameter.new(Encoder.ChrominanceTable, table65) }
+    _assert_stderr_silent(false) { EncoderParameter.new(Encoder.ChrominanceTable, 0) }
+    
+    _assert_stderr_silent(true) { EncoderParameterRenderMethod.new(EncoderValue.RenderProgressive) }
+    _assert_stderr_silent(true) { EncoderParameterRenderMethod.new(EncoderValue.RenderNonProgressive) }
+    _assert_stderr(/RenderMethod/, true) { EncoderParameterRenderMethod.new(0) }
+    _assert_stderr_silent(false) { EncoderParameterRenderMethod.new(0) }
+    
+    _assert_stderr_silent(true) { EncoderParameter.new(Encoder.RenderMethod, EncoderValue.RenderProgressive) }
+    _assert_stderr_silent(true) { EncoderParameter.new(Encoder.RenderMethod, EncoderValue.RenderNonProgressive) }
+    _assert_stderr(/RenderMethod/, true) { EncoderParameter.new(Encoder.RenderMethod, 0) }
+    _assert_stderr_silent(false) { EncoderParameter.new(Encoder.RenderMethod, 0) }
+    
+    _assert_stderr_silent(true) { EncoderParameterScanMethod.new(EncoderValue.ScanMethodInterlaced) }
+    _assert_stderr_silent(true) { EncoderParameterScanMethod.new(EncoderValue.ScanMethodNonInterlaced) }
+    _assert_stderr(/ScanMethod/, true) { EncoderParameterScanMethod.new(0) }
+    _assert_stderr_silent(false) { EncoderParameterScanMethod.new(0) }
+    
+    _assert_stderr_silent(true) { EncoderParameter.new(Encoder.ScanMethod, EncoderValue.ScanMethodInterlaced) }
+    _assert_stderr_silent(true) { EncoderParameter.new(Encoder.ScanMethod, EncoderValue.ScanMethodNonInterlaced) }
+    _assert_stderr(/ScanMethod/, true) { EncoderParameter.new(Encoder.ScanMethod, 0) }
+    _assert_stderr_silent(false) { EncoderParameter.new(Encoder.ScanMethod, 0) }
+  end
   
   def test_EncoderParameters
     #params = EncoderParameters.new
