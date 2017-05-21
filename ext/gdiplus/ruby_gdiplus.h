@@ -33,6 +33,7 @@ extern VALUE cEnumInt;
 extern VALUE cImageFormat;
 extern VALUE cEncoderParameter;
 extern VALUE cEncoderParameters;
+extern VALUE cColor;
 
 extern const rb_data_type_t tGuid;
 extern const rb_data_type_t tImageCodecInfo;
@@ -41,11 +42,13 @@ extern const rb_data_type_t tBitmap;
 extern const rb_data_type_t tEnumInt;
 extern const rb_data_type_t tEncoderParameter;
 extern const rb_data_type_t tEncoderParameters;
+extern const rb_data_type_t tColor;
 
 void Init_codec();
 void Init_image();
 void Init_bitmap();
 void Init_enum();
+void Init_color();
 
 /* gdiplus.cpp */
 extern const char *GpStatusStrs[22];
@@ -182,6 +185,13 @@ Data_Ptr_As(VALUE obj)
     castunion<T> uni;
     uni.ptr = _DATA_PTR(obj);
     return uni.t;
+}
+
+template<typename T>
+static inline void
+Data_Ptr_Set_As(VALUE v, T arg)
+{
+    _DATA_PTR(v) = reinterpret_cast<void *>(arg);
 }
 
 template<typename T>

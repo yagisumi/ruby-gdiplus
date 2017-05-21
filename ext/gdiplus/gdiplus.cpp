@@ -21,6 +21,7 @@ VALUE cEnumInt;
 VALUE cImageFormat;
 VALUE cEncoderParameter;
 VALUE cEncoderParameters;
+VALUE cColor;
 
 int gdip_refcount = 0;
 bool gdip_end_flag = false;
@@ -123,4 +124,5 @@ Init_gdiplus(void)
     Init_image();
     Init_bitmap();
     Init_enum();
+    Init_color();
 }
