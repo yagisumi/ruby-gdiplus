@@ -22,6 +22,8 @@ VALUE cImageFormat;
 VALUE cEncoderParameter;
 VALUE cEncoderParameters;
 VALUE cColor;
+VALUE cPen;
+VALUE cBrush;
 
 int gdip_refcount = 0;
 bool gdip_end_flag = false;

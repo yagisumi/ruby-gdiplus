@@ -5,3 +5,4 @@ gdip_image.o: gdip_image.cpp ruby_gdiplus.h ruby_compatible.h simplemap.h
 gdip_bitmap.o: gdip_bitmap.cpp ruby_gdiplus.h ruby_compatible.h
 gdip_enum.o: gdip_enum.cpp ruby_gdiplus.h ruby_compatible.h simplemap.h
 gdip_color.o: gdip_color.cpp ruby_gdiplus.h ruby_compatible.h
+gdip_pen_brush.o: gdip_pen_brush.cpp ruby_gdiplus.h ruby_compatible.h

@@ -34,6 +34,8 @@ extern VALUE cImageFormat;
 extern VALUE cEncoderParameter;
 extern VALUE cEncoderParameters;
 extern VALUE cColor;
+extern VALUE cPen;
+extern VALUE cBrush;
 
 extern const rb_data_type_t tGuid;
 extern const rb_data_type_t tImageCodecInfo;
@@ -43,6 +45,8 @@ extern const rb_data_type_t tEnumInt;
 extern const rb_data_type_t tEncoderParameter;
 extern const rb_data_type_t tEncoderParameters;
 extern const rb_data_type_t tColor;
+extern const rb_data_type_t tPen;
+extern const rb_data_type_t tBrush;
 
 void Init_codec();
 void Init_image();
@@ -154,9 +158,17 @@ dp_type(const char *msg)
 #define _RB_ARRAY_P(v) RB_TYPE_P(v, RUBY_T_ARRAY)
 #define _RB_STRING_P(v) RB_TYPE_P(v, RUBY_T_STRING)
 #define _RB_INTEGER_P(v) RB_INTEGER_TYPE_P(v)
+#define _RB_FLOAT_P(v) RB_TYPE_P(v, RUBY_T_FLOAT)
 
 static inline const char * __method__() { return rb_id2name(rb_frame_this_func()); }
 static inline const char * __class__(VALUE self) { return rb_class2name(CLASS_OF(self)); }
+
+#define _ARGB2COLOR(argb_ptr) gdip_color_argb2color(argb_ptr)
+static inline Color
+gdip_color_argb2color(ARGB *p)
+{
+    return *reinterpret_cast<Color *>(p);
+}
 
 template<typename T>
 static inline T 
@@ -303,6 +315,22 @@ Check_NULL(void *p, const char *msg)
 {
     if (p == NULL) {
         rb_raise(eGdiplus, msg);
+    }
+}
+
+template<typename T>
+static inline void
+Check_Status(T obj)
+{
+    Status status = obj->GetLastStatus();
+    if (status == Ok) { return; }
+
+    delete obj;
+    if (status < 22) {
+        rb_raise(eGdiplus, "Status.%s, Some error occurred.", GpStatusStrs[status]);
+    }
+    else {
+        rb_raise(eGdiplus, "Unknown error occurred. (Status: %d)", status);
     }
 }
 
