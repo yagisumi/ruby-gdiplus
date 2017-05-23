@@ -31,7 +31,7 @@ GUID _ImageFormatUndefined;
 class KlassTableMap : public SortedArrayMap<VALUE, MapBase *> {
 public:
     KlassTableMap(int capa) : SortedArrayMap<VALUE, MapBase *>(capa) {}
-    ~KlassTableMap() {
+    virtual ~KlassTableMap() {
         for (int i = 0; i < this->Len; ++i) {
             dp("KlassTableMap: delete %d", i);
             delete this->ValTable[i];
@@ -39,7 +39,7 @@ public:
     }
 };
 
-static KlassTableMap klass_table_map(10);
+static KlassTableMap klass_table_map(30);
 
 template <typename TKey>
 static IMap<TKey, ID>*
@@ -59,11 +59,32 @@ gdip_enum_const_get(VALUE self)
 const rb_data_type_t tEnumInt = _MAKE_DATA_TYPE(
     "EnumInt", 0, RUBY_NEVER_FREE, NULL, NULL, &cEnumInt);
 
-static VALUE
-gdip_enumint_create(const rb_data_type_t *type, int num, VALUE klass = Qnil)
+VALUE
+gdip_enumint_create(VALUE klass, int num)
 {
-    if (RB_NIL_P(klass)) klass = _KLASS(type);
-    VALUE r = _Data_Wrap_Struct(klass, type, reinterpret_cast<void*>(num));
+    VALUE r = _Data_Wrap_Struct(klass, &tEnumInt, reinterpret_cast<void*>(num));
+    return r;
+}
+
+int
+gdip_enumint_to_int(VALUE klass, VALUE arg, bool to_int)
+{
+    int r = 0;
+    if (RB_SYMBOL_P(arg)) {
+        arg = rb_const_get(klass, RB_SYM2ID(arg));
+    }
+    if (_KIND_OF(arg, &tEnumInt) && rb_obj_is_kind_of(arg, klass)) {
+        r = Data_Ptr_As<int>(arg);
+    }
+    else {
+        if (to_int) {
+            VALUE num = rb_to_int(arg);
+            r = RB_NUM2INT(num);
+        }
+        else {
+            rb_raise(rb_eTypeError, "An argument must be %s or Symbol", __class__(klass));
+        }
+    }
     return r;
 }
 
@@ -185,21 +206,15 @@ gdip_enumint_inspect(VALUE self)
     if (table != NULL) {
         ID id;
         table->get(num, id, ID_UNKNOWN);
-        return util_utf8_sprintf("#<%s.%s: %08x>", __class__(self), rb_id2name(id), num);
+        return util_utf8_sprintf("#<%s.%s: 0x%08x>", __class__(self), rb_id2name(id), num);
     }
     else {
-        return util_utf8_sprintf("#<%s: %08x>", __class__(self), num);
+        return util_utf8_sprintf("#<%s: 0x%08x>", __class__(self), num);
     }
     
 }
 
-VALUE
-gdip_enumint_get(VALUE klass, int n)
-{
-    return gdip_enumint_create(&tEnumInt, n, klass);
-}
-
-#define define_enumint(klass, table, name, num) gdip_enum_define<int>(klass, table, name, num, gdip_enumint_create(&tEnumInt, num, klass))
+#define define_enumint(klass, table, name, num) gdip_enum_define<int>(klass, table, name, num, gdip_enumint_create(klass, num))
 
 static void
 Init_PixelFormat()
@@ -216,7 +231,7 @@ Init_PixelFormat()
     define_enumint(cPixelFormat, table, "Format48bppRGB", PixelFormat48bppRGB);
     define_enumint(cPixelFormat, table, "Format64bppARGB", PixelFormat64bppARGB);
     define_enumint(cPixelFormat, table, "Format64bppPARGB", PixelFormat64bppPARGB);
-    define_enumint(cPixelFormat, table, "Format32bppCMYK", PixelFormat32bppCMYK);
+    define_enumint(cPixelFormat, table, "Format32bppCMYK", (15 | (32 << 8)));
     define_enumint(cPixelFormat, table, "Format1bppIndexed", PixelFormat1bppIndexed);
     define_enumint(cPixelFormat, table, "Format4bppIndexed", PixelFormat4bppIndexed);
     define_enumint(cPixelFormat, table, "Format8bppIndexed", PixelFormat8bppIndexed);
@@ -232,7 +247,7 @@ Init_PixelFormat()
     define_enumint(cPixelFormat, table, "PAlpha", PixelFormatPAlpha);
     define_enumint(cPixelFormat, table, "Extended", PixelFormatExtended);
     define_enumint(cPixelFormat, table, "Canonical", PixelFormatCanonical);
-    define_enumint(cPixelFormat, table, "Max", PixelFormatMax);
+    define_enumint(cPixelFormat, table, "Max", 16);
     define_enumint(cPixelFormat, table, "DontCare", PixelFormatDontCare);
 }
 
@@ -258,40 +273,173 @@ Init_EncoderParameterValueType()
 /* ValueType */
 
 static void
-Init_ValueType()
+Init_EncoderValue()
 {
     cEncoderValue = rb_define_class_under(mGdiplus, "EncoderValue", cEnumInt);
     rb_undef_alloc_func(cEncoderValue);
     IndexArrayMap<ID> *table = new IndexArrayMap<ID>(26);
     klass_table_map.set(cEncoderValue, table);
     
-    define_enumint(cEncoderValue, table, "ColorTypeCMYK", EncoderValueColorTypeCMYK);
-    define_enumint(cEncoderValue, table, "ColorTypeYCCK", EncoderValueColorTypeYCCK);
-    define_enumint(cEncoderValue, table, "CompressionLZW", EncoderValueCompressionLZW);
-    define_enumint(cEncoderValue, table, "CompressionCCITT3", EncoderValueCompressionCCITT3);
-    define_enumint(cEncoderValue, table, "CompressionCCITT4", EncoderValueCompressionCCITT4);
-    define_enumint(cEncoderValue, table, "CompressionRle", EncoderValueCompressionRle);
-    define_enumint(cEncoderValue, table, "CompressionNone", EncoderValueCompressionNone);
-    define_enumint(cEncoderValue, table, "ScanMethodInterlaced", EncoderValueScanMethodInterlaced);
-    define_enumint(cEncoderValue, table, "ScanMethodNonInterlaced", EncoderValueScanMethodNonInterlaced);
-    define_enumint(cEncoderValue, table, "VersionGif87", EncoderValueVersionGif87);
-    define_enumint(cEncoderValue, table, "VersionGif89", EncoderValueVersionGif89);
-    define_enumint(cEncoderValue, table, "RenderProgressive", EncoderValueRenderProgressive);
-    define_enumint(cEncoderValue, table, "RenderNonProgressive", EncoderValueRenderNonProgressive);
-    define_enumint(cEncoderValue, table, "TransformRotate90", EncoderValueTransformRotate90);
-    define_enumint(cEncoderValue, table, "TransformRotate180", EncoderValueTransformRotate180);
-    define_enumint(cEncoderValue, table, "TransformRotate270", EncoderValueTransformRotate270);
-    define_enumint(cEncoderValue, table, "TransformFlipHorizontal", EncoderValueTransformFlipHorizontal);
-    define_enumint(cEncoderValue, table, "TransformFlipVertical", EncoderValueTransformFlipVertical);
-    define_enumint(cEncoderValue, table, "MultiFrame", EncoderValueMultiFrame);
-    define_enumint(cEncoderValue, table, "LastFrame", EncoderValueLastFrame);
-    define_enumint(cEncoderValue, table, "Flush", EncoderValueFlush);
-    define_enumint(cEncoderValue, table, "FrameDimensionTime", EncoderValueFrameDimensionTime);
-    define_enumint(cEncoderValue, table, "FrameDimensionResolution", EncoderValueFrameDimensionResolution);
-    define_enumint(cEncoderValue, table, "FrameDimensionPage", EncoderValueFrameDimensionPage);
-    define_enumint(cEncoderValue, table, "ColorTypeGray", EncoderValueFrameDimensionPage + 1); // EncoderValueColorTypeGray
-    define_enumint(cEncoderValue, table, "ColorTypeRGB", EncoderValueFrameDimensionPage + 2); // EncoderValueColorTypeRGB
+    define_enumint(cEncoderValue, table, "ColorTypeCMYK", 0);
+    define_enumint(cEncoderValue, table, "ColorTypeYCCK", 1);
+    define_enumint(cEncoderValue, table, "CompressionLZW", 2);
+    define_enumint(cEncoderValue, table, "CompressionCCITT3", 3);
+    define_enumint(cEncoderValue, table, "CompressionCCITT4", 4);
+    define_enumint(cEncoderValue, table, "CompressionRle", 5);
+    define_enumint(cEncoderValue, table, "CompressionNone", 6);
+    define_enumint(cEncoderValue, table, "ScanMethodInterlaced", 7);
+    define_enumint(cEncoderValue, table, "ScanMethodNonInterlaced", 8);
+    define_enumint(cEncoderValue, table, "VersionGif87", 9);
+    define_enumint(cEncoderValue, table, "VersionGif89", 10);
+    define_enumint(cEncoderValue, table, "RenderProgressive", 11);
+    define_enumint(cEncoderValue, table, "RenderNonProgressive", 12);
+    define_enumint(cEncoderValue, table, "TransformRotate90", 13);
+    define_enumint(cEncoderValue, table, "TransformRotate180", 14);
+    define_enumint(cEncoderValue, table, "TransformRotate270", 15);
+    define_enumint(cEncoderValue, table, "TransformFlipHorizontal", 16);
+    define_enumint(cEncoderValue, table, "TransformFlipVertical", 17);
+    define_enumint(cEncoderValue, table, "MultiFrame", 18);
+    define_enumint(cEncoderValue, table, "LastFrame", 19);
+    define_enumint(cEncoderValue, table, "Flush", 20);
+    define_enumint(cEncoderValue, table, "FrameDimensionTime", 21);
+    define_enumint(cEncoderValue, table, "FrameDimensionResolution", 22);
+    define_enumint(cEncoderValue, table, "FrameDimensionPage", 23);
+    define_enumint(cEncoderValue, table, "ColorTypeGray", 24);
+    define_enumint(cEncoderValue, table, "ColorTypeRGB", 25);
 }
+
+static void
+Init_BrushType()
+{
+    cBrushType = rb_define_class_under(mGdiplus, "BrushType", cEnumInt);
+    rb_undef_alloc_func(cBrushType);
+    IndexArrayMap<ID> *table = new IndexArrayMap<ID>(5);
+    klass_table_map.set(cBrushType, table);
+
+    define_enumint(cBrushType, table, "SolidColor", 0);
+    define_enumint(cBrushType, table, "HatchFill", 1);
+    define_enumint(cBrushType, table, "TextureFill", 2);
+    define_enumint(cBrushType, table, "PathGradient", 3);
+    define_enumint(cBrushType, table, "LinearGradient", 4);
+}
+
+static void
+Init_CustomLineCapType()
+{
+    cCustomLineCapType = rb_define_class_under(mGdiplus, "CustomLineCapType", cEnumInt);
+    rb_undef_alloc_func(cCustomLineCapType);
+    IndexArrayMap<ID> *table = new IndexArrayMap<ID>(2);
+    klass_table_map.set(cCustomLineCapType, table);
+
+    define_enumint(cCustomLineCapType, table, "Default", 0);
+    define_enumint(cCustomLineCapType, table, "AdjustableArrow", 1);
+}
+
+static void
+Init_DashCap()
+{
+    cDashCap = rb_define_class_under(mGdiplus, "DashCap", cEnumInt);
+    rb_undef_alloc_func(cDashCap);
+    IndexArrayMap<ID> *table = new IndexArrayMap<ID>(4);
+    klass_table_map.set(cDashCap, table);
+
+    define_enumint(cDashCap, table, "Flat", 0);
+    define_enumint(cDashCap, table, "Round", 2);
+    define_enumint(cDashCap, table, "Triangle", 3);
+}
+
+static void
+Init_DashStyle()
+{
+    cDashStyle = rb_define_class_under(mGdiplus, "DashStyle", cEnumInt);
+    rb_undef_alloc_func(cDashStyle);
+    IndexArrayMap<ID> *table = new IndexArrayMap<ID>(6);
+    klass_table_map.set(cDashStyle, table);
+
+    define_enumint(cDashStyle, table, "Solid", 0);
+    define_enumint(cDashStyle, table, "Dash", 1);
+    define_enumint(cDashStyle, table, "Dot", 2);
+    define_enumint(cDashStyle, table, "DashDot", 3);
+    define_enumint(cDashStyle, table, "DashDotDot", 4);
+    define_enumint(cDashStyle, table, "Custom", 5);
+}
+
+static void
+Init_LineCap()
+{
+    cLineCap = rb_define_class_under(mGdiplus, "LineCap", cEnumInt);
+    rb_undef_alloc_func(cLineCap);
+    SortedArrayMap<int, ID> *table = new SortedArrayMap<int, ID>(11);
+    klass_table_map.set(cLineCap, table);
+
+    define_enumint(cLineCap, table, "Flat", 0);
+    define_enumint(cLineCap, table, "Square", 1);
+    define_enumint(cLineCap, table, "Round", 2);
+    define_enumint(cLineCap, table, "Triangle", 3);
+    define_enumint(cLineCap, table, "NoAnchor", 16);
+    define_enumint(cLineCap, table, "SquareAnchor", 17);
+    define_enumint(cLineCap, table, "RoundAnchor", 18);
+    define_enumint(cLineCap, table, "DiamondAnchor", 19);
+    define_enumint(cLineCap, table, "ArrowAnchor", 20);
+    define_enumint(cLineCap, table, "Custom", 255);
+    define_enumint(cLineCap, table, "AnchorMask", 240);
+}
+
+static void
+Init_LineJoin()
+{
+    cLineJoin = rb_define_class_under(mGdiplus, "LineJoin", cEnumInt);
+    rb_undef_alloc_func(cLineJoin);
+    IndexArrayMap<ID> *table = new IndexArrayMap<ID>(4);
+    klass_table_map.set(cLineJoin, table);
+
+    define_enumint(cLineJoin, table, "Miter", 0);
+    define_enumint(cLineJoin, table, "Bevel", 1);
+    define_enumint(cLineJoin, table, "Round", 2);
+    define_enumint(cLineJoin, table, "MiterClipped", 3);
+}
+
+static void
+Init_MatrixOrder()
+{
+    cMatrixOrder = rb_define_class_under(mGdiplus, "MatrixOrder", cEnumInt);
+    rb_undef_alloc_func(cMatrixOrder);
+    IndexArrayMap<ID> *table = new IndexArrayMap<ID>(2);
+    klass_table_map.set(cMatrixOrder, table);
+
+    define_enumint(cMatrixOrder, table, "Prepend", 0);
+    define_enumint(cMatrixOrder, table, "Append", 1);
+}
+
+static void
+Init_PenAlignment()
+{
+    cPenAlignment = rb_define_class_under(mGdiplus, "PenAlignment", cEnumInt);
+    rb_undef_alloc_func(cPenAlignment);
+    IndexArrayMap<ID> *table = new IndexArrayMap<ID>(2);
+    klass_table_map.set(cPenAlignment, table);
+
+    define_enumint(cPenAlignment, table, "Center", 0);
+    define_enumint(cPenAlignment, table, "Inset", 1);
+}
+
+static void
+Init_PenType()
+{
+    cPenType = rb_define_class_under(mGdiplus, "PenType", cEnumInt);
+    rb_undef_alloc_func(cPenType);
+    SortedArrayMap<int, ID> *table = new SortedArrayMap<int, ID>(6);
+    klass_table_map.set(cPenType, table);
+
+    define_enumint(cPenType, table, "SolidColor", 0);
+    define_enumint(cPenType, table, "HatchFill", 1);
+    define_enumint(cPenType, table, "TextureFill", 2);
+    define_enumint(cPenType, table, "PathGradient", 3);
+    define_enumint(cPenType, table, "LinearGradient", 4);
+    define_enumint(cPenType, table, "Unknown", -1);
+}
+
+
 
 /* Encoder */
 
@@ -473,7 +621,17 @@ Init_enum() {
 
     Init_PixelFormat();
     Init_EncoderParameterValueType();
-    Init_ValueType();
+    Init_EncoderValue();
+    Init_BrushType();
+    Init_CustomLineCapType();
+    Init_DashCap();
+    Init_DashStyle();
+    Init_LineCap();
+    Init_LineJoin();
+    Init_MatrixOrder();
+    Init_PenAlignment();
+    Init_PenType();
+    
     Init_Encoder();
     Init_imageformat();
 }

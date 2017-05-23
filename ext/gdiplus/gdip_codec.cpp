@@ -1320,7 +1320,7 @@ gdip_encprms_build_struct(VALUE v)
     }
     EncoderParameters *data = static_cast<EncoderParameters *>(ruby_xcalloc(1, sizeof(UINT) + sizeof(EncoderParameter) * RARRAY_LEN(params)));
     encprms->data = data;
-    dp("EncoderParameters: create");
+    dp("EncoderParameters: malloc");
 
     data->Count = RARRAY_LEN(params);
     for (int i = 0; i < RARRAY_LEN(params); ++i) {
@@ -1337,6 +1337,7 @@ gdip_encprms_build_struct(VALUE v)
         VALUE values = encprm->values;
         if (encprm->Type == EncoderParameterValueTypeByte || encprm->Type == EncoderParameterValueTypeUndefined) {
             BYTE *param_v = static_cast<BYTE *>(RB_ZALLOC_N(BYTE, size));
+            dp("EncoderParameter.Value malloc (Type: %d, Num: %d)", encprm->Type, size);
             data->Parameter[i].Value = param_v;
             for (int j = 0; j < size; ++j) {
                 VALUE e = rb_ary_entry(values, j);
@@ -1345,6 +1346,7 @@ gdip_encprms_build_struct(VALUE v)
         }
         else if (encprm->Type == EncoderParameterValueTypeShort) {
             WORD *param_v = static_cast<WORD *>(RB_ZALLOC_N(WORD, size));
+            dp("EncoderParameter.Value malloc (Type: %d, Num: %d)", encprm->Type, size);
             data->Parameter[i].Value = param_v;
             for (int j = 0; j < size; ++j) {
                 VALUE e = rb_ary_entry(values, j);
@@ -1353,6 +1355,7 @@ gdip_encprms_build_struct(VALUE v)
         }
         else if (encprm->Type == EncoderParameterValueTypeLong) {
             DWORD *param_v = static_cast<DWORD *>(RB_ZALLOC_N(DWORD, size));
+            dp("EncoderParameter.Value malloc (Type: %d, Num: %d)", encprm->Type, size);
             data->Parameter[i].Value = param_v;
             for (int j = 0; j < size; ++j) {
                 VALUE e = rb_ary_entry(values, j);
@@ -1361,11 +1364,13 @@ gdip_encprms_build_struct(VALUE v)
         }
         else if (encprm->Type == EncoderParameterValueTypeASCII) {
             char *param_v = static_cast<char *>(RB_ZALLOC_N(char, size));
+            dp("EncoderParameter.Value malloc (Type: %d, Num: %d)", encprm->Type, size);
             data->Parameter[i].Value = param_v;
             memcpy(param_v, RSTRING_PTR(values), size - 1); // RSTRING_LEN
         }
         else if (encprm->Type == EncoderParameterValueTypeRational) {
             DWORD *param_v = static_cast<DWORD *>(RB_ZALLOC_N(DWORD, size * 2));
+            dp("EncoderParameter.Value malloc (Type: %d, Num: %d)", encprm->Type, size);
             data->Parameter[i].Value = param_v;
             for (int j = 0; j < size; ++j) {
                 VALUE e = rb_ary_entry(values, j);
@@ -1377,6 +1382,7 @@ gdip_encprms_build_struct(VALUE v)
         }
         else if (encprm->Type == EncoderParameterValueTypeLongRange) {
             DWORD *param_v = static_cast<DWORD *>(RB_ZALLOC_N(DWORD, size * 2));
+            dp("EncoderParameter.Value malloc (Type: %d, Num: %d)", encprm->Type, size);
             data->Parameter[i].Value = param_v;
             for (int j = 0; j < size; ++j) {
                 VALUE e = rb_ary_entry(values, j);
@@ -1388,6 +1394,7 @@ gdip_encprms_build_struct(VALUE v)
         }
         else if (encprm->Type == EncoderParameterValueTypeRationalRange) {
             DWORD *param_v = static_cast<DWORD *>(RB_ZALLOC_N(DWORD, size * 4));
+            dp("EncoderParameter.Value malloc (Type: %d, Num: %d)", encprm->Type, size);
             data->Parameter[i].Value = param_v;
             for (int j = 0; j < size; ++j) {
                 VALUE e = rb_ary_entry(values, j);

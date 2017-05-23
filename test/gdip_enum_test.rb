@@ -178,7 +178,114 @@ class GdiplusEnumIntTest < Test::Unit::TestCase
     assert_match(/SaveFlag/, Encoder.SaveFlag.inspect)
   end
   
-  
+  def test_BrushType
+    assert_equal(0, BrushType.SolidColor.to_i)
+    assert_match(/SolidColor/, BrushType.SolidColor.inspect)
+    assert_equal(1, BrushType.HatchFill.to_i)
+    assert_match(/HatchFill/, BrushType.HatchFill.inspect)
+    assert_equal(2, BrushType.TextureFill.to_i)
+    assert_match(/TextureFill/, BrushType.TextureFill.inspect)
+    assert_equal(3, BrushType.PathGradient.to_i)
+    assert_match(/PathGradient/, BrushType.PathGradient.inspect)
+    assert_equal(4, BrushType.LinearGradient.to_i)
+    assert_match(/LinearGradient/, BrushType.LinearGradient.inspect)
+  end
+
+  def test_CustomLineCapType
+    assert_equal(0, CustomLineCapType.Default.to_i)
+    assert_match(/Default/, CustomLineCapType.Default.inspect)
+    assert_equal(1, CustomLineCapType.AdjustableArrow.to_i)
+    assert_match(/AdjustableArrow/, CustomLineCapType.AdjustableArrow.inspect)
+  end
+
+  def test_DashCap
+    assert_equal(0, DashCap.Flat.to_i)
+    assert_match(/Flat/, DashCap.Flat.inspect)
+    assert_equal(2, DashCap.Round.to_i)
+    assert_match(/Round/, DashCap.Round.inspect)
+    assert_equal(3, DashCap.Triangle.to_i)
+    assert_match(/Triangle/, DashCap.Triangle.inspect)
+  end
+
+  def test_DashStyle
+    assert_equal(0, DashStyle.Solid.to_i)
+    assert_match(/Solid/, DashStyle.Solid.inspect)
+    assert_equal(1, DashStyle.Dash.to_i)
+    assert_match(/Dash/, DashStyle.Dash.inspect)
+    assert_equal(2, DashStyle.Dot.to_i)
+    assert_match(/Dot/, DashStyle.Dot.inspect)
+    assert_equal(3, DashStyle.DashDot.to_i)
+    assert_match(/DashDot/, DashStyle.DashDot.inspect)
+    assert_equal(4, DashStyle.DashDotDot.to_i)
+    assert_match(/DashDotDot/, DashStyle.DashDotDot.inspect)
+    assert_equal(5, DashStyle.Custom.to_i)
+    assert_match(/Custom/, DashStyle.Custom.inspect)
+  end
+
+  def test_LineCap
+    assert_equal(0, LineCap.Flat.to_i)
+    assert_match(/Flat/, LineCap.Flat.inspect)
+    assert_equal(1, LineCap.Square.to_i)
+    assert_match(/Square/, LineCap.Square.inspect)
+    assert_equal(2, LineCap.Round.to_i)
+    assert_match(/Round/, LineCap.Round.inspect)
+    assert_equal(3, LineCap.Triangle.to_i)
+    assert_match(/Triangle/, LineCap.Triangle.inspect)
+    assert_equal(16, LineCap.NoAnchor.to_i)
+    assert_match(/NoAnchor/, LineCap.NoAnchor.inspect)
+    assert_equal(17, LineCap.SquareAnchor.to_i)
+    assert_match(/SquareAnchor/, LineCap.SquareAnchor.inspect)
+    assert_equal(18, LineCap.RoundAnchor.to_i)
+    assert_match(/RoundAnchor/, LineCap.RoundAnchor.inspect)
+    assert_equal(19, LineCap.DiamondAnchor.to_i)
+    assert_match(/DiamondAnchor/, LineCap.DiamondAnchor.inspect)
+    assert_equal(20, LineCap.ArrowAnchor.to_i)
+    assert_match(/ArrowAnchor/, LineCap.ArrowAnchor.inspect)
+    assert_equal(255, LineCap.Custom.to_i)
+    assert_match(/Custom/, LineCap.Custom.inspect)
+    assert_equal(240, LineCap.AnchorMask.to_i)
+    assert_match(/AnchorMask/, LineCap.AnchorMask.inspect)
+  end
+
+  def test_LineJoin
+    assert_equal(0, LineJoin.Miter.to_i)
+    assert_match(/Miter/, LineJoin.Miter.inspect)
+    assert_equal(1, LineJoin.Bevel.to_i)
+    assert_match(/Bevel/, LineJoin.Bevel.inspect)
+    assert_equal(2, LineJoin.Round.to_i)
+    assert_match(/Round/, LineJoin.Round.inspect)
+    assert_equal(3, LineJoin.MiterClipped.to_i)
+    assert_match(/MiterClipped/, LineJoin.MiterClipped.inspect)
+  end
+
+  def test_MatrixOrder
+    assert_equal(0, MatrixOrder.Prepend.to_i)
+    assert_match(/Prepend/, MatrixOrder.Prepend.inspect)
+    assert_equal(1, MatrixOrder.Append.to_i)
+    assert_match(/Append/, MatrixOrder.Append.inspect)
+  end
+
+  def test_PenAlignment
+    assert_equal(0, PenAlignment.Center.to_i)
+    assert_match(/Center/, PenAlignment.Center.inspect)
+    assert_equal(1, PenAlignment.Inset.to_i)
+    assert_match(/Inset/, PenAlignment.Inset.inspect)
+  end
+
+  def test_PenType
+    assert_equal(0, PenType.SolidColor.to_i)
+    assert_match(/SolidColor/, PenType.SolidColor.inspect)
+    assert_equal(1, PenType.HatchFill.to_i)
+    assert_match(/HatchFill/, PenType.HatchFill.inspect)
+    assert_equal(2, PenType.TextureFill.to_i)
+    assert_match(/TextureFill/, PenType.TextureFill.inspect)
+    assert_equal(3, PenType.PathGradient.to_i)
+    assert_match(/PathGradient/, PenType.PathGradient.inspect)
+    assert_equal(4, PenType.LinearGradient.to_i)
+    assert_match(/LinearGradient/, PenType.LinearGradient.inspect)
+    assert_equal(-1, PenType.Unknown.to_i)
+    assert_match(/Unknown/, PenType.Unknown.inspect)
+  end
 end
 
 __END__

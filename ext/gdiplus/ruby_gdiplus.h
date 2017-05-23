@@ -36,6 +36,16 @@ extern VALUE cEncoderParameters;
 extern VALUE cColor;
 extern VALUE cPen;
 extern VALUE cBrush;
+extern VALUE cSolidBrush;
+extern VALUE cBrushType;
+extern VALUE cCustomLineCapType;
+extern VALUE cDashCap;
+extern VALUE cDashStyle;
+extern VALUE cLineCap;
+extern VALUE cLineJoin;
+extern VALUE cMatrixOrder;
+extern VALUE cPenAlignment;
+extern VALUE cPenType;
 
 extern const rb_data_type_t tGuid;
 extern const rb_data_type_t tImageCodecInfo;
@@ -53,6 +63,9 @@ void Init_image();
 void Init_bitmap();
 void Init_enum();
 void Init_color();
+void Init_pen_brush();
+
+VALUE gdip_obj_id(VALUE self);
 
 /* gdiplus.cpp */
 extern const char *GpStatusStrs[22];
@@ -98,13 +111,9 @@ extern GUID _ImageFormatUndefined;
 
 template <typename T> ID gdip_enum_get_id(VALUE klass, T data);
 template <typename T> VALUE gdip_enum_get(VALUE klass, T data);
-VALUE gdip_encoder_get(GUID *guid);
-
-#ifndef PixelFormat32bppCMYK
-#define PixelFormat32bppCMYK       (15 | (32 << 8))
-#undef PixelFormatMax
-#define PixelFormatMax 16
-#endif
+VALUE gdip_enumint_create(VALUE klass, int num);
+VALUE gdip_encoder_get(GUID *guid); // not use
+int gdip_enumint_to_int(VALUE klass, VALUE arg, bool to_int=false);
 
 /* Debug */
 // #define GDIPLUS_DEBUG 1 // moved in extconf.rb
@@ -159,6 +168,7 @@ dp_type(const char *msg)
 #define _RB_STRING_P(v) RB_TYPE_P(v, RUBY_T_STRING)
 #define _RB_INTEGER_P(v) RB_INTEGER_TYPE_P(v)
 #define _RB_FLOAT_P(v) RB_TYPE_P(v, RUBY_T_FLOAT)
+#define _RB_SYMBOL_P(v) RB_SYMBOL_P(v)
 
 static inline const char * __method__() { return rb_id2name(rb_frame_this_func()); }
 static inline const char * __class__(VALUE self) { return rb_class2name(CLASS_OF(self)); }
@@ -248,14 +258,14 @@ typeddata_alloc(VALUE klass)
     }
     #define TYPEDDATA_ALLOC_NULL(T, type) &typeddata_alloc_null<T, type>
 #else
-    template<const rb_data_type_t *type>
+    template<typename T, const rb_data_type_t *type>
     static VALUE
     typeddata_alloc_null(VALUE klass)
     {
         VALUE r = _Data_Wrap_Struct(klass, type, NULL);
         return r;
     }
-    #define TYPEDDATA_ALLOC_NULL(T, type) &typeddata_alloc_null<type>
+    #define TYPEDDATA_ALLOC_NULL(T, type) &typeddata_alloc_null<T, type>
 #endif /* GDIPLUS_DEBUG */
 
 template<typename T>
@@ -320,7 +330,7 @@ Check_NULL(void *p, const char *msg)
 
 template<typename T>
 static inline void
-Check_Status(T obj)
+Check_LastStatus(T obj)
 {
     Status status = obj->GetLastStatus();
     if (status == Ok) { return; }

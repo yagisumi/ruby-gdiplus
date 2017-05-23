@@ -1,0 +1,44 @@
+# coding: utf-8
+require 'test_helper'
+
+class GdiplusPenBrushTest < Test::Unit::TestCase
+  include Gdiplus
+  
+  def test_pen
+    p pen = Pen.new(Color.new(255,123,26))
+    p pen.width
+    pen.width = 3
+    p pen.width
+    p pen.gdiplus_id
+    p pen.pen_type
+    p pen.alignment
+    p pen.DashCap
+    p pen.EndCap
+    p pen.LineJoin
+    p pen.StartCap
+  end
+
+  def test_brush
+    
+  end
+
+end
+
+__END__
+#assert_equal(expected, actual, message=nil)
+#assert_raise(expected_exception_klass, message="") { ... }
+#assert_not_equal(expected, actual, message="")
+#assert_instance_of(klass, object, message="")
+#assert_nil(object, message="")
+#assert_not_nil(object, message="")
+#assert_kind_of(klass, object, message="")
+#assert_respond_to(object, method, message="")
+#assert_match(regexp, string, message="")
+#assert_no_match(regexp, string, message="")
+#assert_same(expected, actual, message="")
+#assert_not_same(expected, actual, message="")
+#assert_operator(object1, operator, object2, message="")
+#assert_nothing_raised(klass1, klass2, ..., message = "") { ... } # klass1, klass2, ... => fail / others => error
+#assert_block(message="assert_block failed.") { ... } # (block -> true) => pass
+#assert_throws(expected_symbol, message="") { ... }
+#assert_nothing_thrown(message="") { ... }

@@ -15,6 +15,15 @@ VALUE cImage;
 VALUE cBitmap;
 VALUE cPixelFormat;
 VALUE cEncoderParameterValueType;
+VALUE cBrushType;
+VALUE cCustomLineCapType;
+VALUE cDashCap;
+VALUE cDashStyle;
+VALUE cLineCap;
+VALUE cLineJoin;
+VALUE cMatrixOrder;
+VALUE cPenAlignment;
+VALUE cPenType;
 VALUE cEncoder;
 VALUE cEncoderValue;
 VALUE cEnumInt;
@@ -24,6 +33,7 @@ VALUE cEncoderParameters;
 VALUE cColor;
 VALUE cPen;
 VALUE cBrush;
+VALUE cSolidBrush;
 
 int gdip_refcount = 0;
 bool gdip_end_flag = false;
@@ -112,6 +122,12 @@ gdiplus_end(VALUE self)
     gdiplus_shutdown();
 }
 
+VALUE
+gdip_obj_id(VALUE self)
+{
+    return (VALUE)(Data_Ptr_As<ID>(self)|FIXNUM_FLAG);
+}
+
 extern "C" void
 Init_gdiplus(void)
 {
@@ -127,4 +143,5 @@ Init_gdiplus(void)
     Init_bitmap();
     Init_enum();
     Init_color();
+    Init_pen_brush();
 }
