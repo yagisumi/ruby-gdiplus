@@ -262,6 +262,26 @@ gdip_image_raw_format(VALUE self)
     }
     return r;
 }
+
+/**
+ *
+ * Block comment
+ * 
+ */
+static VALUE
+gdip_image_draw(VALUE self)
+{
+    Image *image = Data_Ptr<Image *>(self);
+    Check_NULL(image, "The image object does not exist.");
+
+    if (rb_block_given_p()) {
+        Graphics *g = Graphics::FromImage(image);
+        VALUE graphics = gdip_graphics_create(g);
+        rb_yield(graphics);
+    }
+
+}
+
 /*
 Document-class: Gdiplus::Image
 abstruct class

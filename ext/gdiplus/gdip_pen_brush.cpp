@@ -633,7 +633,7 @@ void
 Init_pen_brush()
 {
     cPen = rb_define_class_under(mGdiplus, "Pen", rb_cObject);
-    rb_define_alloc_func(cPen, TYPEDDATA_ALLOC_NULL(Pen, &tPen));
+    rb_define_alloc_func(cPen, &typeddata_alloc_null<&tPen>);
     rb_define_method(cPen, "initialize", RUBY_METHOD_FUNC(gdip_pen_init), -1);
     rb_define_method(cPen, "gdiplus_id", RUBY_METHOD_FUNC(gdip_obj_id), 0);
     rb_define_method(cPen, "width", RUBY_METHOD_FUNC(gdip_pen_get_width), 0);
@@ -695,7 +695,7 @@ Init_pen_brush()
     
 
     cSolidBrush = rb_define_class_under(mGdiplus, "SolidBrush", cBrush);
-    rb_define_alloc_func(cSolidBrush, TYPEDDATA_ALLOC_NULL(SolidBrush, &tBrush));
+    rb_define_alloc_func(cSolidBrush, &typeddata_alloc_null<&tBrush>);
     rb_define_method(cSolidBrush, "initialize", RUBY_METHOD_FUNC(gdip_solidbrush_init), 1);
     rb_define_method(cSolidBrush, "gdiplus_id", RUBY_METHOD_FUNC(gdip_obj_id), 0);
     rb_define_method(cSolidBrush, "color", RUBY_METHOD_FUNC(gdip_solidbrush_get_color), 0);

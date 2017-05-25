@@ -47,6 +47,7 @@ extern VALUE cLineJoin;
 extern VALUE cMatrixOrder;
 extern VALUE cPenAlignment;
 extern VALUE cPenType;
+extern VALUE cGraphics;
 
 extern const rb_data_type_t tGuid;
 extern const rb_data_type_t tImageCodecInfo;
@@ -58,6 +59,7 @@ extern const rb_data_type_t tEncoderParameters;
 extern const rb_data_type_t tColor;
 extern const rb_data_type_t tPen;
 extern const rb_data_type_t tBrush;
+extern const rb_data_type_t tGraphics;
 
 void Init_codec();
 void Init_image();
@@ -65,6 +67,7 @@ void Init_bitmap();
 void Init_enum();
 void Init_color();
 void Init_pen_brush();
+void Init_graphics();
 
 VALUE gdip_obj_id(VALUE self);
 
@@ -115,6 +118,9 @@ template <typename T> VALUE gdip_enum_get(VALUE klass, T data);
 VALUE gdip_enumint_create(VALUE klass, int num);
 VALUE gdip_encoder_get(GUID *guid); // not use
 int gdip_enumint_to_int(VALUE klass, VALUE arg, bool to_int=false);
+
+/* graphics.cpp */
+VALUE gdip_graphics_create(Graphics *g);
 
 /* Debug */
 // #define GDIPLUS_DEBUG 1 // moved in extconf.rb
@@ -273,26 +279,14 @@ typeddata_alloc(VALUE klass)
     return r;
 }
 
-#if GDIPLUS_DEBUG
-    template<typename T, const rb_data_type_t *type>
-    static VALUE
-    typeddata_alloc_null(VALUE klass)
-    {
-        DPT("RData alloc"); // T is used for debug
-        VALUE r = _Data_Wrap_Struct(klass, type, NULL);
-        return r;
-    }
-    #define TYPEDDATA_ALLOC_NULL(T, type) &typeddata_alloc_null<T, type>
-#else
-    template<typename T, const rb_data_type_t *type>
-    static VALUE
-    typeddata_alloc_null(VALUE klass)
-    {
-        VALUE r = _Data_Wrap_Struct(klass, type, NULL);
-        return r;
-    }
-    #define TYPEDDATA_ALLOC_NULL(T, type) &typeddata_alloc_null<T, type>
-#endif /* GDIPLUS_DEBUG */
+template<const rb_data_type_t *type>
+static VALUE
+typeddata_alloc_null(VALUE klass)
+{
+    dp("%s: RData alloc", type->wrap_struct_name);
+    VALUE r = _Data_Wrap_Struct(klass, type, NULL);
+    return r;
+}
 
 template<typename T>
 static void

@@ -107,6 +107,6 @@ gdip_bitmap_init(int argc, VALUE *argv, VALUE self)
 void Init_bitmap()
 {
     cBitmap = rb_define_class_under(mGdiplus, "Bitmap", cImage);
-    rb_define_alloc_func(cBitmap, TYPEDDATA_ALLOC_NULL(Bitmap, &tBitmap));
+    rb_define_alloc_func(cBitmap, &typeddata_alloc_null<&tBitmap>);
     rb_define_method(cBitmap, "initialize", RUBY_METHOD_FUNC(gdip_bitmap_init), -1);
 }

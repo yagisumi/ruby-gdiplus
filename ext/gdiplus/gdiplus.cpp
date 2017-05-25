@@ -34,6 +34,7 @@ VALUE cColor;
 VALUE cPen;
 VALUE cBrush;
 VALUE cSolidBrush;
+VALUE cGraphics;
 
 int gdip_refcount = 0;
 bool gdip_end_flag = false;
@@ -178,4 +179,5 @@ Init_gdiplus(void)
     Init_enum();
     Init_color();
     Init_pen_brush();
+    Init_graphics();
 }
