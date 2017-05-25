@@ -49,6 +49,10 @@ module Test::Unit::Assertions
       x = assert_match(stdout, out, "stdout")
     when String
       x = assert_equal(stdout, out, "stdout")
+    when nil
+      x = assert_equal("", out, "stdout")
+    else
+      assert(false, "The first parameter should be a Regexp, String or nil.")
     end
     
     y = true
@@ -57,6 +61,10 @@ module Test::Unit::Assertions
       y = assert_match(stderr, err, "stderr")
     when String
       y = assert_equal(stderr, err, "stderr")
+    when nil
+      y = assert_equal("", err, "stdout")
+    else
+      assert(false, "The second parameter should be a Regexp or String.")
     end
     
     x && y
@@ -75,6 +83,10 @@ module Test::Unit::Assertions
       y = assert_match(stderr, err, "stderr")
     when String
       y = assert_equal(stderr, err, "stderr")
+    when nil
+      y = assert_equal("", err, "stdout")
+    else
+      assert(false, "The first parameter should be a Regexp, String or nil.")
     end
     
     y
@@ -93,6 +105,10 @@ module Test::Unit::Assertions
       x = assert_match(stdout, out, "stdout")
     when String
       x = assert_equal(stdout, out, "stdout")
+    when nil
+      x = assert_equal("", out, "stdout")
+    else
+      assert(false, "The first parameter should be a Regexp, String or nil.")
     end
     
     x

@@ -5,17 +5,66 @@ class GdiplusPenBrushTest < Test::Unit::TestCase
   include Gdiplus
   
   def test_pen
-    p pen = Pen.new(Color.new(255,123,26))
-    p pen.width
-    pen.width = 3
-    p pen.width
-    p pen.gdiplus_id
-    p pen.pen_type
-    p pen.alignment
-    p pen.DashCap
-    p pen.EndCap
-    p pen.LineJoin
-    p pen.StartCap
+    pen = Pen.new(Color.Red)
+    assert_instance_of(Pen, pen)
+    assert_equal(Color.Red, pen.Color)
+    assert_equal(1.0, pen.Width)
+    assert_equal(0.0, pen.DashOffset)
+    assert_equal(10.0, pen.MiterLimit)
+    assert_equal(PenType.SolidColor, pen.PenType)
+    assert_equal(DashStyle.Solid, pen.DashStyle)
+    assert_equal(PenAlignment.Center, pen.Alignment)
+    assert_equal(DashCap.Flat, pen.DashCap)
+    assert_equal(LineCap.Flat, pen.EndCap)
+    assert_equal(LineCap.Flat, pen.StartCap)
+    assert_equal(LineJoin.Miter, pen.LineJoin)
+    assert_equal([], pen.CompoundArray)
+    assert_equal([], pen.DashPattern)
+    
+    pen.width = 3.0
+    assert_equal(3.0, pen.Width)
+    
+    pen.Color = :Green
+    assert_equal(Color.Green, pen.Color)
+    pen.Alignment = PenAlignment.Inset
+    assert_equal(PenAlignment.Inset, pen.Alignment)
+    pen.Alignment = PenAlignment.Center
+    assert_equal(PenAlignment.Center, pen.Alignment)
+    
+    pen.CompoundArray = [0.0, 0.2, 0.7, 1.0]
+    assert_equal([0.0, 0.2, 0.7, 1.0], pen.CompoundArray)
+    pen.CompoundArray = [0.0, 1.0]
+    assert_equal([0.0, 1.0], pen.CompoundArray)
+    
+    _assert_stderr(/CompoundArray/, false) { pen.Alignment = PenAlignment.Inset }
+    
+    pen.DashPattern = [3.0, 1.0]
+    assert_equal([3.0, 1.0], pen.DashPattern)
+    assert_equal(DashStyle.Custom, pen.DashStyle)
+    
+    pen.DashPattern = [2.0, 6.0, 3.0]
+    assert_equal([2.0, 6.0, 3.0], pen.DashPattern)
+    
+    pen.DashStyle = DashStyle.Dash
+    assert_equal(DashStyle.Dash, pen.DashStyle)
+    
+    pen.DashCap = DashCap.Round
+    assert_equal(DashCap.Round, pen.DashCap)
+    
+    pen.EndCap = LineCap.ArrowAnchor
+    assert_equal(LineCap.ArrowAnchor, pen.EndCap)
+    
+    pen.StartCap = :Round
+    assert_equal(LineCap.Round, pen.StartCap)
+    
+    pen.LineJoin = :Bevel
+    assert_equal(LineJoin.Bevel, pen.LineJoin)
+    
+    pen = Pen.new(Color.Black)
+    pen.Alignment = PenAlignment.Inset
+    _assert_stderr(/Inset/, false) { pen.CompoundArray = [0.0, 0.2, 0.7, 1.0] }
+    
+    pen = Pen.new(Color.Black)
   end
 
   def test_brush

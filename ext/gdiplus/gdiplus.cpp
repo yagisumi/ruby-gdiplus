@@ -128,6 +128,40 @@ gdip_obj_id(VALUE self)
     return (VALUE)(Data_Ptr_As<ID>(self)|FIXNUM_FLAG);
 }
 
+bool
+gdip_value2double(VALUE v, double *dbl, bool do_raise)
+{
+    if (_RB_FLOAT_P(v)) {
+        *dbl = NUM2DBL(v);
+        return true;
+    }
+    else if (_RB_INTEGER_P(v)) {
+        *dbl = 1.0 * RB_NUM2INT(v);
+        return true;
+    }
+    else if (do_raise) {
+        rb_raise(rb_eTypeError, "An argument must be Float or Integer");
+    }
+    return false;
+}
+
+bool
+gdip_value2single(VALUE v, float *flt, bool do_raise)
+{
+    if (_RB_FLOAT_P(v)) {
+        *flt = NUM2SINGLE(v);
+        return true;
+    }
+    else if (_RB_INTEGER_P(v)) {
+        *flt = 1.0f * RB_NUM2INT(v);
+        return true;
+    }
+    else if (do_raise) {
+        rb_raise(rb_eTypeError, "An argument must be Float or Integer");
+    }
+    return false;
+}
+
 extern "C" void
 Init_gdiplus(void)
 {

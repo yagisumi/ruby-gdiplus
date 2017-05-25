@@ -5,6 +5,8 @@
  */
 #include "ruby_gdiplus.h"
 
+
+
 const rb_data_type_t tPen = _MAKE_DATA_TYPE(
     "Pen", 0, GDIP_OBJ_FREE(Pen *), NULL, NULL, &cPen);
 
@@ -42,14 +44,8 @@ gdip_pen_init(int argc, VALUE *argv, VALUE self)
         }
     }
 
-    if (_KIND_OF(color_or_brush, &tColor)) {
-        ARGB argb = Data_Ptr_As<ARGB>(color_or_brush);
-        Color color = _ARGB2COLOR(&argb);
-        _DATA_PTR(self) = gdip_obj_create<Pen *>(new Pen(color, width));
-    }
-    else if (_RB_INTEGER_P(color_or_brush)) {
-        ARGB argb = RB_NUM2UINT(color_or_brush);
-        Color color = _ARGB2COLOR(&argb);
+    Color color;
+    if (gdip_value2color(color_or_brush, &color, false, false)) {
         _DATA_PTR(self) = gdip_obj_create<Pen *>(new Pen(color, width));
     }
     else if (_KIND_OF(color_or_brush, &tBrush)) {
@@ -57,14 +53,13 @@ gdip_pen_init(int argc, VALUE *argv, VALUE self)
         _DATA_PTR(self) = gdip_obj_create<Pen *>(new Pen(brush, width));
     }
     else {
-        rb_raise(rb_eTypeError, "The 1st argument must be Color, Integer or Brush");
+        rb_raise(rb_eTypeError, "The first argument must be Color, Integer or Brush");
     }
     return self;
 }
 
 /**
  *
- * @overload width()
  *   @return [Float]
  */
 static VALUE
@@ -75,12 +70,11 @@ gdip_pen_get_width(VALUE self)
 
     float w = pen->GetWidth();
     Check_LastStatus(pen);
-    return DBL2NUM(static_cast<double>(w));
+    return SINGLE2NUM(w);
 }
 
 /**
  *
- * @overload width=(width)
  *   @param width [Float or Integer]
  */
 static VALUE
@@ -89,24 +83,109 @@ gdip_pen_set_width(VALUE self, VALUE width)
     Pen *pen = Data_Ptr<Pen *>(self);
     Check_NULL(pen, "This object does not exist");
 
-    if (_RB_FLOAT_P(width)) {
-        double w = NUM2DBL(width);
-        pen->SetWidth(static_cast<float>(w));
-    }
-    else if (_RB_INTEGER_P(width)) {
-        float w = 1.0f * RB_NUM2INT(width);
-        pen->SetWidth(w);
-    }
-    else {
-        rb_raise(rb_eTypeError, "The argument must be Float or Integer");
-    }
+    float w = 0.0f;
+    gdip_value2single(width, &w);
+    pen->SetWidth(w);
     Check_LastStatus(pen);
     return self;
 }
 
 /**
  *
- * @overload PenType()
+ *   @return [Float]
+ */
+static VALUE
+gdip_pen_get_dash_offset(VALUE self)
+{
+    Pen *pen = Data_Ptr<Pen *>(self);
+    Check_NULL(pen, "This object does not exist");
+
+    float oft = pen->GetDashOffset();
+    Check_LastStatus(pen);
+    return SINGLE2NUM(oft);
+}
+
+/**
+ *
+ *   @param offset [Float or Integer]
+ */
+static VALUE
+gdip_pen_set_dash_offset(VALUE self, VALUE offset)
+{
+    Pen *pen = Data_Ptr<Pen *>(self);
+    Check_NULL(pen, "This object does not exist");
+
+    float oft = 0.0f;
+    gdip_value2single(offset, &oft);
+    pen->SetDashOffset(oft);
+    Check_LastStatus(pen);
+    return self;
+}
+
+/**
+ *
+ *   @return [Float]
+ */
+static VALUE
+gdip_pen_get_miter_limit(VALUE self)
+{
+    Pen *pen = Data_Ptr<Pen *>(self);
+    Check_NULL(pen, "This object does not exist");
+
+    float lmt = pen->GetMiterLimit();
+    Check_LastStatus(pen);
+    return SINGLE2NUM(lmt);
+}
+
+/**
+ *
+ *   @param offset [Float or Integer]
+ */
+static VALUE
+gdip_pen_set_miter_limit(VALUE self, VALUE limit)
+{
+    Pen *pen = Data_Ptr<Pen *>(self);
+    Check_NULL(pen, "This object does not exist");
+
+    float lmt = 0.0f;
+    gdip_value2single(limit, &lmt);
+    pen->SetMiterLimit(lmt);
+    Check_LastStatus(pen);
+    return self;
+}
+
+/**
+ *
+ * @return [Color]
+ * 
+ */
+static VALUE
+gdip_pen_get_color(VALUE self)
+{
+    Pen *pen = Data_Ptr<Pen *>(self);
+    Check_NULL(pen, "This object does not exist");
+    Color color;
+    Check_Status(pen->GetColor(&color));
+    return gdip_color_create(color);
+ }
+/**
+ *
+ * @param color [Color]
+ * 
+ */
+static VALUE
+gdip_pen_set_color(VALUE self, VALUE color)
+{
+    Pen *pen = Data_Ptr<Pen *>(self);
+    Check_NULL(pen, "This object does not exist");
+    Color clr;
+    gdip_value2color(color, &clr);
+    Check_Status(pen->SetColor(clr));
+    return self;
+ }
+
+/**
+ *
  *   @return [PenType]
  */
 static VALUE
@@ -119,7 +198,181 @@ gdip_pen_get_pen_type(VALUE self)
 
 /**
  *
- * @overload Alignment()
+ * @return [Array<Float>]
+ * 
+ */
+static VALUE
+gdip_pen_get_compound_array(VALUE self)
+{
+    Pen *pen = Data_Ptr<Pen *>(self);
+    Check_NULL(pen, "This object does not exist");
+
+    int count = pen->GetCompoundArrayCount();
+    if (count <= 0) {
+        return rb_ary_new();
+    }
+    VALUE r = rb_ary_new_capa(count);
+    float *array = static_cast<float *>(ruby_xmalloc(count * sizeof(float)));
+    Status status = pen->GetCompoundArray(array, count);
+    if (status != Ok) {
+        ruby_xfree(array);
+        Check_Status(status);
+    }
+    else {
+        for (int i = 0; i < count; ++i) {
+            rb_ary_push(r, SINGLE2NUM(array[i]));
+        }
+        ruby_xfree(array);
+    }
+    return r;
+}
+
+/**
+ *
+ * @param ary [Array<Float>]
+ * 
+ */
+static VALUE
+gdip_pen_set_compound_array(VALUE self, VALUE ary)
+{
+    Pen *pen = Data_Ptr<Pen *>(self);
+    Check_NULL(pen, "This object does not exist");
+    if (!_RB_ARRAY_P(ary)) {
+        rb_raise(rb_eTypeError, "An argument must be Array of Float");
+    }
+    if (pen->GetAlignment() == PenAlignmentInset) {
+        _WARNING("Don't set CompoundArray if the pen alignment is Inset");
+        return self;
+    }
+    
+    int count = 0;
+    bool verbose = false;
+    for (int i = 0; i < RARRAY_LEN(ary); ++i) {
+        VALUE num = rb_ary_entry(ary, i);
+        if (_RB_FLOAT_P(num)) {
+            ++count;
+        }
+        else if (!verbose) {
+            _VERBOSE("An argument must be Array of Float");
+            verbose = true;
+        }
+    }
+    dp("count: %d", count);
+    if (count == 0) {
+        rb_raise(rb_eTypeError, "An argument must be Array of Float");
+        //Status status = pen->SetCompoundArray(NULL, 0);
+        //Check_Status(status); // InvalidParameter
+    }
+    else {
+        int index = 0;
+        verbose = false;
+        float *array = static_cast<float *>(ruby_xmalloc(count * sizeof(float)));
+        for (int i = 0; i < RARRAY_LEN(ary); ++i) {
+            VALUE num = rb_ary_entry(ary, i);
+            if (_RB_FLOAT_P(num)) {
+                float flt = NUM2SINGLE(num);
+                array[index] = flt;
+                ++index;
+                if (!verbose && (flt < 0.0 || 1.0 < flt)) {
+                    _VERBOSE("Tje value in CompoundArray must be 0.0-1.0");
+                    verbose = true;
+                }
+            }
+        }
+
+        Status status = pen->SetCompoundArray(array, count);
+        ruby_xfree(array);
+        Check_Status(status);
+    }
+
+    return self;
+}
+
+/**
+ *
+ * @return [Array<Float>]
+ * 
+ */
+static VALUE
+gdip_pen_get_dash_pattern(VALUE self)
+{
+    Pen *pen = Data_Ptr<Pen *>(self);
+    Check_NULL(pen, "This object does not exist");
+
+    int count = pen->GetDashPatternCount();
+    if (count <= 0) {
+        return rb_ary_new();
+    }
+    VALUE r = rb_ary_new_capa(count);
+    float *array = static_cast<float *>(ruby_xmalloc(count * sizeof(float)));
+    Status status = pen->GetDashPattern(array, count);
+    if (status != Ok) {
+        ruby_xfree(array);
+        Check_Status(status);
+    }
+    else {
+        for (int i = 0; i < count; ++i) {
+            rb_ary_push(r, SINGLE2NUM(array[i]));
+        }
+        ruby_xfree(array);
+    }
+    return r;
+}
+
+/**
+ *
+ * @param ary [Array<Float>]
+ * 
+ */
+static VALUE
+gdip_pen_set_dash_pattern(VALUE self, VALUE ary)
+{
+    Pen *pen = Data_Ptr<Pen *>(self);
+    Check_NULL(pen, "This object does not exist");
+
+    if (!_RB_ARRAY_P(ary)) {
+        rb_raise(rb_eTypeError, "An argument must be Array of Float");
+    }
+
+    int count = 0;
+    bool verbose = false;
+    for (int i = 0; i < RARRAY_LEN(ary); ++i) {
+        VALUE num = rb_ary_entry(ary, i);
+        if (_RB_FLOAT_P(num)) {
+            ++count;
+        }
+        else if (!verbose) {
+            _VERBOSE("An argument must be Array of Float");
+            verbose = true;
+        }
+    }
+
+    if (count == 0) {
+        //rb_raise(rb_eTypeError, "An argument must be Array of Float");
+        Status status = pen->SetDashPattern(NULL, 0);
+        Check_Status(status);
+    }
+    else {
+        int index = 0;
+        float *array = static_cast<float *>(ruby_xmalloc(count * sizeof(float)));
+        for (int i = 0; i < RARRAY_LEN(ary); ++i) {
+            VALUE num = rb_ary_entry(ary, i);
+            if (_RB_FLOAT_P(num)) {
+                array[index] = NUM2SINGLE(num);
+                ++index;
+            }
+        }
+
+        Status status = pen->SetDashPattern(array, count);
+        ruby_xfree(array);
+        Check_Status(status);
+    }
+    
+    return self;
+}
+
+/**
+ *
  *   @return [PenAlignment]
  *
  */
@@ -133,7 +386,6 @@ gdip_pen_get_alignment(VALUE self)
 
 /**
  *
- * @overload Alignment=(align)
  *   @param align [PenAlignment]
  *
  */
@@ -142,16 +394,20 @@ gdip_pen_set_alignment(VALUE self, VALUE align)
 {
     Pen *pen = Data_Ptr<Pen *>(self);
     Check_NULL(pen, "This object does not exist");
-
     int enum_align = gdip_enumint_to_int(cPenAlignment, align);
-    pen->SetAlignment(static_cast<PenAlignment>(enum_align));
-    Check_LastStatus(pen);
+    PenAlignment pa = static_cast<PenAlignment>(enum_align);
+    if (pa == PenAlignmentInset && pen->GetCompoundArrayCount() > 0) {
+        _WARNING("Do not use PenAlignment.Inset with CompoundArray");
+    }
+    else {
+        pen->SetAlignment(pa);
+        Check_LastStatus(pen);
+    }
     return self;
 }
 
 /**
  *
- * @overload DashCap()
  *   @return [DashCap]
  *
  */
@@ -165,7 +421,6 @@ gdip_pen_get_dash_cap(VALUE self)
 
 /**
  *
- * @overload DashCap=(cap)
  *   @param cap [DashCap]
  *
  */
@@ -183,7 +438,6 @@ gdip_pen_set_dash_cap(VALUE self, VALUE cap)
 
 /**
  *
- * @overload DashStyle()
  *   @return [DashStyle]
  *
  */
@@ -197,7 +451,6 @@ gdip_pen_get_dash_style(VALUE self)
 
 /**
  *
- * @overload DashStyle=(style)
  *   @param style [DashStyle]
  *
  */
@@ -215,7 +468,6 @@ gdip_pen_set_dash_style(VALUE self, VALUE style)
 
 /**
  *
- * @overload EndCap()
  *   @return [LineCap]
  *
  */
@@ -229,7 +481,6 @@ gdip_pen_get_end_cap(VALUE self)
 
 /**
  *
- * @overload EndCap=(cap)
  *   @param cap [LineCap]
  *
  */
@@ -247,7 +498,6 @@ gdip_pen_set_end_cap(VALUE self, VALUE cap)
 
 /**
  *
- * @overload LineJoin()
  *   @return [LineJoin]
  *
  */
@@ -261,7 +511,6 @@ gdip_pen_get_line_join(VALUE self)
 
 /**
  *
- * @overload LineJoin=(join)
  *   @param join [LineJoin]
  *
  */
@@ -279,7 +528,6 @@ gdip_pen_set_line_join(VALUE self, VALUE join)
 
 /**
  *
- * @overload StartCap()
  *   @return [LineCap]
  *
  */
@@ -293,7 +541,6 @@ gdip_pen_get_start_cap(VALUE self)
 
 /**
  *
- * @overload StartCap=(cap)
  *   @param cap [LineCap]
  *
  */
@@ -320,6 +567,18 @@ const rb_data_type_t tBrush = _MAKE_DATA_TYPE(
 
 /**
  *
+ *   @return [PenType]
+ */
+static VALUE
+gdip_brush_get_brush_type(VALUE self)
+{
+    Brush *brush = Data_Ptr<Brush *>(self);
+    Check_NULL(brush, "This object does not exist");
+    return gdip_enumint_create(cBrushType, brush->GetType());
+}
+
+/**
+ *
  * @overload initialize(color)
  *   @param color [Color or Integer]
  * 
@@ -332,22 +591,43 @@ gdip_solidbrush_init(VALUE self, VALUE color)
         _VERBOSE("Gdiplus::SolidBrush already initialized");
         return self;
     }
-
-    if (_KIND_OF(color, &tColor)) {
-        ARGB argb = Data_Ptr_As<ARGB>(color);
-        Color c = _ARGB2COLOR(&argb);
-        _DATA_PTR(self) = gdip_obj_create<SolidBrush *>(new SolidBrush(c));
-    }
-    else if (_RB_INTEGER_P(color)) {
-        ARGB argb = RB_NUM2UINT(color);
-        Color c = _ARGB2COLOR(&argb);
-        _DATA_PTR(self) = gdip_obj_create<SolidBrush *>(new SolidBrush(c));
-    }
-    else {
-        rb_raise(rb_eTypeError, "The argument must be Color or Integer");
-    }
+    Color clr;
+    gdip_value2color(color, &clr);
+    _DATA_PTR(self) = gdip_obj_create<SolidBrush *>(new SolidBrush(clr));
     return self;
 }
+
+/**
+ *
+ * @return [Color]
+ * 
+ */
+ static VALUE
+gdip_solidbrush_get_color(VALUE self)
+{
+    SolidBrush *brush = Data_Ptr<SolidBrush *>(self);
+    Check_NULL(brush, "This object does not exist");
+    Color color;
+    Check_Status(brush->GetColor(&color));
+    return gdip_color_create(color);
+}
+
+/**
+ *
+ * @param color [Color]
+ * 
+ */
+ static VALUE
+gdip_solidbrush_set_color(VALUE self, VALUE color)
+{
+    SolidBrush *brush = Data_Ptr<SolidBrush *>(self);
+    Check_NULL(brush, "This object does not exist");
+    Color clr;
+    gdip_value2color(color, &clr);
+    Check_Status(brush->SetColor(clr));
+    return self;
+}
+
 
 void
 Init_pen_brush()
@@ -360,9 +640,29 @@ Init_pen_brush()
     rb_define_method(cPen, "width=", RUBY_METHOD_FUNC(gdip_pen_set_width), 1);
     rb_define_method(cPen, "Width", RUBY_METHOD_FUNC(gdip_pen_get_width), 0);
     rb_define_method(cPen, "Width=", RUBY_METHOD_FUNC(gdip_pen_set_width), 1);
+    rb_define_method(cPen, "color", RUBY_METHOD_FUNC(gdip_pen_get_color), 0);
+    rb_define_method(cPen, "color=", RUBY_METHOD_FUNC(gdip_pen_set_color), 1);
+    rb_define_method(cPen, "Color", RUBY_METHOD_FUNC(gdip_pen_get_color), 0);
+    rb_define_method(cPen, "Color=", RUBY_METHOD_FUNC(gdip_pen_set_color), 1);
     rb_define_method(cPen, "PenType", RUBY_METHOD_FUNC(gdip_pen_get_pen_type), 0);
     rb_define_method(cPen, "pen_type", RUBY_METHOD_FUNC(gdip_pen_get_pen_type), 0);
-    
+    rb_define_method(cPen, "compound_array", RUBY_METHOD_FUNC(gdip_pen_get_compound_array), 0);
+    rb_define_method(cPen, "compound_array=", RUBY_METHOD_FUNC(gdip_pen_set_compound_array), 1);
+    rb_define_method(cPen, "CompoundArray", RUBY_METHOD_FUNC(gdip_pen_get_compound_array), 0);
+    rb_define_method(cPen, "CompoundArray=", RUBY_METHOD_FUNC(gdip_pen_set_compound_array), 1);
+    rb_define_method(cPen, "dash_pattern", RUBY_METHOD_FUNC(gdip_pen_get_dash_pattern), 0);
+    rb_define_method(cPen, "dash_pattern=", RUBY_METHOD_FUNC(gdip_pen_set_dash_pattern), 1);
+    rb_define_method(cPen, "DashPattern", RUBY_METHOD_FUNC(gdip_pen_get_dash_pattern), 0);
+    rb_define_method(cPen, "DashPattern=", RUBY_METHOD_FUNC(gdip_pen_set_dash_pattern), 1);
+    rb_define_method(cPen, "dash_offset", RUBY_METHOD_FUNC(gdip_pen_get_dash_offset), 0);
+    rb_define_method(cPen, "dash_offset=", RUBY_METHOD_FUNC(gdip_pen_set_dash_offset), 1);
+    rb_define_method(cPen, "DashOffset", RUBY_METHOD_FUNC(gdip_pen_get_dash_offset), 0);
+    rb_define_method(cPen, "DashOffset=", RUBY_METHOD_FUNC(gdip_pen_set_dash_offset), 1);
+    rb_define_method(cPen, "miter_limit", RUBY_METHOD_FUNC(gdip_pen_get_miter_limit), 0);
+    rb_define_method(cPen, "miter_limit=", RUBY_METHOD_FUNC(gdip_pen_set_miter_limit), 1);
+    rb_define_method(cPen, "MiterLimit", RUBY_METHOD_FUNC(gdip_pen_get_miter_limit), 0);
+    rb_define_method(cPen, "MiterLimit=", RUBY_METHOD_FUNC(gdip_pen_set_miter_limit), 1);
+
     rb_define_method(cPen, "Alignment", RUBY_METHOD_FUNC(gdip_pen_get_alignment), 0);
     rb_define_method(cPen, "alignment", RUBY_METHOD_FUNC(gdip_pen_get_alignment), 0);
     rb_define_method(cPen, "Alignment=", RUBY_METHOD_FUNC(gdip_pen_set_alignment), 1);
@@ -390,9 +690,18 @@ Init_pen_brush()
 
     cBrush = rb_define_class_under(mGdiplus, "Brush", rb_cObject);
     rb_undef_alloc_func(cBrush);
+    rb_define_method(cBrush, "BrushType", RUBY_METHOD_FUNC(gdip_brush_get_brush_type), 0);
+    rb_define_method(cBrush, "brush_type", RUBY_METHOD_FUNC(gdip_brush_get_brush_type), 0);
+    
 
     cSolidBrush = rb_define_class_under(mGdiplus, "SolidBrush", cBrush);
     rb_define_alloc_func(cSolidBrush, TYPEDDATA_ALLOC_NULL(SolidBrush, &tBrush));
     rb_define_method(cSolidBrush, "initialize", RUBY_METHOD_FUNC(gdip_solidbrush_init), 1);
     rb_define_method(cSolidBrush, "gdiplus_id", RUBY_METHOD_FUNC(gdip_obj_id), 0);
+    rb_define_method(cSolidBrush, "color", RUBY_METHOD_FUNC(gdip_solidbrush_get_color), 0);
+    rb_define_method(cSolidBrush, "color=", RUBY_METHOD_FUNC(gdip_solidbrush_set_color), 1);
+    rb_define_method(cSolidBrush, "Color", RUBY_METHOD_FUNC(gdip_solidbrush_get_color), 0);
+    rb_define_method(cSolidBrush, "Color=", RUBY_METHOD_FUNC(gdip_solidbrush_set_color), 1);
 }
+
+// ToDo: Pen#Transform

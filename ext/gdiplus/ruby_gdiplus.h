@@ -14,6 +14,7 @@
 #include <stdio.h>
 #include <stdarg.h>
 #include <string.h>
+#include <math.h>
 
 using namespace Gdiplus;
 
@@ -170,15 +171,40 @@ dp_type(const char *msg)
 #define _RB_FLOAT_P(v) RB_TYPE_P(v, RUBY_T_FLOAT)
 #define _RB_SYMBOL_P(v) RB_SYMBOL_P(v)
 
+static inline float
+NUM2SINGLE(VALUE num)
+{
+    return static_cast<float>(NUM2DBL(num));
+}
+/*
+static inline VALUE
+SINGLE2NUM(float n)
+{
+    return DBL2NUM(static_cast<double>(n));
+}
+*/
+
+static inline VALUE
+SINGLE2NUM(float n)
+{
+    return DBL2NUM(round(static_cast<double>(n) * 1000000.0) / 1000000.0);
+}
+
+bool gdip_value2double(VALUE v, double *dbl, bool do_raise=true);
+bool gdip_value2single(VALUE v, float *flt, bool do_raise=true);
+
 static inline const char * __method__() { return rb_id2name(rb_frame_this_func()); }
 static inline const char * __class__(VALUE self) { return rb_class2name(CLASS_OF(self)); }
 
-#define _ARGB2COLOR(argb_ptr) gdip_color_argb2color(argb_ptr)
-static inline Color
-gdip_color_argb2color(ARGB *p)
+VALUE gdip_color_create(ARGB argb);
+static inline VALUE
+gdip_color_create(Color& color)
 {
-    return *reinterpret_cast<Color *>(p);
+    return gdip_color_create(color.GetValue());
 }
+
+bool gdip_value2color(VALUE v, Color *color, bool to_int=false, bool do_raise=true);
+#define ARGB2COLOR(argb) (*reinterpret_cast<Color *>(&argb))
 
 template<typename T>
 static inline T 

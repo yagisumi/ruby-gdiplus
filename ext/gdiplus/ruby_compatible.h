@@ -94,8 +94,11 @@
 #endif
   #endif /* RB_FIX2SHORT */
 #else
-/* comming soon */
+/* not yet */
 #endif /* FIX2SHORT */
+#ifndef DBL2NUM
+#define DBL2NUM(dbl)  rb_float_new(dbl)
+#endif
 #if SIZEOF_LONG == SIZEOF_VOIDP
 #define _RB_NUM2ID(x) RB_NUM2ULONG(x)
 #elif SIZEOF_LONG_LONG == SIZEOF_VOIDP

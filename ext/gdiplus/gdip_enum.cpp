@@ -76,14 +76,12 @@ gdip_enumint_to_int(VALUE klass, VALUE arg, bool to_int)
     if (_KIND_OF(arg, &tEnumInt) && rb_obj_is_kind_of(arg, klass)) {
         r = Data_Ptr_As<int>(arg);
     }
+    else if (to_int) {
+        VALUE num = rb_to_int(arg);
+        r = RB_NUM2INT(num);
+    }
     else {
-        if (to_int) {
-            VALUE num = rb_to_int(arg);
-            r = RB_NUM2INT(num);
-        }
-        else {
-            rb_raise(rb_eTypeError, "An argument must be %s or Symbol", __class__(klass));
-        }
+        rb_raise(rb_eTypeError, "An argument must be %s or Symbol", __class__(klass));
     }
     return r;
 }

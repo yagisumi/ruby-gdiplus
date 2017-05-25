@@ -8,6 +8,40 @@
 const rb_data_type_t tColor = _MAKE_DATA_TYPE(
     "Color", 0, RUBY_NEVER_FREE, NULL, NULL, &cColor);
 
+// bool gdip_value2color(VALUE v, Color *color, bool to_int=false, bool do_raise=true)
+bool
+gdip_value2color(VALUE v, Color *color, bool to_int, bool do_raise)
+{
+    if (RB_SYMBOL_P(v)) {
+        v = rb_const_get(cColor, RB_SYM2ID(v));
+    }
+    
+    if (_KIND_OF(v, &tColor)) {
+        color->SetValue(Data_Ptr_As<ARGB>(v));
+        return true;
+    }
+    else if (_RB_INTEGER_P(v)) {
+        color->SetValue(RB_NUM2UINT(v));
+        return true;
+    }
+    else if (to_int) {
+        VALUE num = rb_to_int(v);
+        color->SetValue(RB_NUM2UINT(num));
+        return true;
+    }
+    else if (do_raise) {
+        rb_raise(rb_eTypeError, "The argument must be Color or Integer");
+    }
+    return false;
+}
+
+
+VALUE
+gdip_color_create(ARGB argb)
+{
+    return _Data_Wrap_Struct(cColor, &tColor, reinterpret_cast<void*>(argb));
+}
+
 static VALUE
 gdip_color_alloc(VALUE klass)
 {
@@ -49,7 +83,7 @@ gdip_color_set_color(VALUE v, ARGB argb)
 static VALUE
 gdip_color_init(int argc, VALUE *argv, VALUE self)
 {
-    if (argc == 0) {}
+    if (argc == 0) { }
     else if (argc == 1) {
         if (Integer_p(argv[0])) {
             Data_Ptr_Set_As<ARGB>(self, RB_NUM2UINT(argv[0]));
@@ -156,7 +190,6 @@ gdip_color_to_i(VALUE self)
 
 /**
  *
- * @overload A()
  *   @return [Integer] alpha
  */
 static VALUE
@@ -168,7 +201,6 @@ gdip_color_get_a(VALUE self)
 
 /**
  *
- * @overload R()
  *   @return [Integer] red
  */
 static VALUE
@@ -180,7 +212,6 @@ gdip_color_get_r(VALUE self)
 
 /**
  *
- * @overload G()
  *   @return [Integer] green
  */
 static VALUE
@@ -192,7 +223,6 @@ gdip_color_get_g(VALUE self)
 
 /**
  *
- * @overload B()
  *   @return [Integer] blue
  */
 static VALUE
