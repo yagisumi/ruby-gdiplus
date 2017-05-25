@@ -92,6 +92,16 @@ class GdiplusImageTest < Test::Unit::TestCase
     end
   end
   
+  def test_image_properties
+    bmp = Bitmap.new(40, 30)
+    assert_equal(40, bmp.Width)
+    assert_equal(30, bmp.Height)
+    assert(bmp.HorizontalResolution > 0)
+    assert(bmp.VerticalResolution > 0)
+    assert_equal(PixelFormat.Format32bppARGB, bmp.PixelFormat)
+    assert_equal(ImageFormat.MemoryBmp, bmp.RawFormat)
+  end
+  
   
   
 end

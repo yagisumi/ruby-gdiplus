@@ -15,7 +15,7 @@ gdip_value2color(VALUE v, Color *color, bool to_int, bool do_raise)
     if (RB_SYMBOL_P(v)) {
         v = rb_const_get(cColor, RB_SYM2ID(v));
     }
-    
+
     if (_KIND_OF(v, &tColor)) {
         color->SetValue(Data_Ptr_As<ARGB>(v));
         return true;
@@ -412,7 +412,6 @@ Init_color_constants()
     gdip_color_define_const(0xFFFFFF00, "Yellow");
     gdip_color_define_const(0xFF9ACD32, "YellowGreen");
 }
-
 
 /**
  * Document-class: Gdiplus::Color

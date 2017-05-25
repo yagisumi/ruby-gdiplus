@@ -95,7 +95,7 @@ gdip_image_save(int argc, VALUE *argv, VALUE self)
 {
     Image *image = Data_Ptr<Image *>(self);
     GpStatus status;
-    Check_NULL(image, "unexpected image object");
+    Check_NULL(image, "This image object does not exist.");
 
     if (argc == 0) {
         rb_raise(rb_eArgError, "too few arguments");
@@ -115,7 +115,7 @@ gdip_image_save(int argc, VALUE *argv, VALUE self)
             Check_Status(status);
         }
         else {
-            rb_raise(rb_eArgError, "failed to get a image format from a filename");
+            rb_raise(rb_eArgError, "failed to get an image format from a filename");
         }
     }
     else if (argc == 2) {
@@ -126,7 +126,7 @@ gdip_image_save(int argc, VALUE *argv, VALUE self)
                 Check_Status(status);
             }
             else {
-                rb_raise(rb_eArgError, "failed to get a image format from a ImageFormat");
+                rb_raise(rb_eArgError, "failed to get an image format from a ImageFormat");
             }
         }
         else if (_KIND_OF(argv[1], &tImageCodecInfo)) {
@@ -178,6 +178,90 @@ gdip_image_save(int argc, VALUE *argv, VALUE self)
     return self;
 }
 
+/**
+ *
+ * @return [Integer]
+ * 
+ */
+static VALUE
+gdip_image_width(VALUE self)
+{
+    Image *image = Data_Ptr<Image *>(self);
+    Check_NULL(image, "The image object does not exist.");
+    return RB_UINT2NUM(image->GetWidth());
+}
+
+/**
+ *
+ * @return [Integer]
+ * 
+ */
+static VALUE
+gdip_image_height(VALUE self)
+{
+    Image *image = Data_Ptr<Image *>(self);
+    Check_NULL(image, "The image object does not exist.");
+    return RB_UINT2NUM(image->GetHeight());
+}
+
+/**
+ *
+ * @return [Float]
+ * 
+ */
+static VALUE
+gdip_image_horizontal_resolution(VALUE self)
+{
+    Image *image = Data_Ptr<Image *>(self);
+    Check_NULL(image, "The image object does not exist.");
+    return SINGLE2NUM(image->GetHorizontalResolution());
+}
+
+/**
+ *
+ * @return [Float]
+ * 
+ */
+static VALUE
+gdip_image_vertical_resolution(VALUE self)
+{
+    Image *image = Data_Ptr<Image *>(self);
+    Check_NULL(image, "The image object does not exist.");
+    return SINGLE2NUM(image->GetVerticalResolution());
+}
+
+/**
+ *
+ * @return [PixelFormat]
+ * 
+ */
+static VALUE
+gdip_image_pixel_format(VALUE self)
+{
+    Image *image = Data_Ptr<Image *>(self);
+    Check_NULL(image, "The image object does not exist.");
+    PixelFormat format = image->GetPixelFormat();
+    return gdip_enumint_create(cPixelFormat, format);
+}
+
+/**
+ *
+ * @return [PixelFormat]
+ * 
+ */
+static VALUE
+gdip_image_raw_format(VALUE self)
+{
+    Image *image = Data_Ptr<Image *>(self);
+    Check_NULL(image, "The image object does not exist.");
+    GUID guid;
+    PixelFormat format = image->GetRawFormat(&guid);
+    VALUE r = gdip_enum_get(cImageFormat, &guid);
+    if (RB_NIL_P(r)) {
+        r = typeddata_alloc<GUID, &tGuid>(cImageFormat);
+    }
+    return r;
+}
 /*
 Document-class: Gdiplus::Image
 abstruct class
@@ -189,4 +273,17 @@ void Init_image()
     cImage = rb_define_class_under(mGdiplus, "Image", rb_cObject);
     rb_undef_alloc_func(cImage);
     rb_define_method(cImage, "save", RUBY_METHOD_FUNC(gdip_image_save), -1);
+    rb_define_method(cImage, "Width", RUBY_METHOD_FUNC(gdip_image_width), 0);
+    rb_define_method(cImage, "width", RUBY_METHOD_FUNC(gdip_image_width), 0);
+    rb_define_method(cImage, "Height", RUBY_METHOD_FUNC(gdip_image_height), 0);
+    rb_define_method(cImage, "height", RUBY_METHOD_FUNC(gdip_image_height), 0);
+    rb_define_method(cImage, "HorizontalResolution", RUBY_METHOD_FUNC(gdip_image_horizontal_resolution), 0);
+    rb_define_method(cImage, "horizontal_resolution", RUBY_METHOD_FUNC(gdip_image_horizontal_resolution), 0);
+    rb_define_method(cImage, "VerticalResolution", RUBY_METHOD_FUNC(gdip_image_vertical_resolution), 0);
+    rb_define_method(cImage, "vertical_resolution", RUBY_METHOD_FUNC(gdip_image_vertical_resolution), 0);
+    rb_define_method(cImage, "PixelFormat", RUBY_METHOD_FUNC(gdip_image_pixel_format), 0);
+    rb_define_method(cImage, "pixel_format", RUBY_METHOD_FUNC(gdip_image_pixel_format), 0);
+    rb_define_method(cImage, "RawFormat", RUBY_METHOD_FUNC(gdip_image_raw_format), 0);
+    rb_define_method(cImage, "raw_format", RUBY_METHOD_FUNC(gdip_image_raw_format), 0);
+    
 }

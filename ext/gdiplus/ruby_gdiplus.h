@@ -268,7 +268,7 @@ static VALUE
 typeddata_alloc(VALUE klass)
 {
     void *ptr = RB_ZALLOC(T);
-    DPT("alloc");
+    DPT("RData alloc");
     VALUE r = _Data_Wrap_Struct(klass, type, ptr);
     return r;
 }
@@ -278,7 +278,7 @@ typeddata_alloc(VALUE klass)
     static VALUE
     typeddata_alloc_null(VALUE klass)
     {
-        DPT("alloc"); // T is used for debug
+        DPT("RData alloc"); // T is used for debug
         VALUE r = _Data_Wrap_Struct(klass, type, NULL);
         return r;
     }
@@ -298,7 +298,7 @@ template<typename T>
 static void
 gdip_default_free(void *ptr)
 {
-    DPT("free");
+    DPT("RData free");
     ruby_xfree(ptr);
 }
 #if GDIPLUS_DEBUG
