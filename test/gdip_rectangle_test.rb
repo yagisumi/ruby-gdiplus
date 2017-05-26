@@ -4,8 +4,35 @@ require 'test_helper'
 class GdiplusRectangleTest < Test::Unit::TestCase
   include Gdiplus
   
-  def test_point
-    p Point.new
+  def test_Point
+    assert_instance_of(Point, Point.new)
+    assert_instance_of(Point, Point.new(100, -100))
+    assert_raise(ArgumentError) { Point.new(1) }
+    assert_raise(TypeError) { Point.new("1", "2") }
+    po = Point.new
+    po.X = -100
+    po.Y = -200
+    assert_equal(-100, po.X)
+    assert_equal(-200, po.Y)
+    assert_equal(Point.new(-100, -200), po)
+    po2 = Point.new(100, 200)
+    assert_equal(Point.new, po + po2)
+  end
+  
+  def test_PointF
+    assert_instance_of(PointF, PointF.new)
+    assert_instance_of(PointF, PointF.new(100.0, -100.0))
+    assert_raise(ArgumentError) { PointF.new(1) }
+    assert_raise(TypeError) { PointF.new("1", "2") }
+    assert_raise(TypeError) { PointF.new(1, 2) }
+    po = PointF.new
+    po.X = -100.0
+    po.Y = -200.0
+    assert_equal(-100.0, po.X)
+    assert_equal(-200.0, po.Y)
+    assert_equal(PointF.new(-100.0, -200.0), po)
+    po2 = PointF.new(100.0, 200.0)
+    assert_equal(PointF.new, po + po2)
   end
 end
 

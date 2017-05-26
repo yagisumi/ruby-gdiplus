@@ -255,7 +255,7 @@ gdip_image_raw_format(VALUE self)
     Image *image = Data_Ptr<Image *>(self);
     Check_NULL(image, "The image object does not exist.");
     GUID guid;
-    PixelFormat format = image->GetRawFormat(&guid);
+    Check_Status(image->GetRawFormat(&guid));
     VALUE r = gdip_enum_get(cImageFormat, &guid);
     if (RB_NIL_P(r)) {
         r = typeddata_alloc<GUID, &tGuid>(cImageFormat);
@@ -279,7 +279,7 @@ gdip_image_draw(VALUE self)
         VALUE graphics = gdip_graphics_create(g);
         rb_yield(graphics);
     }
-
+    return self;
 }
 
 /*

@@ -8,6 +8,7 @@
 
 #include <ruby.h>
 #include "ruby_compatible.h"
+#include "gdip_utils.h"
 #include <windows.h>
 #include <rpc.h>
 #include <gdiplus.h>
@@ -15,6 +16,7 @@
 #include <stdarg.h>
 #include <string.h>
 #include <math.h>
+#include <float.h>
 
 using namespace Gdiplus;
 
@@ -181,39 +183,9 @@ dp_type(const char *msg)
 #define DPT(msg)
 #endif
 
-/* Utils */
-#define _VERBOSE(...) rb_warning(__VA_ARGS__)
-#define _WARNING(...) rb_warn(__VA_ARGS__)
-#define _RB_ARRAY_P(v) RB_TYPE_P(v, RUBY_T_ARRAY)
-#define _RB_STRING_P(v) RB_TYPE_P(v, RUBY_T_STRING)
-#define _RB_INTEGER_P(v) RB_INTEGER_TYPE_P(v)
-#define _RB_FLOAT_P(v) RB_TYPE_P(v, RUBY_T_FLOAT)
-#define _RB_SYMBOL_P(v) RB_SYMBOL_P(v)
-
-static inline float
-NUM2SINGLE(VALUE num)
-{
-    return static_cast<float>(NUM2DBL(num));
-}
-/*
-static inline VALUE
-SINGLE2NUM(float n)
-{
-    return DBL2NUM(static_cast<double>(n));
-}
-*/
-
-static inline VALUE
-SINGLE2NUM(float n)
-{
-    return DBL2NUM(round(static_cast<double>(n) * 1000000.0) / 1000000.0);
-}
 
 bool gdip_value2double(VALUE v, double *dbl, bool do_raise=true);
 bool gdip_value2single(VALUE v, float *flt, bool do_raise=true);
-
-static inline const char * __method__() { return rb_id2name(rb_frame_this_func()); }
-static inline const char * __class__(VALUE self) { return rb_class2name(CLASS_OF(self)); }
 
 VALUE gdip_color_create(ARGB argb);
 static inline VALUE
@@ -389,30 +361,6 @@ Check_Status(GpStatus status) {
 }
 
 #define NOT_IMPLEMENTED_ERROR rb_raise(rb_eNotImpError, "not implemented yet")
-
-static inline bool
-Integer_p(VALUE v1)
-{
-    return (RB_INTEGER_TYPE_P(v1));
-}
-
-static inline bool
-Integer_p(VALUE v1, VALUE v2)
-{
-    return (Integer_p(v1) && Integer_p(v2));
-}
-
-static inline bool
-Integer_p(VALUE v1, VALUE v2, VALUE v3)
-{
-    return (Integer_p(v1, v2) && Integer_p(v3));
-}
-
-static inline bool
-Integer_p(VALUE v1, VALUE v2, VALUE v3, VALUE v4)
-{
-    return (Integer_p(v1, v2, v3) && Integer_p(v4));
-}
 
 /* gdip_utils.cpp */
 VALUE util_encode_to_utf8(VALUE str);
