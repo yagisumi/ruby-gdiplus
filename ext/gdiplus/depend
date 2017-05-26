@@ -7,3 +7,4 @@ gdip_enum.o: gdip_enum.cpp ruby_gdiplus.h ruby_compatible.h simplemap.h
 gdip_color.o: gdip_color.cpp ruby_gdiplus.h ruby_compatible.h
 gdip_pen_brush.o: gdip_pen_brush.cpp ruby_gdiplus.h ruby_compatible.h
 gdip_graphics.o: gdip_graphics.cpp ruby_gdiplus.h ruby_compatible.h
+gdip_rectangle.o: gdip_rectangle.cpp ruby_gdiplus.h ruby_compatible.h

@@ -35,6 +35,12 @@ VALUE cPen;
 VALUE cBrush;
 VALUE cSolidBrush;
 VALUE cGraphics;
+VALUE cPoint;
+VALUE cPointF;
+VALUE cSize;
+VALUE cSizeF;
+VALUE cRectangle;
+VALUE cRectangleF;
 
 int gdip_refcount = 0;
 bool gdip_end_flag = false;

@@ -48,6 +48,12 @@ extern VALUE cMatrixOrder;
 extern VALUE cPenAlignment;
 extern VALUE cPenType;
 extern VALUE cGraphics;
+extern VALUE cPoint;
+extern VALUE cPointF;
+extern VALUE cSize;
+extern VALUE cSizeF;
+extern VALUE cRectangle;
+extern VALUE cRectangleF;
 
 extern const rb_data_type_t tGuid;
 extern const rb_data_type_t tImageCodecInfo;
@@ -60,6 +66,12 @@ extern const rb_data_type_t tColor;
 extern const rb_data_type_t tPen;
 extern const rb_data_type_t tBrush;
 extern const rb_data_type_t tGraphics;
+extern const rb_data_type_t tPoint;
+extern const rb_data_type_t tPointF;
+extern const rb_data_type_t tSize;
+extern const rb_data_type_t tSizeF;
+extern const rb_data_type_t tRectangle;
+extern const rb_data_type_t tRectangleF;
 
 void Init_codec();
 void Init_image();
