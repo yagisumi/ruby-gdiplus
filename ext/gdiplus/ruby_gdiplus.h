@@ -80,6 +80,7 @@ void Init_enum();
 void Init_color();
 void Init_pen_brush();
 void Init_graphics();
+void Init_rectangle();
 
 VALUE gdip_obj_id(VALUE self);
 

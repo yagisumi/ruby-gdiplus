@@ -186,4 +186,5 @@ Init_gdiplus(void)
     Init_color();
     Init_pen_brush();
     Init_graphics();
+    Init_rectangle();
 }
