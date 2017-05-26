@@ -17,6 +17,7 @@ class GdiplusRectangleTest < Test::Unit::TestCase
     assert_equal(Point.new(-100, -200), po)
     po2 = Point.new(100, 200)
     assert_equal(Point.new, po + po2)
+    assert_not_equal(0, po)
   end
   
   def test_PointF
@@ -33,7 +34,41 @@ class GdiplusRectangleTest < Test::Unit::TestCase
     assert_equal(PointF.new(-100.0, -200.0), po)
     po2 = PointF.new(100.0, 200.0)
     assert_equal(PointF.new, po + po2)
+    assert_not_equal(0, po)
   end
+  
+  def test_Size
+    assert_instance_of(Size, Size.new)
+    assert_instance_of(Size, Size.new(100, -100))
+    assert_raise(ArgumentError) { Size.new(1) }
+    assert_raise(TypeError) { Size.new("1", "2") }
+    size = Size.new
+    size.Width = -100
+    size.Height = -200
+    assert_equal(-100, size.Width)
+    assert_equal(-200, size.Height)
+    assert_equal(Size.new(-100, -200), size)
+    size2 = Size.new(100, 200)
+    assert_equal(Size.new, size + size2)
+    assert_not_equal(0.0, size)
+  end
+  
+  def test_SizeF
+    assert_instance_of(SizeF, SizeF.new)
+    assert_instance_of(SizeF, SizeF.new(100.0, -100.0))
+    assert_raise(ArgumentError) { SizeF.new(1.0) }
+    assert_raise(TypeError) { SizeF.new("1", "2") }
+    size = SizeF.new
+    size.Width = -100.0
+    size.Height = -200.0
+    assert_equal(-100.0, size.Width)
+    assert_equal(-200.0, size.Height)
+    assert_equal(SizeF.new(-100.0, -200.0), size)
+    size2 = SizeF.new(100.0, 200.0)
+    assert_equal(SizeF.new, size + size2)
+    assert_not_equal(0.0, size)
+  end
+  
 end
 
 __END__
