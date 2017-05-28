@@ -256,8 +256,9 @@ typeddata_size(const void *p)
 
 template<typename T, const rb_data_type_t *type>
 static VALUE
-typeddata_alloc(VALUE klass)
+typeddata_alloc(VALUE klass=Qnil)
 {
+    if (RB_NIL_P(klass)) klass = *static_cast<VALUE *>(type->data);
     void *ptr = RB_ZALLOC(T);
     DPT("RData alloc");
     VALUE r = _Data_Wrap_Struct(klass, type, ptr);
@@ -266,8 +267,9 @@ typeddata_alloc(VALUE klass)
 
 template<const rb_data_type_t *type>
 static VALUE
-typeddata_alloc_null(VALUE klass)
+typeddata_alloc_null(VALUE klass=Qnil)
 {
+    if (RB_NIL_P(klass)) klass = *static_cast<VALUE *>(type->data);
     dp("%s: RData alloc", type->wrap_struct_name);
     VALUE r = _Data_Wrap_Struct(klass, type, NULL);
     return r;

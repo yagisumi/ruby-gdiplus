@@ -24,6 +24,15 @@ const rb_data_type_t tRectangleF = _MAKE_DATA_TYPE(
     "RectangleF", 0, GDIP_DEFAULT_FREE(RectF), &typeddata_size<RectF>, NULL, &cRectangleF);
 
 
+static VALUE
+gdip_point_create(int x, int y)
+{
+    VALUE r = typeddata_alloc<Point, &tPoint>(cPoint);
+    Point *point = Data_Ptr<Point *>(r);
+    point->X = x;
+    point->Y = y;
+    return r;
+}
 
 static VALUE
 gdip_point_init(int argc, VALUE *argv, VALUE self)
@@ -137,6 +146,16 @@ gdip_point_sub(VALUE self, VALUE other)
         rb_raise(rb_eTypeError, "The argument should be Point or Size.");
         return Qnil;
     }
+}
+
+static VALUE
+gdip_pointf_create(float x, float y)
+{
+    VALUE r = typeddata_alloc<PointF, &tPointF>(cPointF);
+    PointF *point = Data_Ptr<PointF *>(r);
+    point->X = x;
+    point->Y = y;
+    return r;
 }
 
 static VALUE
@@ -255,6 +274,17 @@ gdip_pointf_sub(VALUE self, VALUE other)
         return Qnil;
     }
 }
+
+static VALUE
+gdip_size_create(int width, int height)
+{
+    VALUE r = typeddata_alloc<Size, &tSize>(cSize);
+    Size *size = Data_Ptr<Size *>(r);
+    size->Width = width;
+    size->Height = height;
+    return r;
+}
+
 static VALUE
 gdip_size_init(int argc, VALUE *argv, VALUE self)
 {
@@ -372,6 +402,17 @@ gdip_size_sub(VALUE self, VALUE other)
     }
 }
 
+
+static VALUE
+gdip_sizef_create(float width, float height)
+{
+    VALUE r = typeddata_alloc<SizeF, &tSizeF>(cSizeF);
+    SizeF *size = Data_Ptr<SizeF *>(r);
+    size->Width = width;
+    size->Height = height;
+    return r;
+}
+
 static VALUE
 gdip_sizef_init(int argc, VALUE *argv, VALUE self)
 {
@@ -458,7 +499,7 @@ static VALUE
 gdip_sizef_add(VALUE self, VALUE other)
 {
     if (_KIND_OF(other, &tSizeF)) {
-        VALUE r = typeddata_alloc<SizeF, &tSizeF>(cSize);
+        VALUE r = typeddata_alloc<SizeF, &tSizeF>(cSizeF);
         SizeF *size_r = Data_Ptr<SizeF *>(r);
         SizeF *size_self = Data_Ptr<SizeF *>(self);
         SizeF *size_other = Data_Ptr<SizeF *>(other);
@@ -476,7 +517,7 @@ static VALUE
 gdip_sizef_sub(VALUE self, VALUE other)
 {
     if (_KIND_OF(other, &tSizeF)) {
-        VALUE r = typeddata_alloc<SizeF, &tSizeF>(cSize);
+        VALUE r = typeddata_alloc<SizeF, &tSizeF>(cSizeF);
         SizeF *size_r = Data_Ptr<SizeF *>(r);
         SizeF *size_self = Data_Ptr<SizeF *>(self);
         SizeF *size_other = Data_Ptr<SizeF *>(other);
@@ -486,6 +527,769 @@ gdip_sizef_sub(VALUE self, VALUE other)
     }
     else {
         rb_raise(rb_eTypeError, "The argument should be Size.");
+        return Qnil;
+    }
+}
+
+static VALUE
+gdip_rect_create(int x, int y, int width, int height)
+{
+    VALUE r = typeddata_alloc<Rect, &tRectangle>(cRectangle);
+    Rect *rect = Data_Ptr<Rect *>(r);
+    rect->X = x;
+    rect->Y = y;
+    rect->Width = width;
+    rect->Height = height;
+    return r;
+}
+
+static VALUE
+gdip_rect_create(Rect *rect=NULL)
+{
+    VALUE r = typeddata_alloc<Rect, &tRectangle>(cRectangle);
+    Rect *rect_r = Data_Ptr<Rect *>(r);
+    if (rect) {
+        rect_r->X = rect->X;
+        rect_r->Y = rect->Y;
+        rect_r->Width = rect->Width;
+        rect_r->Height = rect->Height;
+    }
+    return r;
+}
+
+static VALUE
+gdip_rect_init(int argc, VALUE *argv, VALUE self)
+{
+    if (argc != 0 && argc != 4) {
+        rb_raise(rb_eArgError, "wrong number of arguments (%d for 0 or 4)", argc);
+    }
+    if (argc == 0) return self;
+    else if (Integer_p(argv[0], argv[1], argv[2], argv[3])) {
+        Rect *rect = Data_Ptr<Rect *>(self);
+        rect->X = RB_NUM2INT(argv[0]);
+        rect->Y = RB_NUM2INT(argv[1]);
+        rect->Width = RB_NUM2INT(argv[2]);
+        rect->Height = RB_NUM2INT(argv[3]);
+    }
+    else {
+        rb_raise(rb_eTypeError, "The arguments should be Integer.");
+    }
+    return self;
+}
+
+static VALUE
+gdip_rect_s_from_ltrb(VALUE self, VALUE left, VALUE top, VALUE right, VALUE bottom)
+{
+    if (!Integer_p(left, top, right, bottom)) {
+        rb_raise(rb_eTypeError, "The arguments should be Integer.");
+    }
+    return gdip_rect_create(RB_NUM2INT(left), RB_NUM2INT(top), RB_NUM2INT(right) - RB_NUM2INT(left), RB_NUM2INT(bottom) - RB_NUM2INT(top));
+}
+
+static VALUE
+gdip_rect_inspect(VALUE self)
+{
+    Rect *rect = Data_Ptr<Rect *>(self);
+    VALUE r = util_utf8_sprintf("#<%s X=%d, Y=%d, Width=%d, Height=%d>", __class__(self), rect->X, rect->Y, rect->Width, rect->Height);
+    return r;
+}
+
+static VALUE
+gdip_rect_get_x(VALUE self)
+{
+    Rect *rect = Data_Ptr<Rect *>(self);
+    return RB_INT2NUM(rect->X);
+}
+
+static VALUE
+gdip_rect_set_x(VALUE self, VALUE num)
+{
+    if (Integer_p(num)) {
+        Rect *rect = Data_Ptr<Rect *>(self);
+        rect->X = RB_NUM2INT(num);
+    }
+    else {
+        rb_raise(rb_eTypeError, "The argument should be Integer.");
+    }
+    return self;
+}
+
+static VALUE
+gdip_rect_get_y(VALUE self)
+{
+    Rect *rect = Data_Ptr<Rect *>(self);
+    return RB_INT2NUM(rect->Y);
+}
+
+static VALUE
+gdip_rect_set_y(VALUE self, VALUE num)
+{
+    if (Integer_p(num)) {
+        Rect *rect = Data_Ptr<Rect *>(self);
+        rect->Y = RB_NUM2INT(num);
+    }
+    else {
+        rb_raise(rb_eTypeError, "The argument should be Integer.");
+    }
+    return self;
+}
+
+static VALUE
+gdip_rect_get_width(VALUE self)
+{
+    Rect *rect = Data_Ptr<Rect *>(self);
+    return RB_INT2NUM(rect->Width);
+}
+
+static VALUE
+gdip_rect_set_width(VALUE self, VALUE num)
+{
+    if (Integer_p(num)) {
+        Rect *rect = Data_Ptr<Rect *>(self);
+        rect->Width = RB_NUM2INT(num);
+    }
+    else {
+        rb_raise(rb_eTypeError, "The argument should be Integer.");
+    }
+    return self;
+}
+
+static VALUE
+gdip_rect_get_height(VALUE self)
+{
+    Rect *rect = Data_Ptr<Rect *>(self);
+    return RB_INT2NUM(rect->Height);
+}
+
+
+static VALUE
+gdip_rect_set_height(VALUE self, VALUE num)
+{
+    if (Integer_p(num)) {
+        Rect *rect = Data_Ptr<Rect *>(self);
+        rect->Height = RB_NUM2INT(num);
+    }
+    else {
+        rb_raise(rb_eTypeError, "The argument should be Integer.");
+    }
+    return self;
+}
+
+static VALUE
+gdip_rect_get_right(VALUE self)
+{
+    Rect *rect = Data_Ptr<Rect *>(self);
+    return RB_INT2NUM(rect->X + rect->Width);
+}
+
+static VALUE
+gdip_rect_get_bottom(VALUE self)
+{
+    Rect *rect = Data_Ptr<Rect *>(self);
+    return RB_INT2NUM(rect->Y + rect->Height);
+}
+
+static VALUE
+gdip_rect_get_location(VALUE self)
+{
+    Rect *rect = Data_Ptr<Rect *>(self);
+    return gdip_point_create(rect->X, rect->Y);
+}
+
+static VALUE
+gdip_rect_set_location(VALUE self, VALUE loc)
+{
+    if (_KIND_OF(loc, &tPoint)) {
+        Rect *rect = Data_Ptr<Rect *>(self);
+        Point *point = Data_Ptr<Point *>(loc);
+        rect->X = point->X;
+        rect->Y = point->Y;
+    }
+    else {
+        rb_raise(rb_eTypeError, "The argument should be Point.");
+    }
+    return self;
+}
+
+
+static VALUE
+gdip_rect_get_size(VALUE self)
+{
+    Rect *rect = Data_Ptr<Rect *>(self);
+    return gdip_size_create(rect->Width, rect->Height);
+}
+
+static VALUE
+gdip_rect_set_size(VALUE self, VALUE size)
+{
+    if (_KIND_OF(size, &tSize)) {
+        Rect *rect = Data_Ptr<Rect *>(self);
+        Size *sz = Data_Ptr<Size *>(size);
+        rect->Width = sz->Width;
+        rect->Height = sz->Height;
+    }
+    else {
+        rb_raise(rb_eTypeError, "The argument should be Size.");
+    }
+    return self;
+}
+
+static VALUE
+gdip_rect_equal(VALUE self, VALUE other)
+{
+    if (self == other) return Qtrue;
+    else if (!_KIND_OF(other, &tRectangle)) return Qfalse;
+    else {
+        Rect *rect_self = Data_Ptr<Rect *>(self);
+        Rect *rect_other = Data_Ptr<Rect *>(other);
+        return (rect_self->X == rect_other->X && rect_self->Y == rect_other->Y &&
+            rect_self->Width == rect_other->Width && rect_self->Height == rect_other->Height) ? Qtrue : Qfalse;
+    }
+}
+
+static VALUE
+gdip_rect_contains(int argc, VALUE *argv, VALUE self)
+{
+    if (argc != 1 && argc != 2) {
+        rb_raise(rb_eArgError, "wrong number of arguments (%d for 1..2)", argc);
+    }
+    Rect *rect = Data_Ptr<Rect *>(self);
+    if (argc == 1) {
+        if (_KIND_OF(argv[0], &tPoint)) {
+            Point *po = Data_Ptr<Point *>(argv[0]);
+            return rect->Contains(*po) ? Qtrue : Qfalse;
+        }
+        else if (_KIND_OF(argv[0], &tRectangle)) {
+            Rect *rect_other = Data_Ptr<Rect *>(argv[0]);
+            return rect->Contains(*rect_other) ? Qtrue : Qfalse;
+        }
+        else {
+            rb_raise(rb_eTypeError, "The argument should be Point or Rectangle.");
+        }
+    }
+    if (argc == 2) {
+        if (Integer_p(argv[0], argv[1])) {
+            return rect->Contains(RB_NUM2INT(argv[0]), RB_NUM2INT(argv[1])) ? Qtrue : Qfalse;
+        }
+        else {
+            rb_raise(rb_eTypeError, "The arguments should be Integer.");
+        }
+    }
+    return Qfalse;
+}
+
+static VALUE
+gdip_rect_inflate_bang(int argc, VALUE *argv, VALUE self)
+{
+    if (argc != 1 && argc != 2) {
+        rb_raise(rb_eArgError, "wrong number of arguments (%d for 1..2)", argc);
+    }
+    Rect *rect = Data_Ptr<Rect *>(self);
+    if (argc == 1) {
+        if (_KIND_OF(argv[0], &tPoint)) {
+            Point *point = Data_Ptr<Point *>(argv[0]);
+            rect->Inflate(point->X, point->Y);
+        }
+        else if (_KIND_OF(argv[0], &tSize)) {
+            Size *size = Data_Ptr<Size *>(argv[0]);
+            rect->Inflate(size->Width, size->Height);
+        }
+        else {
+            rb_raise(rb_eTypeError, "The argument should be Point or Size.");
+        }
+    }
+    else if (argc == 2) {
+        if (Integer_p(argv[0], argv[1])) {
+            rect->Inflate(RB_NUM2INT(argv[0]), RB_NUM2INT(argv[1]));
+        }
+        else {
+            rb_raise(rb_eTypeError, "The arguments should be Integer.");
+        }
+    }
+    return self;
+}
+
+
+static VALUE
+gdip_rect_inflate(int argc, VALUE *argv, VALUE self)
+{
+    if (argc != 1 && argc != 2) {
+        rb_raise(rb_eArgError, "wrong number of arguments (%d for 1..2)", argc);
+    }
+    Rect *rect = Data_Ptr<Rect *>(self);
+    if (argc == 1) {
+        if (_KIND_OF(argv[0], &tPoint)) {
+            VALUE r = gdip_rect_create(rect);
+            Rect *rect_r = Data_Ptr<Rect *>(r);
+            Point *point = Data_Ptr<Point *>(argv[0]);
+            rect_r->Inflate(point->X, point->Y);
+            return r;
+        }
+        else if (_KIND_OF(argv[0], &tSize)) {
+            VALUE r = gdip_rect_create(rect);
+            Rect *rect_r = Data_Ptr<Rect *>(r);
+            Size *size = Data_Ptr<Size *>(argv[0]);
+            rect_r->Inflate(size->Width, size->Height);
+            return r;
+        }
+        else {
+            rb_raise(rb_eTypeError, "The argument should be Point or Size.");
+        }
+    }
+    else if (argc == 2) {
+        if (Integer_p(argv[0], argv[1])) {
+            VALUE r = gdip_rect_create(rect);
+            Rect *rect_r = Data_Ptr<Rect *>(r);
+            rect_r->Inflate(RB_NUM2INT(argv[0]), RB_NUM2INT(argv[1]));
+            return r;
+        }
+        else {
+            rb_raise(rb_eTypeError, "The arguments should be Integer.");
+        }
+    }
+    return Qnil;
+}
+
+static VALUE
+gdip_rect_intersects_with(VALUE self, VALUE other)
+{
+    if (_KIND_OF(other, &tRectangle)) {
+        Rect *rect_self = Data_Ptr<Rect *>(self);
+        Rect *rect_other = Data_Ptr<Rect *>(other);
+        return rect_self->IntersectsWith(*rect_other) ? Qtrue : Qfalse;
+    }
+    else {
+        rb_raise(rb_eTypeError, "The arguments should be Rectangle.");
+        return Qfalse;
+    }
+}
+
+static VALUE
+gdip_rect_intersect_bang(VALUE self, VALUE other)
+{
+    if (_KIND_OF(other, &tRectangle)) {
+        Rect *rect_self = Data_Ptr<Rect *>(self);
+        Rect *rect_other = Data_Ptr<Rect *>(other);
+        rect_self->Intersect(*rect_other);
+    }
+    else {
+        rb_raise(rb_eTypeError, "The arguments should be Rectangle.");
+    }
+    return self;
+}
+
+static VALUE
+gdip_rect_intersect(VALUE self, VALUE other)
+{
+    if (_KIND_OF(other, &tRectangle)) {
+        Rect *rect_self = Data_Ptr<Rect *>(self);
+        VALUE r = gdip_rect_create(rect_self);
+        Rect *rect_r = Data_Ptr<Rect *>(r);
+        Rect *rect_other = Data_Ptr<Rect *>(other);
+        rect_r->Intersect(*rect_other);
+        return r;
+    }
+    else {
+        rb_raise(rb_eTypeError, "The arguments should be Rectangle.");
+        return Qnil;
+    }
+}
+
+static VALUE
+gdip_rect_union(VALUE self, VALUE other)
+{
+    if (_KIND_OF(other, &tRectangle)) {
+        Rect *rect_self = Data_Ptr<Rect *>(self);
+        VALUE r = gdip_rect_create();
+        Rect *rect_r = Data_Ptr<Rect *>(r);
+        Rect *rect_other = Data_Ptr<Rect *>(other);
+        Rect::Union(*rect_r, *rect_self, *rect_other);
+        return r;
+    }
+    else {
+        rb_raise(rb_eTypeError, "The arguments should be Rectangle.");
+        return Qnil;
+    }
+}
+
+
+static VALUE
+gdip_rectf_create(float x, float y, float width, float height)
+{
+    VALUE r = typeddata_alloc<RectF, &tRectangleF>(cRectangleF);
+    RectF *rect = Data_Ptr<RectF *>(r);
+    rect->X = x;
+    rect->Y = y;
+    rect->Width = width;
+    rect->Height = height;
+    return r;
+}
+
+static VALUE
+gdip_rectf_create(RectF *rect=NULL)
+{
+    VALUE r = typeddata_alloc<RectF, &tRectangleF>(cRectangleF);
+    RectF *rect_r = Data_Ptr<RectF *>(r);
+    if (rect) {
+        rect_r->X = rect->X;
+        rect_r->Y = rect->Y;
+        rect_r->Width = rect->Width;
+        rect_r->Height = rect->Height;
+    }
+    return r;
+}
+
+static VALUE
+gdip_rectf_init(int argc, VALUE *argv, VALUE self)
+{
+    if (argc != 0 && argc != 4) {
+        rb_raise(rb_eArgError, "wrong number of arguments (%d for 0 or 4)", argc);
+    }
+    if (argc == 0) return self;
+    else if (Float_p(argv[0], argv[1], argv[2], argv[3])) {
+        RectF *rect = Data_Ptr<RectF *>(self);
+        rect->X = NUM2SINGLE(argv[0]);
+        rect->Y = NUM2SINGLE(argv[1]);
+        rect->Width = NUM2SINGLE(argv[2]);
+        rect->Height = NUM2SINGLE(argv[3]);
+    }
+    else {
+        rb_raise(rb_eTypeError, "The arguments should be Float.");
+    }
+    return self;
+}
+
+static VALUE
+gdip_rectf_s_from_ltrb(VALUE self, VALUE left, VALUE top, VALUE right, VALUE bottom)
+{
+    if (!Float_p(left, top, right, bottom)) {
+        rb_raise(rb_eTypeError, "The arguments should be Float.");
+    }
+    return gdip_rectf_create(NUM2SINGLE(left), NUM2SINGLE(top), NUM2SINGLE(right) - NUM2SINGLE(left), NUM2SINGLE(bottom) - NUM2SINGLE(top));
+}
+
+static VALUE
+gdip_rectf_inspect(VALUE self)
+{
+    RectF *rect = Data_Ptr<RectF *>(self);
+    VALUE r = util_utf8_sprintf("#<%s X=%f, Y=%f, Width=%f, Height=%f>", __class__(self), rect->X, rect->Y, rect->Width, rect->Height);
+    return r;
+}
+
+static VALUE
+gdip_rectf_get_x(VALUE self)
+{
+    RectF *rect = Data_Ptr<RectF *>(self);
+    return SINGLE2NUM(rect->X);
+}
+
+static VALUE
+gdip_rectf_set_x(VALUE self, VALUE num)
+{
+    if (Float_p(num)) {
+        RectF *rect = Data_Ptr<RectF *>(self);
+        rect->X = NUM2SINGLE(num);
+    }
+    else {
+        rb_raise(rb_eTypeError, "The argument should be Float.");
+    }
+    return self;
+}
+
+static VALUE
+gdip_rectf_get_y(VALUE self)
+{
+    RectF *rect = Data_Ptr<RectF *>(self);
+    return SINGLE2NUM(rect->Y);
+}
+
+static VALUE
+gdip_rectf_set_y(VALUE self, VALUE num)
+{
+    if (Float_p(num)) {
+        RectF *rect = Data_Ptr<RectF *>(self);
+        rect->Y = NUM2SINGLE(num);
+    }
+    else {
+        rb_raise(rb_eTypeError, "The argument should be Float.");
+    }
+    return self;
+}
+
+static VALUE
+gdip_rectf_get_width(VALUE self)
+{
+    RectF *rect = Data_Ptr<RectF *>(self);
+    return SINGLE2NUM(rect->Width);
+}
+
+static VALUE
+gdip_rectf_set_width(VALUE self, VALUE num)
+{
+    if (Float_p(num)) {
+        RectF *rect = Data_Ptr<RectF *>(self);
+        rect->Width = NUM2SINGLE(num);
+    }
+    else {
+        rb_raise(rb_eTypeError, "The argument should be Float.");
+    }
+    return self;
+}
+
+static VALUE
+gdip_rectf_get_height(VALUE self)
+{
+    RectF *rect = Data_Ptr<RectF *>(self);
+    return SINGLE2NUM(rect->Height);
+}
+
+
+static VALUE
+gdip_rectf_set_height(VALUE self, VALUE num)
+{
+    if (Float_p(num)) {
+        RectF *rect = Data_Ptr<RectF *>(self);
+        rect->Height = NUM2SINGLE(num);
+    }
+    else {
+        rb_raise(rb_eTypeError, "The argument should be Float.");
+    }
+    return self;
+}
+
+static VALUE
+gdip_rectf_get_right(VALUE self)
+{
+    RectF *rect = Data_Ptr<RectF *>(self);
+    return SINGLE2NUM(rect->X + rect->Width);
+}
+
+static VALUE
+gdip_rectf_get_bottom(VALUE self)
+{
+    RectF *rect = Data_Ptr<RectF *>(self);
+    return SINGLE2NUM(rect->Y + rect->Height);
+}
+
+static VALUE
+gdip_rectf_get_location(VALUE self)
+{
+    RectF *rect = Data_Ptr<RectF *>(self);
+    return gdip_pointf_create(rect->X, rect->Y);
+}
+
+static VALUE
+gdip_rectf_set_location(VALUE self, VALUE loc)
+{
+    if (_KIND_OF(loc, &tPointF)) {
+        RectF *rect = Data_Ptr<RectF *>(self);
+        Point *point = Data_Ptr<Point *>(loc);
+        rect->X = point->X;
+        rect->Y = point->Y;
+    }
+    else {
+        rb_raise(rb_eTypeError, "The argument should be PointF.");
+    }
+    return self;
+}
+
+
+static VALUE
+gdip_rectf_get_size(VALUE self)
+{
+    RectF *rect = Data_Ptr<RectF *>(self);
+    return gdip_sizef_create(rect->Width, rect->Height);
+}
+
+static VALUE
+gdip_rectf_set_size(VALUE self, VALUE size)
+{
+    if (_KIND_OF(size, &tSizeF)) {
+        RectF *rect = Data_Ptr<RectF *>(self);
+        SizeF *sz = Data_Ptr<SizeF *>(size);
+        rect->Width = sz->Width;
+        rect->Height = sz->Height;
+    }
+    else {
+        rb_raise(rb_eTypeError, "The argument should be SizeF.");
+    }
+    return self;
+}
+
+static VALUE
+gdip_rectf_equal(VALUE self, VALUE other)
+{
+    if (self == other) return Qtrue;
+    else if (!_KIND_OF(other, &tRectangleF)) return Qfalse;
+    else {
+        RectF *rect_self = Data_Ptr<RectF *>(self);
+        RectF *rect_other = Data_Ptr<RectF *>(other);
+        return (rect_self->X == rect_other->X && rect_self->Y == rect_other->Y &&
+            rect_self->Width == rect_other->Width && rect_self->Height == rect_other->Height) ? Qtrue : Qfalse;
+    }
+}
+
+static VALUE
+gdip_rectf_contains(int argc, VALUE *argv, VALUE self)
+{
+    if (argc != 1 && argc != 2) {
+        rb_raise(rb_eArgError, "wrong number of arguments (%d for 1..2)", argc);
+    }
+    RectF *rect = Data_Ptr<RectF *>(self);
+    if (argc == 1) {
+        if (_KIND_OF(argv[0], &tPointF)) {
+            PointF *po = Data_Ptr<PointF *>(argv[0]);
+            return rect->Contains(*po) ? Qtrue : Qfalse;
+        }
+        else if (_KIND_OF(argv[0], &tRectangleF)) {
+            RectF *rect_other = Data_Ptr<RectF *>(argv[0]);
+            return rect->Contains(*rect_other) ? Qtrue : Qfalse;
+        }
+        else {
+            rb_raise(rb_eTypeError, "The argument should be PointF or RectFangleF.");
+        }
+    }
+    if (argc == 2) {
+        if (Float_p(argv[0], argv[1])) {
+            return rect->Contains(NUM2SINGLE(argv[0]), NUM2SINGLE(argv[1])) ? Qtrue : Qfalse;
+        }
+        else {
+            rb_raise(rb_eTypeError, "The arguments should be Float.");
+        }
+    }
+    return Qfalse;
+}
+
+static VALUE
+gdip_rectf_inflate_bang(int argc, VALUE *argv, VALUE self)
+{
+    if (argc != 1 && argc != 2) {
+        rb_raise(rb_eArgError, "wrong number of arguments (%d for 1..2)", argc);
+    }
+    RectF *rect = Data_Ptr<RectF *>(self);
+    if (argc == 1) {
+        if (_KIND_OF(argv[0], &tPointF)) {
+            PointF *point = Data_Ptr<PointF *>(argv[0]);
+            rect->Inflate(point->X, point->Y);
+        }
+        else if (_KIND_OF(argv[0], &tSizeF)) {
+            SizeF *size = Data_Ptr<SizeF *>(argv[0]);
+            rect->Inflate(size->Width, size->Height);
+        }
+        else {
+            rb_raise(rb_eTypeError, "The argument should be PointF or SizeF.");
+        }
+    }
+    else if (argc == 2) {
+        if (Float_p(argv[0], argv[1])) {
+            rect->Inflate(NUM2SINGLE(argv[0]), NUM2SINGLE(argv[1]));
+        }
+        else {
+            rb_raise(rb_eTypeError, "The arguments should be Float.");
+        }
+    }
+    return self;
+}
+
+
+static VALUE
+gdip_rectf_inflate(int argc, VALUE *argv, VALUE self)
+{
+    if (argc != 1 && argc != 2) {
+        rb_raise(rb_eArgError, "wrong number of arguments (%d for 1..2)", argc);
+    }
+    RectF *rect = Data_Ptr<RectF *>(self);
+    if (argc == 1) {
+        if (_KIND_OF(argv[0], &tPointF)) {
+            VALUE r = gdip_rectf_create(rect);
+            RectF *rect_r = Data_Ptr<RectF *>(r);
+            PointF *point = Data_Ptr<PointF *>(argv[0]);
+            rect_r->Inflate(point->X, point->Y);
+            return r;
+        }
+        else if (_KIND_OF(argv[0], &tSizeF)) {
+            VALUE r = gdip_rectf_create(rect);
+            RectF *rect_r = Data_Ptr<RectF *>(r);
+            SizeF *size = Data_Ptr<SizeF *>(argv[0]);
+            rect_r->Inflate(size->Width, size->Height);
+            return r;
+        }
+        else {
+            rb_raise(rb_eTypeError, "The argument should be PointF or SizeF.");
+        }
+    }
+    else if (argc == 2) {
+        if (Float_p(argv[0], argv[1])) {
+            VALUE r = gdip_rectf_create(rect);
+            RectF *rect_r = Data_Ptr<RectF *>(r);
+            rect_r->Inflate(NUM2SINGLE(argv[0]), NUM2SINGLE(argv[1]));
+            return r;
+        }
+        else {
+            rb_raise(rb_eTypeError, "The arguments should be Float.");
+        }
+    }
+    return Qnil;
+}
+
+static VALUE
+gdip_rectf_intersects_with(VALUE self, VALUE other)
+{
+    if (_KIND_OF(other, &tRectangleF)) {
+        RectF *rect_self = Data_Ptr<RectF *>(self);
+        RectF *rect_other = Data_Ptr<RectF *>(other);
+        return rect_self->IntersectsWith(*rect_other) ? Qtrue : Qfalse;
+    }
+    else {
+        rb_raise(rb_eTypeError, "The arguments should be RectFangleF.");
+        return Qfalse;
+    }
+}
+
+static VALUE
+gdip_rectf_intersect_bang(VALUE self, VALUE other)
+{
+    if (_KIND_OF(other, &tRectangleF)) {
+        RectF *rect_self = Data_Ptr<RectF *>(self);
+        RectF *rect_other = Data_Ptr<RectF *>(other);
+        rect_self->Intersect(*rect_other);
+    }
+    else {
+        rb_raise(rb_eTypeError, "The arguments should be RectFangleF.");
+    }
+    return self;
+}
+
+static VALUE
+gdip_rectf_intersect(VALUE self, VALUE other)
+{
+    if (_KIND_OF(other, &tRectangleF)) {
+        RectF *rect_self = Data_Ptr<RectF *>(self);
+        VALUE r = gdip_rectf_create(rect_self);
+        RectF *rect_r = Data_Ptr<RectF *>(r);
+        RectF *rect_other = Data_Ptr<RectF *>(other);
+        rect_r->Intersect(*rect_other);
+        return r;
+    }
+    else {
+        rb_raise(rb_eTypeError, "The arguments should be RectFangleF.");
+        return Qnil;
+    }
+}
+
+static VALUE
+gdip_rectf_union(VALUE self, VALUE other)
+{
+    if (_KIND_OF(other, &tRectangleF)) {
+        RectF *rect_self = Data_Ptr<RectF *>(self);
+        VALUE r = gdip_rectf_create();
+        RectF *rect_r = Data_Ptr<RectF *>(r);
+        RectF *rect_other = Data_Ptr<RectF *>(other);
+        RectF::Union(*rect_r, *rect_self, *rect_other);
+        return r;
+    }
+    else {
+        rb_raise(rb_eTypeError, "The arguments should be RectangleF.");
         return Qnil;
     }
 }
@@ -566,4 +1370,102 @@ Init_rectangle()
     rb_define_method(cSizeF, "==", RUBY_METHOD_FUNC(gdip_sizef_equal), 1);
     rb_define_method(cSizeF, "+", RUBY_METHOD_FUNC(gdip_sizef_add), 1);
     rb_define_method(cSizeF, "-", RUBY_METHOD_FUNC(gdip_sizef_sub), 1);
+
+    rb_define_singleton_method(cRectangle, "FromLTRB", RUBY_METHOD_FUNC(gdip_rect_s_from_ltrb), 4);
+    rb_define_method(cRectangle, "initialize", RUBY_METHOD_FUNC(gdip_rect_init), -1);
+    rb_define_method(cRectangle, "inspect", RUBY_METHOD_FUNC(gdip_rect_inspect), 0);
+    rb_define_method(cRectangle, "x", RUBY_METHOD_FUNC(gdip_rect_get_x), 0);
+    rb_define_method(cRectangle, "X", RUBY_METHOD_FUNC(gdip_rect_get_x), 0);
+    rb_define_method(cRectangle, "x=", RUBY_METHOD_FUNC(gdip_rect_set_x), 1);
+    rb_define_method(cRectangle, "X=", RUBY_METHOD_FUNC(gdip_rect_set_x), 1);
+    rb_define_method(cRectangle, "left", RUBY_METHOD_FUNC(gdip_rect_get_x), 0);
+    rb_define_method(cRectangle, "Left", RUBY_METHOD_FUNC(gdip_rect_get_x), 0);
+    rb_define_method(cRectangle, "y", RUBY_METHOD_FUNC(gdip_rect_get_y), 0);
+    rb_define_method(cRectangle, "Y", RUBY_METHOD_FUNC(gdip_rect_get_y), 0);
+    rb_define_method(cRectangle, "y=", RUBY_METHOD_FUNC(gdip_rect_set_y), 1);
+    rb_define_method(cRectangle, "Y=", RUBY_METHOD_FUNC(gdip_rect_set_y), 1);
+    rb_define_method(cRectangle, "top", RUBY_METHOD_FUNC(gdip_rect_get_y), 0);
+    rb_define_method(cRectangle, "Top", RUBY_METHOD_FUNC(gdip_rect_get_y), 0);
+    rb_define_method(cRectangle, "width", RUBY_METHOD_FUNC(gdip_rect_get_width), 0);
+    rb_define_method(cRectangle, "Width", RUBY_METHOD_FUNC(gdip_rect_get_width), 0);
+    rb_define_method(cRectangle, "width=", RUBY_METHOD_FUNC(gdip_rect_set_width), 1);
+    rb_define_method(cRectangle, "Width=", RUBY_METHOD_FUNC(gdip_rect_set_width), 1);
+    rb_define_method(cRectangle, "height", RUBY_METHOD_FUNC(gdip_rect_get_height), 0);
+    rb_define_method(cRectangle, "Height", RUBY_METHOD_FUNC(gdip_rect_get_height), 0);
+    rb_define_method(cRectangle, "height=", RUBY_METHOD_FUNC(gdip_rect_set_height), 1);
+    rb_define_method(cRectangle, "Height=", RUBY_METHOD_FUNC(gdip_rect_set_height), 1);
+    rb_define_method(cRectangle, "right", RUBY_METHOD_FUNC(gdip_rect_get_right), 0);
+    rb_define_method(cRectangle, "Right", RUBY_METHOD_FUNC(gdip_rect_get_right), 0);
+    rb_define_method(cRectangle, "bottom", RUBY_METHOD_FUNC(gdip_rect_get_bottom), 0);
+    rb_define_method(cRectangle, "Bottom", RUBY_METHOD_FUNC(gdip_rect_get_bottom), 0);
+    rb_define_method(cRectangle, "location", RUBY_METHOD_FUNC(gdip_rect_get_location), 0);
+    rb_define_method(cRectangle, "Location", RUBY_METHOD_FUNC(gdip_rect_get_location), 0);
+    rb_define_method(cRectangle, "location=", RUBY_METHOD_FUNC(gdip_rect_set_location), 1);
+    rb_define_method(cRectangle, "Location=", RUBY_METHOD_FUNC(gdip_rect_set_location), 1);
+    rb_define_method(cRectangle, "size", RUBY_METHOD_FUNC(gdip_rect_get_size), 0);
+    rb_define_method(cRectangle, "Size", RUBY_METHOD_FUNC(gdip_rect_get_size), 0);
+    rb_define_method(cRectangle, "size=", RUBY_METHOD_FUNC(gdip_rect_set_size), 1);
+    rb_define_method(cRectangle, "Size=", RUBY_METHOD_FUNC(gdip_rect_set_size), 1);
+    rb_define_method(cRectangle, "==", RUBY_METHOD_FUNC(gdip_rect_equal), 1);
+    rb_define_method(cRectangle, "Contains", RUBY_METHOD_FUNC(gdip_rect_contains), -1);
+    rb_define_method(cRectangle, "contains?", RUBY_METHOD_FUNC(gdip_rect_contains), -1);
+    rb_define_method(cRectangle, "Inflate", RUBY_METHOD_FUNC(gdip_rect_inflate_bang), -1);
+    rb_define_method(cRectangle, "inflate!", RUBY_METHOD_FUNC(gdip_rect_inflate_bang), -1);
+    rb_define_method(cRectangle, "inflate", RUBY_METHOD_FUNC(gdip_rect_inflate), -1);
+    rb_define_method(cRectangle, "IntersectsWith", RUBY_METHOD_FUNC(gdip_rect_intersects_with), 1);
+    rb_define_method(cRectangle, "intersects_with?", RUBY_METHOD_FUNC(gdip_rect_intersects_with), 1);
+    rb_define_method(cRectangle, "Intersect", RUBY_METHOD_FUNC(gdip_rect_intersect_bang), 1);
+    rb_define_method(cRectangle, "intersect!", RUBY_METHOD_FUNC(gdip_rect_intersect_bang), 1);
+    rb_define_method(cRectangle, "intersect", RUBY_METHOD_FUNC(gdip_rect_intersect), 1);
+    rb_define_method(cRectangle, "Union", RUBY_METHOD_FUNC(gdip_rect_union), 1);
+    rb_define_method(cRectangle, "union", RUBY_METHOD_FUNC(gdip_rect_union), 1);
+
+    rb_define_singleton_method(cRectangleF, "FromLTRB", RUBY_METHOD_FUNC(gdip_rectf_s_from_ltrb), 4);
+    rb_define_method(cRectangleF, "initialize", RUBY_METHOD_FUNC(gdip_rectf_init), -1);
+    rb_define_method(cRectangleF, "inspect", RUBY_METHOD_FUNC(gdip_rectf_inspect), 0);
+    rb_define_method(cRectangleF, "x", RUBY_METHOD_FUNC(gdip_rectf_get_x), 0);
+    rb_define_method(cRectangleF, "X", RUBY_METHOD_FUNC(gdip_rectf_get_x), 0);
+    rb_define_method(cRectangleF, "x=", RUBY_METHOD_FUNC(gdip_rectf_set_x), 1);
+    rb_define_method(cRectangleF, "X=", RUBY_METHOD_FUNC(gdip_rectf_set_x), 1);
+    rb_define_method(cRectangleF, "left", RUBY_METHOD_FUNC(gdip_rectf_get_x), 0);
+    rb_define_method(cRectangleF, "Left", RUBY_METHOD_FUNC(gdip_rectf_get_x), 0);
+    rb_define_method(cRectangleF, "y", RUBY_METHOD_FUNC(gdip_rectf_get_y), 0);
+    rb_define_method(cRectangleF, "Y", RUBY_METHOD_FUNC(gdip_rectf_get_y), 0);
+    rb_define_method(cRectangleF, "y=", RUBY_METHOD_FUNC(gdip_rectf_set_y), 1);
+    rb_define_method(cRectangleF, "Y=", RUBY_METHOD_FUNC(gdip_rectf_set_y), 1);
+    rb_define_method(cRectangleF, "top", RUBY_METHOD_FUNC(gdip_rectf_get_y), 0);
+    rb_define_method(cRectangleF, "Top", RUBY_METHOD_FUNC(gdip_rectf_get_y), 0);
+    rb_define_method(cRectangleF, "width", RUBY_METHOD_FUNC(gdip_rectf_get_width), 0);
+    rb_define_method(cRectangleF, "Width", RUBY_METHOD_FUNC(gdip_rectf_get_width), 0);
+    rb_define_method(cRectangleF, "width=", RUBY_METHOD_FUNC(gdip_rectf_set_width), 1);
+    rb_define_method(cRectangleF, "Width=", RUBY_METHOD_FUNC(gdip_rectf_set_width), 1);
+    rb_define_method(cRectangleF, "height", RUBY_METHOD_FUNC(gdip_rectf_get_height), 0);
+    rb_define_method(cRectangleF, "Height", RUBY_METHOD_FUNC(gdip_rectf_get_height), 0);
+    rb_define_method(cRectangleF, "height=", RUBY_METHOD_FUNC(gdip_rectf_set_height), 1);
+    rb_define_method(cRectangleF, "Height=", RUBY_METHOD_FUNC(gdip_rectf_set_height), 1);
+    rb_define_method(cRectangleF, "right", RUBY_METHOD_FUNC(gdip_rectf_get_right), 0);
+    rb_define_method(cRectangleF, "Right", RUBY_METHOD_FUNC(gdip_rectf_get_right), 0);
+    rb_define_method(cRectangleF, "bottom", RUBY_METHOD_FUNC(gdip_rectf_get_bottom), 0);
+    rb_define_method(cRectangleF, "Bottom", RUBY_METHOD_FUNC(gdip_rectf_get_bottom), 0);
+    rb_define_method(cRectangleF, "location", RUBY_METHOD_FUNC(gdip_rectf_get_location), 0);
+    rb_define_method(cRectangleF, "Location", RUBY_METHOD_FUNC(gdip_rectf_get_location), 0);
+    rb_define_method(cRectangleF, "location=", RUBY_METHOD_FUNC(gdip_rectf_set_location), 1);
+    rb_define_method(cRectangleF, "Location=", RUBY_METHOD_FUNC(gdip_rectf_set_location), 1);
+    rb_define_method(cRectangleF, "size", RUBY_METHOD_FUNC(gdip_rectf_get_size), 0);
+    rb_define_method(cRectangleF, "Size", RUBY_METHOD_FUNC(gdip_rectf_get_size), 0);
+    rb_define_method(cRectangleF, "size=", RUBY_METHOD_FUNC(gdip_rectf_set_size), 1);
+    rb_define_method(cRectangleF, "Size=", RUBY_METHOD_FUNC(gdip_rectf_set_size), 1);
+    rb_define_method(cRectangleF, "==", RUBY_METHOD_FUNC(gdip_rectf_equal), 1);
+    rb_define_method(cRectangleF, "Contains", RUBY_METHOD_FUNC(gdip_rectf_contains), -1);
+    rb_define_method(cRectangleF, "contains?", RUBY_METHOD_FUNC(gdip_rectf_contains), -1);
+    rb_define_method(cRectangleF, "Inflate", RUBY_METHOD_FUNC(gdip_rectf_inflate_bang), -1);
+    rb_define_method(cRectangleF, "inflate!", RUBY_METHOD_FUNC(gdip_rectf_inflate_bang), -1);
+    rb_define_method(cRectangleF, "inflate", RUBY_METHOD_FUNC(gdip_rectf_inflate), -1);
+    rb_define_method(cRectangleF, "IntersectsWith", RUBY_METHOD_FUNC(gdip_rectf_intersects_with), 1);
+    rb_define_method(cRectangleF, "intersects_with?", RUBY_METHOD_FUNC(gdip_rectf_intersects_with), 1);
+    rb_define_method(cRectangleF, "Intersect", RUBY_METHOD_FUNC(gdip_rectf_intersect_bang), 1);
+    rb_define_method(cRectangleF, "intersect!", RUBY_METHOD_FUNC(gdip_rectf_intersect_bang), 1);
+    rb_define_method(cRectangleF, "intersect", RUBY_METHOD_FUNC(gdip_rectf_intersect), 1);
+    rb_define_method(cRectangleF, "Union", RUBY_METHOD_FUNC(gdip_rectf_union), 1);
+    rb_define_method(cRectangleF, "union", RUBY_METHOD_FUNC(gdip_rectf_union), 1);
 }
