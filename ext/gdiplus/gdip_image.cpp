@@ -256,11 +256,7 @@ gdip_image_raw_format(VALUE self)
     Check_NULL(image, "The image object does not exist.");
     GUID guid;
     Check_Status(image->GetRawFormat(&guid));
-    VALUE r = gdip_enum_get(cImageFormat, &guid);
-    if (RB_NIL_P(r)) {
-        r = typeddata_alloc<GUID, &tGuid>(cImageFormat);
-    }
-    return r;
+    return gdip_enum_guid_create(cImageFormat, &guid);
 }
 
 /**

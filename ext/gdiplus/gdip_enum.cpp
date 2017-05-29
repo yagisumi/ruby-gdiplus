@@ -67,7 +67,7 @@ gdip_enumint_create(VALUE klass, int num)
 }
 
 int
-gdip_enumint_to_int(VALUE klass, VALUE arg, bool to_int)
+gdip_arg_to_enumint(VALUE klass, VALUE arg, bool to_int)
 {
     int r = 0;
     if (RB_SYMBOL_P(arg)) {
@@ -185,6 +185,17 @@ gdip_enum_get(VALUE klass, T data) {
 template ID gdip_enum_get<GUID *>(VALUE klass, GUID *data);
 template ID gdip_enum_get<int>(VALUE klass, int data);
 
+VALUE
+gdip_enum_guid_create(VALUE klass, GUID *guid)
+{
+    VALUE r = gdip_enum_get(klass, guid);
+    if (RB_NIL_P(r)) {
+        r = typeddata_alloc<GUID, &tGuid>(klass);
+        GUID *g = Data_Ptr<GUID *>(r);
+        *g = *guid;
+    }
+    return r;
+}
 
 template <typename TKey>
 static void

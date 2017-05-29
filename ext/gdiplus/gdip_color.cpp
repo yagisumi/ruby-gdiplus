@@ -8,9 +8,9 @@
 const rb_data_type_t tColor = _MAKE_DATA_TYPE(
     "Color", 0, RUBY_NEVER_FREE, NULL, NULL, &cColor);
 
-// bool gdip_value2color(VALUE v, Color *color, bool to_int=false, bool do_raise=true)
+// bool gdip_arg_to_color(VALUE v, Color *color, bool to_int=false, bool do_raise=true)
 bool
-gdip_value2color(VALUE v, Color *color, bool to_int, bool do_raise)
+gdip_arg_to_color(VALUE v, Color *color, bool to_int, bool do_raise)
 {
     if (RB_SYMBOL_P(v)) {
         v = rb_const_get(cColor, RB_SYM2ID(v));

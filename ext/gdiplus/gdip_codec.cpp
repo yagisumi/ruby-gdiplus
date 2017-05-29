@@ -9,7 +9,7 @@
 const rb_data_type_t tGuid = _MAKE_DATA_TYPE(
     "Guid", 0, GDIP_DEFAULT_FREE(GUID), &typeddata_size<GUID>, NULL, &cGuid);
 
-VALUE
+static VALUE
 gdip_guid_create(GUID *guid)
 {
     VALUE v = typeddata_alloc<GUID, &tGuid>(cGuid);
@@ -375,6 +375,7 @@ gdip_icinfo_sigmask(VALUE self)
     return v;
 }
 
+static VALUE gdip_encprms_create(EncoderParameters *encprms);
 /**
  * Returns parameter specifications of this encoder.
  * @return [EncoderParameters]
@@ -1197,7 +1198,7 @@ gdip_encprms_mark(gdipEncoderParameters *ptr)
 const rb_data_type_t tEncoderParameters = _MAKE_DATA_TYPE(
     "EncoderParameters", RUBY_DATA_FUNC(gdip_encprms_mark), RUBY_DATA_FUNC(gdip_encprms_free), &typeddata_size<gdipEncoderParameters>, NULL, &cEncoderParameters);
 
-VALUE
+static VALUE
 gdip_encprms_create(EncoderParameters *encprms)
 {
     VALUE r = typeddata_alloc<gdipEncoderParameters, &tEncoderParameters>(cEncoderParameters);

@@ -45,7 +45,7 @@ gdip_pen_init(int argc, VALUE *argv, VALUE self)
     }
 
     Color color;
-    if (gdip_value2color(color_or_brush, &color, false, false)) {
+    if (gdip_arg_to_color(color_or_brush, &color, false, false)) {
         _DATA_PTR(self) = gdip_obj_create<Pen *>(new Pen(color, width));
     }
     else if (_KIND_OF(color_or_brush, &tBrush)) {
@@ -84,7 +84,7 @@ gdip_pen_set_width(VALUE self, VALUE width)
     Check_NULL(pen, "This object does not exist");
 
     float w = 0.0f;
-    gdip_value2single(width, &w);
+    gdip_arg_to_single(width, &w);
     pen->SetWidth(w);
     Check_LastStatus(pen);
     return self;
@@ -116,7 +116,7 @@ gdip_pen_set_dash_offset(VALUE self, VALUE offset)
     Check_NULL(pen, "This object does not exist");
 
     float oft = 0.0f;
-    gdip_value2single(offset, &oft);
+    gdip_arg_to_single(offset, &oft);
     pen->SetDashOffset(oft);
     Check_LastStatus(pen);
     return self;
@@ -148,7 +148,7 @@ gdip_pen_set_miter_limit(VALUE self, VALUE limit)
     Check_NULL(pen, "This object does not exist");
 
     float lmt = 0.0f;
-    gdip_value2single(limit, &lmt);
+    gdip_arg_to_single(limit, &lmt);
     pen->SetMiterLimit(lmt);
     Check_LastStatus(pen);
     return self;
@@ -179,7 +179,7 @@ gdip_pen_set_color(VALUE self, VALUE color)
     Pen *pen = Data_Ptr<Pen *>(self);
     Check_NULL(pen, "This object does not exist");
     Color clr;
-    gdip_value2color(color, &clr);
+    gdip_arg_to_color(color, &clr);
     Check_Status(pen->SetColor(clr));
     return self;
  }
@@ -394,7 +394,7 @@ gdip_pen_set_alignment(VALUE self, VALUE align)
 {
     Pen *pen = Data_Ptr<Pen *>(self);
     Check_NULL(pen, "This object does not exist");
-    int enum_align = gdip_enumint_to_int(cPenAlignment, align);
+    int enum_align = gdip_arg_to_enumint(cPenAlignment, align);
     PenAlignment pa = static_cast<PenAlignment>(enum_align);
     if (pa == PenAlignmentInset && pen->GetCompoundArrayCount() > 0) {
         _WARNING("Do not use PenAlignment.Inset with CompoundArray");
@@ -430,7 +430,7 @@ gdip_pen_set_dash_cap(VALUE self, VALUE cap)
     Pen *pen = Data_Ptr<Pen *>(self);
     Check_NULL(pen, "This object does not exist");
 
-    int enum_cap = gdip_enumint_to_int(cDashCap, cap);
+    int enum_cap = gdip_arg_to_enumint(cDashCap, cap);
     pen->SetDashCap(static_cast<DashCap>(enum_cap));
     Check_LastStatus(pen);
     return self;
@@ -460,7 +460,7 @@ gdip_pen_set_dash_style(VALUE self, VALUE style)
     Pen *pen = Data_Ptr<Pen *>(self);
     Check_NULL(pen, "This object does not exist");
 
-    int enum_style = gdip_enumint_to_int(cDashStyle, style);
+    int enum_style = gdip_arg_to_enumint(cDashStyle, style);
     pen->SetDashStyle(static_cast<DashStyle>(enum_style));
     Check_LastStatus(pen);
     return self;
@@ -490,7 +490,7 @@ gdip_pen_set_end_cap(VALUE self, VALUE cap)
     Pen *pen = Data_Ptr<Pen *>(self);
     Check_NULL(pen, "This object does not exist");
 
-    int enum_cap = gdip_enumint_to_int(cLineCap, cap);
+    int enum_cap = gdip_arg_to_enumint(cLineCap, cap);
     pen->SetEndCap(static_cast<LineCap>(enum_cap));
     Check_LastStatus(pen);
     return self;
@@ -520,7 +520,7 @@ gdip_pen_set_line_join(VALUE self, VALUE join)
     Pen *pen = Data_Ptr<Pen *>(self);
     Check_NULL(pen, "This object does not exist");
 
-    int enum_join = gdip_enumint_to_int(cLineJoin, join);
+    int enum_join = gdip_arg_to_enumint(cLineJoin, join);
     pen->SetLineJoin(static_cast<LineJoin>(enum_join));
     Check_LastStatus(pen);
     return self;
@@ -550,7 +550,7 @@ gdip_pen_set_start_cap(VALUE self, VALUE cap)
     Pen *pen = Data_Ptr<Pen *>(self);
     Check_NULL(pen, "This object does not exist");
 
-    int enum_cap = gdip_enumint_to_int(cLineCap, cap);
+    int enum_cap = gdip_arg_to_enumint(cLineCap, cap);
     pen->SetStartCap(static_cast<LineCap>(enum_cap));
     Check_LastStatus(pen);
     return self;
@@ -592,7 +592,7 @@ gdip_solidbrush_init(VALUE self, VALUE color)
         return self;
     }
     Color clr;
-    gdip_value2color(color, &clr);
+    gdip_arg_to_color(color, &clr);
     _DATA_PTR(self) = gdip_obj_create<SolidBrush *>(new SolidBrush(clr));
     return self;
 }
@@ -623,7 +623,7 @@ gdip_solidbrush_set_color(VALUE self, VALUE color)
     SolidBrush *brush = Data_Ptr<SolidBrush *>(self);
     Check_NULL(brush, "This object does not exist");
     Color clr;
-    gdip_value2color(color, &clr);
+    gdip_arg_to_color(color, &clr);
     Check_Status(brush->SetColor(clr));
     return self;
 }

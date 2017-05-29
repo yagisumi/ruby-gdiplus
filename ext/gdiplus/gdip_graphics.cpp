@@ -32,7 +32,7 @@ gdip_graphics_set_smoothing_mode(VALUE self, VALUE mode)
     Graphics *g = Data_Ptr<Graphics *>(self);
     Check_NULL(g, "This object does not exist");
 
-    int enum_mode = gdip_enumint_to_int(cSmoothingMode, mode);
+    int enum_mode = gdip_arg_to_enumint(cSmoothingMode, mode);
     g->SetSmoothingMode(static_cast<SmoothingMode>(enum_mode));
     return self;
 }

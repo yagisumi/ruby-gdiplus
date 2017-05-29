@@ -106,8 +106,6 @@ static inline void GdiplusRelease() {
 }
 
 /* gdip_codec.cpp */
-VALUE gdip_guid_create(GUID *guid);
-VALUE gdip_encprms_create(EncoderParameters *encprms);
 EncoderParameters *gdip_encprms_build_struct(VALUE v);
 
 /* gdip_enum.cpp */
@@ -136,8 +134,8 @@ extern GUID _ImageFormatUndefined;
 template <typename T> ID gdip_enum_get_id(VALUE klass, T data);
 template <typename T> VALUE gdip_enum_get(VALUE klass, T data);
 VALUE gdip_enumint_create(VALUE klass, int num);
-VALUE gdip_encoder_get(GUID *guid); // not use
-int gdip_enumint_to_int(VALUE klass, VALUE arg, bool to_int=false);
+int gdip_arg_to_enumint(VALUE klass, VALUE arg, bool to_int=false);
+VALUE gdip_enum_guid_create(VALUE klass, GUID *guid);
 
 /* graphics.cpp */
 VALUE gdip_graphics_create(Graphics *g);
@@ -189,8 +187,8 @@ dp_type(const char *msg)
 #endif
 
 
-bool gdip_value2double(VALUE v, double *dbl, bool do_raise=true);
-bool gdip_value2single(VALUE v, float *flt, bool do_raise=true);
+bool gdip_arg_to_double(VALUE v, double *dbl, bool do_raise=true);
+bool gdip_arg_to_single(VALUE v, float *flt, bool do_raise=true);
 
 VALUE gdip_color_create(ARGB argb);
 static inline VALUE
@@ -199,8 +197,7 @@ gdip_color_create(Color& color)
     return gdip_color_create(color.GetValue());
 }
 
-bool gdip_value2color(VALUE v, Color *color, bool to_int=false, bool do_raise=true);
-#define ARGB2COLOR(argb) (*reinterpret_cast<Color *>(&argb))
+bool gdip_arg_to_color(VALUE v, Color *color, bool to_int=false, bool do_raise=true);
 
 template<typename T>
 static inline T 

@@ -142,7 +142,7 @@ gdip_obj_id(VALUE self)
 }
 
 bool
-gdip_value2double(VALUE v, double *dbl, bool do_raise)
+gdip_arg_to_double(VALUE v, double *dbl, bool do_raise)
 {
     if (_RB_FLOAT_P(v)) {
         *dbl = NUM2DBL(v);
@@ -153,13 +153,13 @@ gdip_value2double(VALUE v, double *dbl, bool do_raise)
         return true;
     }
     else if (do_raise) {
-        rb_raise(rb_eTypeError, "An argument must be Float or Integer");
+        rb_raise(rb_eTypeError, "The argument should be Float or Integer.");
     }
     return false;
 }
 
 bool
-gdip_value2single(VALUE v, float *flt, bool do_raise)
+gdip_arg_to_single(VALUE v, float *flt, bool do_raise)
 {
     if (_RB_FLOAT_P(v)) {
         *flt = NUM2SINGLE(v);
@@ -170,7 +170,7 @@ gdip_value2single(VALUE v, float *flt, bool do_raise)
         return true;
     }
     else if (do_raise) {
-        rb_raise(rb_eTypeError, "An argument must be Float or Integer");
+        rb_raise(rb_eTypeError, "The argument should be Float or Integer.");
     }
     return false;
 }

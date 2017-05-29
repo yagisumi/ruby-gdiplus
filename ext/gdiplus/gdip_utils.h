@@ -17,13 +17,6 @@ NUM2SINGLE(VALUE num)
 {
     return static_cast<float>(NUM2DBL(num));
 }
-/*
-static inline VALUE
-SINGLE2NUM(float n)
-{
-    return DBL2NUM(static_cast<double>(n));
-}
-*/
 
 static inline VALUE
 SINGLE2NUM(float n)
