@@ -286,6 +286,79 @@ class GdiplusEnumIntTest < Test::Unit::TestCase
     assert_equal(-1, PenType.Unknown.to_i)
     assert_match(/Unknown/, PenType.Unknown.inspect)
   end
+  
+  def test_FontStyle
+    assert_equal(0, FontStyle.Regular.to_i)
+    assert_match(/Regular/, FontStyle.Regular.inspect)
+    assert_equal(1, FontStyle.Bold.to_i)
+    assert_match(/Bold/, FontStyle.Bold.inspect)
+    assert_equal(2, FontStyle.Italic.to_i)
+    assert_match(/Italic/, FontStyle.Italic.inspect)
+    assert_equal(3, FontStyle.BoldItalic.to_i)
+    assert_match(/BoldItalic/, FontStyle.BoldItalic.inspect)
+    assert_equal(4, FontStyle.Underline.to_i)
+    assert_match(/Underline/, FontStyle.Underline.inspect)
+    assert_equal(8, FontStyle.Strikeout.to_i)
+    assert_match(/Strikeout/, FontStyle.Strikeout.inspect)
+  end
+
+  def test_GenericFontFamily
+    assert_equal(0, GenericFontFamily.Serif.to_i)
+    assert_match(/Serif/, GenericFontFamily.Serif.inspect)
+    assert_equal(1, GenericFontFamily.SansSerif.to_i)
+    assert_match(/SansSerif/, GenericFontFamily.SansSerif.inspect)
+    assert_equal(2, GenericFontFamily.Monospace.to_i)
+    assert_match(/Monospace/, GenericFontFamily.Monospace.inspect)
+  end
+
+  def test_PixelOffsetMode
+    assert_equal(-1, PixelOffsetMode.Invalid.to_i)
+    assert_match(/Invalid/, PixelOffsetMode.Invalid.inspect)
+    assert_equal(0, PixelOffsetMode.Default.to_i)
+    assert_match(/Default/, PixelOffsetMode.Default.inspect)
+    assert_equal(1, PixelOffsetMode.HighSpeed.to_i)
+    assert_match(/HighSpeed/, PixelOffsetMode.HighSpeed.inspect)
+    assert_equal(2, PixelOffsetMode.HighQuality.to_i)
+    assert_match(/HighQuality/, PixelOffsetMode.HighQuality.inspect)
+    assert_equal(3, PixelOffsetMode.None.to_i)
+    assert_match(/None/, PixelOffsetMode.None.inspect)
+    assert_equal(4, PixelOffsetMode.Half.to_i)
+    assert_match(/Half/, PixelOffsetMode.Half.inspect)
+  end
+
+  def test_SmoothingMode
+    assert_equal(-1, SmoothingMode.Invalid.to_i)
+    assert_match(/Invalid/, SmoothingMode.Invalid.inspect)
+    assert_equal(0, SmoothingMode.Default.to_i)
+    assert_match(/Default/, SmoothingMode.Default.inspect)
+    assert_equal(1, SmoothingMode.HighSpeed.to_i)
+    assert_match(/HighSpeed/, SmoothingMode.HighSpeed.inspect)
+    assert_equal(2, SmoothingMode.HighQuality.to_i)
+    assert_match(/HighQuality/, SmoothingMode.HighQuality.inspect)
+    assert_equal(3, SmoothingMode.None.to_i)
+    assert_match(/None/, SmoothingMode.None.inspect)
+    assert_equal(4, SmoothingMode.AntiAlias.to_i)
+    assert_match(/AntiAlias/, SmoothingMode.AntiAlias.inspect)
+    assert_equal(4, SmoothingMode.AntiAlias8x4.to_i)
+    assert_match(/AntiAlias/, SmoothingMode.AntiAlias8x4.inspect) #
+    assert_equal(5, SmoothingMode.AntiAlias8x8.to_i)
+    assert_match(/AntiAlias8x8/, SmoothingMode.AntiAlias8x8.inspect)
+  end
+
+  def test_TextRenderingHint
+    assert_equal(0, TextRenderingHint.SystemDefault.to_i)
+    assert_match(/SystemDefault/, TextRenderingHint.SystemDefault.inspect)
+    assert_equal(1, TextRenderingHint.SingleBitPerPixelGridFit.to_i)
+    assert_match(/SingleBitPerPixelGridFit/, TextRenderingHint.SingleBitPerPixelGridFit.inspect)
+    assert_equal(2, TextRenderingHint.SingleBitPerPixel.to_i)
+    assert_match(/SingleBitPerPixel/, TextRenderingHint.SingleBitPerPixel.inspect)
+    assert_equal(3, TextRenderingHint.AntiAliasGridFit.to_i)
+    assert_match(/AntiAliasGridFit/, TextRenderingHint.AntiAliasGridFit.inspect)
+    assert_equal(4, TextRenderingHint.AntiAlias.to_i)
+    assert_match(/AntiAlias/, TextRenderingHint.AntiAlias.inspect)
+    assert_equal(5, TextRenderingHint.ClearTypeGridFit.to_i)
+    assert_match(/ClearTypeGridFit/, TextRenderingHint.ClearTypeGridFit.inspect)
+  end
 end
 
 __END__

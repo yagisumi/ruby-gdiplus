@@ -24,6 +24,12 @@ VALUE cLineJoin;
 VALUE cMatrixOrder;
 VALUE cPenAlignment;
 VALUE cPenType;
+VALUE cFontStyle;
+VALUE cGenericFontFamily;
+VALUE cPixelOffsetMode;
+VALUE cSmoothingMode;
+VALUE cTextRenderingHint;
+
 VALUE cEncoder;
 VALUE cEncoderValue;
 VALUE cEnumInt;

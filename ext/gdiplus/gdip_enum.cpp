@@ -437,6 +437,84 @@ Init_PenType()
     define_enumint(cPenType, table, "Unknown", -1);
 }
 
+static void
+Init_FontStyle()
+{
+    cFontStyle = rb_define_class_under(mGdiplus, "FontStyle", cEnumInt);
+    rb_undef_alloc_func(cFontStyle);
+    SortedArrayMap<int, ID> *table = new SortedArrayMap<int, ID>(6);
+    klass_table_map.set(cFontStyle, table);
+
+    define_enumint(cFontStyle, table, "Regular", 0);
+    define_enumint(cFontStyle, table, "Bold", 1);
+    define_enumint(cFontStyle, table, "Italic", 2);
+    define_enumint(cFontStyle, table, "BoldItalic", 3);
+    define_enumint(cFontStyle, table, "Underline", 4);
+    define_enumint(cFontStyle, table, "Strikeout", 8);
+}
+
+static void
+Init_GenericFontFamily()
+{
+    cGenericFontFamily = rb_define_class_under(mGdiplus, "GenericFontFamily", cEnumInt);
+    rb_undef_alloc_func(cGenericFontFamily);
+    IndexArrayMap<ID> *table = new IndexArrayMap<ID>(3);
+    klass_table_map.set(cGenericFontFamily, table);
+
+    define_enumint(cGenericFontFamily, table, "Serif", 0);
+    define_enumint(cGenericFontFamily, table, "SansSerif", 1);
+    define_enumint(cGenericFontFamily, table, "Monospace", 2);
+}
+
+static void
+Init_PixelOffsetMode()
+{
+    cPixelOffsetMode = rb_define_class_under(mGdiplus, "PixelOffsetMode", cEnumInt);
+    rb_undef_alloc_func(cPixelOffsetMode);
+    SortedArrayMap<int, ID> *table = new SortedArrayMap<int, ID>(6);
+    klass_table_map.set(cPixelOffsetMode, table);
+
+    define_enumint(cPixelOffsetMode, table, "Invalid", -1);
+    define_enumint(cPixelOffsetMode, table, "Default", 0);
+    define_enumint(cPixelOffsetMode, table, "HighSpeed", 1);
+    define_enumint(cPixelOffsetMode, table, "HighQuality", 2);
+    define_enumint(cPixelOffsetMode, table, "None", 3);
+    define_enumint(cPixelOffsetMode, table, "Half", 4);
+}
+
+static void
+Init_SmoothingMode()
+{
+    cSmoothingMode = rb_define_class_under(mGdiplus, "SmoothingMode", cEnumInt);
+    rb_undef_alloc_func(cSmoothingMode);
+    SortedArrayMap<int, ID> *table = new SortedArrayMap<int, ID>(8);
+    klass_table_map.set(cSmoothingMode, table);
+
+    define_enumint(cSmoothingMode, table, "Invalid", -1);
+    define_enumint(cSmoothingMode, table, "Default", 0);
+    define_enumint(cSmoothingMode, table, "HighSpeed", 1);
+    define_enumint(cSmoothingMode, table, "HighQuality", 2);
+    define_enumint(cSmoothingMode, table, "None", 3);
+    define_enumint(cSmoothingMode, table, "AntiAlias", 4);
+    define_enumint(cSmoothingMode, table, "AntiAlias8x4", 4);
+    define_enumint(cSmoothingMode, table, "AntiAlias8x8", 5);
+}
+
+static void
+Init_TextRenderingHint()
+{
+    cTextRenderingHint = rb_define_class_under(mGdiplus, "TextRenderingHint", cEnumInt);
+    rb_undef_alloc_func(cTextRenderingHint);
+    IndexArrayMap<ID> *table = new IndexArrayMap<ID>(6);
+    klass_table_map.set(cTextRenderingHint, table);
+
+    define_enumint(cTextRenderingHint, table, "SystemDefault", 0);
+    define_enumint(cTextRenderingHint, table, "SingleBitPerPixelGridFit", 1);
+    define_enumint(cTextRenderingHint, table, "SingleBitPerPixel", 2);
+    define_enumint(cTextRenderingHint, table, "AntiAliasGridFit", 3);
+    define_enumint(cTextRenderingHint, table, "AntiAlias", 4);
+    define_enumint(cTextRenderingHint, table, "ClearTypeGridFit", 5);
+}
 
 
 /* Encoder */
@@ -629,6 +707,11 @@ Init_enum() {
     Init_MatrixOrder();
     Init_PenAlignment();
     Init_PenType();
+    Init_FontStyle();
+    Init_GenericFontFamily();
+    Init_PixelOffsetMode();
+    Init_SmoothingMode();
+    Init_TextRenderingHint();
     
     Init_Encoder();
     Init_imageformat();

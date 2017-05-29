@@ -56,6 +56,11 @@ extern VALUE cSize;
 extern VALUE cSizeF;
 extern VALUE cRectangle;
 extern VALUE cRectangleF;
+extern VALUE cFontStyle;
+extern VALUE cGenericFontFamily;
+extern VALUE cPixelOffsetMode;
+extern VALUE cSmoothingMode;
+extern VALUE cTextRenderingHint;
 
 extern const rb_data_type_t tGuid;
 extern const rb_data_type_t tImageCodecInfo;

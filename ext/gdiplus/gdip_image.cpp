@@ -305,5 +305,5 @@ void Init_image()
     rb_define_method(cImage, "pixel_format", RUBY_METHOD_FUNC(gdip_image_pixel_format), 0);
     rb_define_method(cImage, "RawFormat", RUBY_METHOD_FUNC(gdip_image_raw_format), 0);
     rb_define_method(cImage, "raw_format", RUBY_METHOD_FUNC(gdip_image_raw_format), 0);
-    
+    rb_define_method(cImage, "draw", RUBY_METHOD_FUNC(gdip_image_draw), 0);
 }
