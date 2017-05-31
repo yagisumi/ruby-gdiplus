@@ -352,7 +352,7 @@ gdip_graphics_fill_rectangle(int argc, VALUE *argv, VALUE self)
             Rect *rect = Data_Ptr<Rect *>(argv[1]);
             g->FillRectangle(brush, *rect);
         }
-        else if (_KIND_OF(argv[1], &tRectangle)) {
+        else if (_KIND_OF(argv[1], &tRectangleF)) {
             RectF *rect = Data_Ptr<RectF *>(argv[1]);
             g->FillRectangle(brush, *rect);
         }
@@ -380,7 +380,7 @@ static VALUE
 gdip_graphics_draw_line(int argc, VALUE *argv, VALUE self)
 {
     if (argc != 3 && argc != 5) {
-        rb_raise(rb_eArgError, "wrong number of arguments (%d for 2 or 5)", argc);
+        rb_raise(rb_eArgError, "wrong number of arguments (%d for 3 or 5)", argc);
     }
     if (!_KIND_OF(argv[0], &tPen)) {
         rb_raise(rb_eTypeError, "The first argument should be Pen.");
@@ -418,6 +418,88 @@ gdip_graphics_draw_line(int argc, VALUE *argv, VALUE self)
     return self;
 }
 
+static VALUE
+gdip_graphics_draw_ellipse(int argc, VALUE *argv, VALUE self)
+{
+    if (argc != 2 && argc != 5) {
+        rb_raise(rb_eArgError, "wrong number of arguments (%d for 2 or 5)", argc);
+    }
+    if (!_KIND_OF(argv[0], &tPen)) {
+        rb_raise(rb_eTypeError, "The first argument should be Pen.");
+    }
+
+    Graphics *g = Data_Ptr<Graphics *>(self);
+    Pen *pen = Data_Ptr<Pen *>(argv[0]);
+    if (argc == 2) {
+        if (_KIND_OF(argv[1], &tRectangle)) {
+            Rect *rect = Data_Ptr<Rect *>(argv[1]);
+            g->DrawEllipse(pen, *rect);
+        }
+        else if (_KIND_OF(argv[1], &tRectangle)) {
+            RectF *rect = Data_Ptr<RectF *>(argv[1]);
+            g->DrawEllipse(pen, *rect);
+        }
+        else {
+            rb_raise(rb_eTypeError, "The argument should be Rectangle or RectangleF.");
+        }
+
+    }
+    else if (argc == 5) {
+        if (Integer_p(argv[1], argv[2], argv[3], argv[4])) {
+            g->DrawEllipse(pen, RB_NUM2INT(argv[1]), RB_NUM2INT(argv[2]), RB_NUM2INT(argv[3]), RB_NUM2INT(argv[4]));
+        }
+        else if (Float_p(argv[1], argv[2], argv[3], argv[4])) {
+            g->DrawEllipse(pen, NUM2SINGLE(argv[1]), NUM2SINGLE(argv[2]), NUM2SINGLE(argv[3]), NUM2SINGLE(argv[4]));
+        }
+        else {
+            rb_raise(rb_eTypeError, "The arguments should be Integer or Float.");
+        }
+    }
+    
+    return self;
+}
+
+
+static VALUE
+gdip_graphics_fill_ellipse(int argc, VALUE *argv, VALUE self)
+{
+    if (argc != 2 && argc != 5) {
+        rb_raise(rb_eArgError, "wrong number of arguments (%d for 2 or 5)", argc);
+    }
+    if (!_KIND_OF(argv[0], &tBrush)) {
+        rb_raise(rb_eTypeError, "The first argument should be Brush.");
+    }
+
+    Graphics *g = Data_Ptr<Graphics *>(self);
+    Brush *brush = Data_Ptr<Brush *>(argv[0]);
+    if (argc == 2) {
+        if (_KIND_OF(argv[1], &tRectangle)) {
+            Rect *rect = Data_Ptr<Rect *>(argv[1]);
+            g->FillEllipse(brush, *rect);
+        }
+        else if (_KIND_OF(argv[1], &tRectangleF)) {
+            RectF *rect = Data_Ptr<RectF *>(argv[1]);
+            g->FillEllipse(brush, *rect);
+        }
+        else {
+            rb_raise(rb_eTypeError, "The argument should be Rectangle or RectangleF.");
+        }
+
+    }
+    else if (argc == 5) {
+        if (Integer_p(argv[1], argv[2], argv[3], argv[4])) {
+            g->FillEllipse(brush, RB_NUM2INT(argv[1]), RB_NUM2INT(argv[2]), RB_NUM2INT(argv[3]), RB_NUM2INT(argv[4]));
+        }
+        else if (Float_p(argv[1], argv[2], argv[3], argv[4])) {
+            g->FillEllipse(brush, NUM2SINGLE(argv[1]), NUM2SINGLE(argv[2]), NUM2SINGLE(argv[3]), NUM2SINGLE(argv[4]));
+        }
+        else {
+            rb_raise(rb_eTypeError, "The arguments should be Integer or Float.");
+        }
+    }
+    
+    return self;
+}
 
 void
 Init_graphics()
@@ -485,4 +567,8 @@ Init_graphics()
     rb_define_method(cGraphics, "fill_rectangle", RUBY_METHOD_FUNC(gdip_graphics_fill_rectangle), -1);
     rb_define_method(cGraphics, "DrawLine", RUBY_METHOD_FUNC(gdip_graphics_draw_line), -1);
     rb_define_method(cGraphics, "draw_line", RUBY_METHOD_FUNC(gdip_graphics_draw_line), -1);
+    rb_define_method(cGraphics, "DrawEllipse", RUBY_METHOD_FUNC(gdip_graphics_draw_ellipse), -1);
+    rb_define_method(cGraphics, "draw_ellipse", RUBY_METHOD_FUNC(gdip_graphics_draw_ellipse), -1);
+    rb_define_method(cGraphics, "FillEllipse", RUBY_METHOD_FUNC(gdip_graphics_fill_ellipse), -1);
+    rb_define_method(cGraphics, "fill_ellipse", RUBY_METHOD_FUNC(gdip_graphics_fill_ellipse), -1);
 }
