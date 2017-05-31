@@ -27,6 +27,15 @@ SINGLE2NUM(float n)
 static inline const char * __method__() { return rb_id2name(rb_frame_this_func()); }
 static inline const char * __class__(VALUE self) { return rb_class2name(CLASS_OF(self)); }
 
+template <typename T>
+static inline T
+clamp(T val, T min, T max)
+{
+    if (val < min) return min;
+    else if (max < val) return max;
+    else return val;
+}
+
 static inline bool
 Integer_p(VALUE v1)
 {

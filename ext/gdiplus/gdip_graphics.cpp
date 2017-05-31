@@ -304,6 +304,7 @@ gdip_graphics_draw_rectangle(int argc, VALUE *argv, VALUE self)
     }
 
     Graphics *g = Data_Ptr<Graphics *>(self);
+    Check_NULL(g, "The graphics object does not exist.");
     Pen *pen = Data_Ptr<Pen *>(argv[0]);
     if (argc == 2) {
         if (_KIND_OF(argv[1], &tRectangle)) {
@@ -346,6 +347,7 @@ gdip_graphics_fill_rectangle(int argc, VALUE *argv, VALUE self)
     }
 
     Graphics *g = Data_Ptr<Graphics *>(self);
+    Check_NULL(g, "The graphics object does not exist.");
     Brush *brush = Data_Ptr<Brush *>(argv[0]);
     if (argc == 2) {
         if (_KIND_OF(argv[1], &tRectangle)) {
@@ -387,6 +389,7 @@ gdip_graphics_draw_line(int argc, VALUE *argv, VALUE self)
     }
 
     Graphics *g = Data_Ptr<Graphics *>(self);
+    Check_NULL(g, "The graphics object does not exist.");
     Pen *pen = Data_Ptr<Pen *>(argv[0]);
     if (argc == 3) {
         if (_KIND_OF(argv[1], &tPoint) && _KIND_OF(argv[2], &tPoint)) {
@@ -419,6 +422,200 @@ gdip_graphics_draw_line(int argc, VALUE *argv, VALUE self)
 }
 
 static VALUE
+gdip_graphics_draw_lines(VALUE self, VALUE pen_v, VALUE ary)
+{
+    if (!_KIND_OF(pen_v, &tPen)) {
+        rb_raise(rb_eTypeError, "The first argument should be Pen.");
+    }
+    if (!_RB_ARRAY_P(ary)) {
+        rb_raise(rb_eTypeError, "The second argument should be Array of Point or PointF.");
+    }
+
+    Graphics *g = Data_Ptr<Graphics *>(self);
+    Check_NULL(g, "The graphics object does not exist.");
+    Pen *pen = Data_Ptr<Pen *>(pen_v);
+
+    if (RARRAY_LEN(ary) == 0) {
+        _VERBOSE("The array is empty.");
+    }
+    else {
+        VALUE first = rb_ary_entry(ary, 0);
+        if (_KIND_OF(first, &tPoint)) {
+            int count = 0;
+            for (long i = 0; i < RARRAY_LEN(ary); ++i) {
+                VALUE elem = rb_ary_entry(ary, i);
+                if (_KIND_OF(elem, &tPoint)) {
+                    count += 1;
+                }
+            }
+            int idx = 0;
+            Point *points = static_cast<Point *>(ruby_xmalloc(count * sizeof(Point)));
+            for (long i = 0; i < RARRAY_LEN(ary); ++i) {
+                VALUE elem = rb_ary_entry(ary, i);
+                if (_KIND_OF(elem, &tPoint)) {
+                    Point *po = Data_Ptr<Point *>(elem);
+                    points[idx] = *po;
+                    idx += 1;
+                }
+            }
+            Status status = g->DrawLines(pen, points, count);
+            ruby_xfree(points);
+            Check_Status(status);
+        }
+        else if (_KIND_OF(first, &tPointF)) {
+            int count = 0;
+            for (long i = 0; i < RARRAY_LEN(ary); ++i) {
+                VALUE elem = rb_ary_entry(ary, i);
+                if (_KIND_OF(elem, &tPointF)) {
+                    count += 1;
+                }
+            }
+            int idx = 0;
+            PointF *points = static_cast<PointF *>(ruby_xmalloc(count * sizeof(PointF)));
+            for (long i = 0; i < RARRAY_LEN(ary); ++i) {
+                VALUE elem = rb_ary_entry(ary, i);
+                if (_KIND_OF(elem, &tPointF)) {
+                    PointF *po = Data_Ptr<PointF *>(elem);
+                    points[idx] = *po;
+                    idx += 1;
+                }
+            }
+            Status status = g->DrawLines(pen, points, count);
+            ruby_xfree(points);
+            Check_Status(status);
+        }
+        else {
+            rb_raise(rb_eTypeError, "The second argument should be Array of Point or PointF.");
+        }
+    }
+    return self;
+}
+
+static VALUE
+gdip_graphics_draw_curve(int argc, VALUE *argv, VALUE self)
+{
+    if (argc < 2 || 5 < argc) {
+        rb_raise(rb_eArgError, "wrong number of arguments (%d for 2..5)", argc);
+    }
+    if (!_KIND_OF(argv[0], &tPen)) {
+        rb_raise(rb_eTypeError, "The first argument should be Pen.");
+    }
+    if (!_RB_ARRAY_P(argv[1])) {
+        rb_raise(rb_eTypeError, "The second argument should be Array of Point or PointF.");
+    }
+    if (argc == 3 && !Float_p(argv[2])) {
+        rb_raise(rb_eTypeError, "The last argument should be Float.");
+    }
+    else if (argc == 4 && !Integer_p(argv[2], argv[3])) {
+        rb_raise(rb_eTypeError, "The arguments should be Integer.");
+    }
+    else if (argc == 5) {
+        if (!Float_p(argv[4])) {
+            rb_raise(rb_eTypeError, "The last argument should be Float.");
+        }
+        else if (!Integer_p(argv[2], argv[3])) {
+            rb_raise(rb_eTypeError, "The arguments should be Integer.");
+        }
+    }
+
+    Graphics *g = Data_Ptr<Graphics *>(self);
+    Check_NULL(g, "The graphics object does not exist.");
+    Pen *pen = Data_Ptr<Pen *>(argv[0]);
+
+    if (RARRAY_LEN(argv[1]) == 0) {
+        _VERBOSE("The array is empty.");
+    }
+    else {
+        VALUE first = rb_ary_entry(argv[1], 0);
+        if (_KIND_OF(first, &tPoint)) {
+            
+            int count = 0;
+            for (long i = 0; i < RARRAY_LEN(argv[1]); ++i) {
+                VALUE elem = rb_ary_entry(argv[1], i);
+                if (_KIND_OF(elem, &tPoint)) {
+                    count += 1;
+                }
+            }
+            int idx = 0;
+            Point *points = static_cast<Point *>(ruby_xmalloc(count * sizeof(Point)));
+            for (long i = 0; i < RARRAY_LEN(argv[1]); ++i) {
+                VALUE elem = rb_ary_entry(argv[1], i);
+                if (_KIND_OF(elem, &tPoint)) {
+                    Point *po = Data_Ptr<Point *>(elem);
+                    points[idx] = *po;
+                    idx += 1;
+                }
+            }
+            Status status;
+            if (argc == 2) {
+                status = g->DrawCurve(pen, points, count);
+            }
+            else if (argc == 3) {
+                float tension = clamp(NUM2SINGLE(argv[2]), 0.0f, 1.0f);
+                status = g->DrawCurve(pen, points, count, tension);
+            }
+            else if (argc == 4) {
+                int offset = RB_NUM2INT(argv[2]);
+                int num = RB_NUM2INT(argv[3]);
+                status = g->DrawCurve(pen, points, count, offset, num, 0.5f);
+            }
+            else if (argc == 5) {
+                int offset = RB_NUM2INT(argv[2]);
+                int num = RB_NUM2INT(argv[3]);
+                float tension = clamp(NUM2SINGLE(argv[4]), 0.0f, 1.0f);
+                status = g->DrawCurve(pen, points, count, offset, num, tension);
+            }
+            ruby_xfree(points);
+            Check_Status(status);
+        }
+        else if (_KIND_OF(first, &tPointF)) {
+            int count = 0;
+            for (long i = 0; i < RARRAY_LEN(argv[1]); ++i) {
+                VALUE elem = rb_ary_entry(argv[1], i);
+                if (_KIND_OF(elem, &tPointF)) {
+                    count += 1;
+                }
+            }
+            int idx = 0;
+            PointF *points = static_cast<PointF *>(ruby_xmalloc(count * sizeof(PointF)));
+            for (long i = 0; i < RARRAY_LEN(argv[1]); ++i) {
+                VALUE elem = rb_ary_entry(argv[1], i);
+                if (_KIND_OF(elem, &tPointF)) {
+                    PointF *po = Data_Ptr<PointF *>(elem);
+                    points[idx] = *po;
+                    idx += 1;
+                }
+            }
+            Status status;
+            if (argc == 2) {
+                status = g->DrawCurve(pen, points, count);
+            }
+            else if (argc == 3) {
+                float tension = clamp(NUM2SINGLE(argv[2]), 0.0f, 1.0f);
+                status = g->DrawCurve(pen, points, count, tension);
+            }
+            else if (argc == 4) {
+                int offset = RB_NUM2INT(argv[2]);
+                int num = RB_NUM2INT(argv[3]);
+                status = g->DrawCurve(pen, points, count, offset, num, 0.5f);
+            }
+            else if (argc == 5) {
+                int offset = RB_NUM2INT(argv[2]);
+                int num = RB_NUM2INT(argv[3]);
+                float tension = clamp(NUM2SINGLE(argv[4]), 0.0f, 1.0f);
+                status = g->DrawCurve(pen, points, count, offset, num, tension);
+            }
+            ruby_xfree(points);
+            Check_Status(status);
+        }
+        else {
+            rb_raise(rb_eTypeError, "The second argument should be Array of Point or PointF.");
+        }
+    }
+    return self;
+}
+
+static VALUE
 gdip_graphics_draw_ellipse(int argc, VALUE *argv, VALUE self)
 {
     if (argc != 2 && argc != 5) {
@@ -429,6 +626,7 @@ gdip_graphics_draw_ellipse(int argc, VALUE *argv, VALUE self)
     }
 
     Graphics *g = Data_Ptr<Graphics *>(self);
+    Check_NULL(g, "The graphics object does not exist.");
     Pen *pen = Data_Ptr<Pen *>(argv[0]);
     if (argc == 2) {
         if (_KIND_OF(argv[1], &tRectangle)) {
@@ -471,7 +669,8 @@ gdip_graphics_fill_ellipse(int argc, VALUE *argv, VALUE self)
     }
 
     Graphics *g = Data_Ptr<Graphics *>(self);
-    Brush *brush = Data_Ptr<Brush *>(argv[0]);
+    Check_NULL(g, "The graphics object does not exist.");
+   Brush *brush = Data_Ptr<Brush *>(argv[0]);
     if (argc == 2) {
         if (_KIND_OF(argv[1], &tRectangle)) {
             Rect *rect = Data_Ptr<Rect *>(argv[1]);
@@ -567,8 +766,12 @@ Init_graphics()
     rb_define_method(cGraphics, "fill_rectangle", RUBY_METHOD_FUNC(gdip_graphics_fill_rectangle), -1);
     rb_define_method(cGraphics, "DrawLine", RUBY_METHOD_FUNC(gdip_graphics_draw_line), -1);
     rb_define_method(cGraphics, "draw_line", RUBY_METHOD_FUNC(gdip_graphics_draw_line), -1);
+    rb_define_method(cGraphics, "DrawLines", RUBY_METHOD_FUNC(gdip_graphics_draw_lines), 2);
+    rb_define_method(cGraphics, "draw_lines", RUBY_METHOD_FUNC(gdip_graphics_draw_lines), 2);
     rb_define_method(cGraphics, "DrawEllipse", RUBY_METHOD_FUNC(gdip_graphics_draw_ellipse), -1);
     rb_define_method(cGraphics, "draw_ellipse", RUBY_METHOD_FUNC(gdip_graphics_draw_ellipse), -1);
     rb_define_method(cGraphics, "FillEllipse", RUBY_METHOD_FUNC(gdip_graphics_fill_ellipse), -1);
     rb_define_method(cGraphics, "fill_ellipse", RUBY_METHOD_FUNC(gdip_graphics_fill_ellipse), -1);
+    rb_define_method(cGraphics, "DrawCurve", RUBY_METHOD_FUNC(gdip_graphics_draw_curve), -1);
+    rb_define_method(cGraphics, "DrawCurve", RUBY_METHOD_FUNC(gdip_graphics_draw_curve), -1);
 }
