@@ -1,16 +1,14 @@
 # coding: utf-8
 require 'test_helper'
 
-class GdiplusTest < Test::Unit::TestCase
+class GdiplusGraphicsTest < Test::Unit::TestCase
   include Gdiplus
   
-  def test_that_it_has_a_version_number
-    assert_not_nil(::Gdiplus::VERSION)
-  end
-
-  def test_error
-    assert_not_nil(::Gdiplus::GdiplusError)
-    #
+  def test_graphics
+    bmp = Bitmap.new(200, 400)
+    bmp.draw {|g|
+      #p g.ClipBounds
+    }
   end
 end
 

@@ -61,6 +61,11 @@ extern VALUE cGenericFontFamily;
 extern VALUE cPixelOffsetMode;
 extern VALUE cSmoothingMode;
 extern VALUE cTextRenderingHint;
+extern VALUE cCompositingMode;
+extern VALUE cCompositingQuality;
+extern VALUE cFillMode;
+extern VALUE cGraphicsUnit;
+extern VALUE cInterpolationMode;
 
 extern const rb_data_type_t tGuid;
 extern const rb_data_type_t tImageCodecInfo;
@@ -89,25 +94,6 @@ void Init_pen_brush();
 void Init_graphics();
 void Init_rectangle();
 
-VALUE gdip_obj_id(VALUE self);
-
-/* gdiplus.cpp */
-extern const char *GpStatusStrs[22];
-extern int gdip_refcount;
-extern bool gdip_end_flag;
-void gdiplus_shutdown();
-
-static inline void GdiplusAddRef() { ++gdip_refcount; }
-static inline void GdiplusRelease() {
-    --gdip_refcount;
-    if (gdip_end_flag && gdip_refcount == 0) {
-        gdiplus_shutdown();
-    }
-}
-
-/* gdip_codec.cpp */
-EncoderParameters *gdip_encprms_build_struct(VALUE v);
-
 /* gdip_enum.cpp */
 extern ID ID_UNKNOWN;
 extern ID ID_Compression;
@@ -131,14 +117,66 @@ extern GUID _EncoderSaveAsCMYK;
 extern GUID _ImageFormatEXIF;
 extern GUID _ImageFormatUndefined;
 
+
+/* gdiplus.cpp */
+extern const char *GpStatusStrs[22];
+extern int gdip_refcount;
+extern bool gdip_end_flag;
+void gdiplus_shutdown();
+
+bool gdip_arg_to_double(VALUE v, double *dbl, bool do_raise=true);
+bool gdip_arg_to_single(VALUE v, float *flt, bool do_raise=true);
+VALUE gdip_obj_id(VALUE self);
+
+static inline void GdiplusAddRef() { ++gdip_refcount; }
+static inline void GdiplusRelease() {
+    --gdip_refcount;
+    if (gdip_end_flag && gdip_refcount == 0) {
+        gdiplus_shutdown();
+    }
+}
+
+/* gdip_codec.cpp */
+EncoderParameters *gdip_encprms_build_struct(VALUE v);
+
+/* gdip_enum.cpp */
 template <typename T> ID gdip_enum_get_id(VALUE klass, T data);
 template <typename T> VALUE gdip_enum_get(VALUE klass, T data);
 VALUE gdip_enumint_create(VALUE klass, int num);
 int gdip_arg_to_enumint(VALUE klass, VALUE arg, bool to_int=false);
 VALUE gdip_enum_guid_create(VALUE klass, GUID *guid);
 
-/* graphics.cpp */
+/* gdip_graphics.cpp */
 VALUE gdip_graphics_create(Graphics *g);
+
+/* gdip_color.cpp */
+VALUE gdip_color_create(ARGB argb);
+static inline VALUE
+gdip_color_create(Color& color)
+{
+    return gdip_color_create(color.GetValue());
+}
+bool gdip_arg_to_color(VALUE v, Color *color, bool to_int=false, bool do_raise=true);
+
+/* gdip_rectangle.cpp */
+VALUE gdip_point_create(int x, int y);
+VALUE gdip_pointf_create(float x, float y);
+VALUE gdip_size_create(int width, int height);
+VALUE gdip_sizef_create(float width, float height);
+VALUE gdip_rect_create(int x, int y, int width, int height);
+VALUE gdip_rect_create(Rect *rect=NULL);
+VALUE gdip_rectf_create(float x, float y, float width, float height);
+VALUE gdip_rectf_create(RectF *rect=NULL);
+
+/* gdip_utils.cpp */
+VALUE util_encode_to_utf8(VALUE str);
+VALUE util_associate_utf8(VALUE str);
+VALUE util_utf8_sprintf(const char* format, ...);
+VALUE util_utf16_str_new(VALUE v);
+VALUE util_utf8_str_new_from_wstr(const wchar_t * wstr);
+bool util_extname(VALUE str, char (&ext)[6]);
+
+
 
 /* Debug */
 // #define GDIPLUS_DEBUG 1 // moved in extconf.rb
@@ -185,19 +223,6 @@ dp_type(const char *msg)
 #else
 #define DPT(msg)
 #endif
-
-
-bool gdip_arg_to_double(VALUE v, double *dbl, bool do_raise=true);
-bool gdip_arg_to_single(VALUE v, float *flt, bool do_raise=true);
-
-VALUE gdip_color_create(ARGB argb);
-static inline VALUE
-gdip_color_create(Color& color)
-{
-    return gdip_color_create(color.GetValue());
-}
-
-bool gdip_arg_to_color(VALUE v, Color *color, bool to_int=false, bool do_raise=true);
 
 template<typename T>
 static inline T 
@@ -365,14 +390,6 @@ Check_Status(GpStatus status) {
 }
 
 #define NOT_IMPLEMENTED_ERROR rb_raise(rb_eNotImpError, "not implemented yet")
-
-/* gdip_utils.cpp */
-VALUE util_encode_to_utf8(VALUE str);
-VALUE util_associate_utf8(VALUE str);
-VALUE util_utf8_sprintf(const char* format, ...);
-VALUE util_utf16_str_new(VALUE v);
-VALUE util_utf8_str_new_from_wstr(const wchar_t * wstr);
-bool util_extname(VALUE str, char (&ext)[6]);
 
 
 #endif /* RUBY_GDIPLUS_H */

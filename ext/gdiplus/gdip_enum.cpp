@@ -527,6 +527,81 @@ Init_TextRenderingHint()
     define_enumint(cTextRenderingHint, table, "ClearTypeGridFit", 5);
 }
 
+static void
+Init_CompositingMode()
+{
+    cCompositingMode = rb_define_class_under(mGdiplus, "CompositingMode", cEnumInt);
+    rb_undef_alloc_func(cCompositingMode);
+    IndexArrayMap<ID> *table = new IndexArrayMap<ID>(2);
+    klass_table_map.set(cCompositingMode, table);
+
+    define_enumint(cCompositingMode, table, "SourceOver", 0);
+    define_enumint(cCompositingMode, table, "SourceCopy", 1);
+}
+
+static void
+Init_CompositingQuality()
+{
+    cCompositingQuality = rb_define_class_under(mGdiplus, "CompositingQuality", cEnumInt);
+    rb_undef_alloc_func(cCompositingQuality);
+    SortedArrayMap<int, ID> *table = new SortedArrayMap<int, ID>(6);
+    klass_table_map.set(cCompositingQuality, table);
+
+    define_enumint(cCompositingQuality, table, "Invalid", -1);
+    define_enumint(cCompositingQuality, table, "Default", 0);
+    define_enumint(cCompositingQuality, table, "HighSpeed", 1);
+    define_enumint(cCompositingQuality, table, "HighQuality", 2);
+    define_enumint(cCompositingQuality, table, "GammaCorrected", 3);
+    define_enumint(cCompositingQuality, table, "AssumeLinear", 4);
+}
+
+static void
+Init_FillMode()
+{
+    cFillMode = rb_define_class_under(mGdiplus, "FillMode", cEnumInt);
+    rb_undef_alloc_func(cFillMode);
+    IndexArrayMap<ID> *table = new IndexArrayMap<ID>(2);
+    klass_table_map.set(cFillMode, table);
+
+    define_enumint(cFillMode, table, "Alternate", 0);
+    define_enumint(cFillMode, table, "Winding", 1);
+}
+
+static void
+Init_GraphicsUnit()
+{
+    cGraphicsUnit = rb_define_class_under(mGdiplus, "GraphicsUnit", cEnumInt);
+    rb_undef_alloc_func(cGraphicsUnit);
+    IndexArrayMap<ID> *table = new IndexArrayMap<ID>(7);
+    klass_table_map.set(cGraphicsUnit, table);
+
+    define_enumint(cGraphicsUnit, table, "World", 0);
+    define_enumint(cGraphicsUnit, table, "Display", 1);
+    define_enumint(cGraphicsUnit, table, "Pixel", 2);
+    define_enumint(cGraphicsUnit, table, "Point", 3);
+    define_enumint(cGraphicsUnit, table, "Inch", 4);
+    define_enumint(cGraphicsUnit, table, "Document", 5);
+    define_enumint(cGraphicsUnit, table, "Millimeter", 6);
+}
+
+static void
+Init_InterpolationMode()
+{
+    cInterpolationMode = rb_define_class_under(mGdiplus, "InterpolationMode", cEnumInt);
+    rb_undef_alloc_func(cInterpolationMode);
+    SortedArrayMap<int, ID> *table = new SortedArrayMap<int, ID>(9);
+    klass_table_map.set(cInterpolationMode, table);
+
+    define_enumint(cInterpolationMode, table, "Invalid", -1);
+    define_enumint(cInterpolationMode, table, "Default", 0);
+    define_enumint(cInterpolationMode, table, "LowQuality", 1);
+    define_enumint(cInterpolationMode, table, "HighQuality", 2);
+    define_enumint(cInterpolationMode, table, "Bilinear", 3);
+    define_enumint(cInterpolationMode, table, "Bicubic", 4);
+    define_enumint(cInterpolationMode, table, "NearestNeighbor", 5);
+    define_enumint(cInterpolationMode, table, "HighQualityBilinear", 6);
+    define_enumint(cInterpolationMode, table, "HighQualityBicubic", 7);
+}
 
 /* Encoder */
 
@@ -723,6 +798,11 @@ Init_enum() {
     Init_PixelOffsetMode();
     Init_SmoothingMode();
     Init_TextRenderingHint();
+    Init_CompositingMode();
+    Init_CompositingQuality();
+    Init_FillMode();
+    Init_GraphicsUnit();
+    Init_InterpolationMode();
     
     Init_Encoder();
     Init_imageformat();

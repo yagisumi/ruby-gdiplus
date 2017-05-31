@@ -24,7 +24,7 @@ const rb_data_type_t tRectangleF = _MAKE_DATA_TYPE(
     "RectangleF", 0, GDIP_DEFAULT_FREE(RectF), &typeddata_size<RectF>, NULL, &cRectangleF);
 
 
-static VALUE
+VALUE
 gdip_point_create(int x, int y)
 {
     VALUE r = typeddata_alloc<Point, &tPoint>(cPoint);
@@ -148,7 +148,7 @@ gdip_point_sub(VALUE self, VALUE other)
     }
 }
 
-static VALUE
+VALUE
 gdip_pointf_create(float x, float y)
 {
     VALUE r = typeddata_alloc<PointF, &tPointF>(cPointF);
@@ -275,7 +275,7 @@ gdip_pointf_sub(VALUE self, VALUE other)
     }
 }
 
-static VALUE
+VALUE
 gdip_size_create(int width, int height)
 {
     VALUE r = typeddata_alloc<Size, &tSize>(cSize);
@@ -403,7 +403,7 @@ gdip_size_sub(VALUE self, VALUE other)
 }
 
 
-static VALUE
+VALUE
 gdip_sizef_create(float width, float height)
 {
     VALUE r = typeddata_alloc<SizeF, &tSizeF>(cSizeF);
@@ -531,7 +531,7 @@ gdip_sizef_sub(VALUE self, VALUE other)
     }
 }
 
-static VALUE
+VALUE
 gdip_rect_create(int x, int y, int width, int height)
 {
     VALUE r = typeddata_alloc<Rect, &tRectangle>(cRectangle);
@@ -543,8 +543,8 @@ gdip_rect_create(int x, int y, int width, int height)
     return r;
 }
 
-static VALUE
-gdip_rect_create(Rect *rect=NULL)
+VALUE
+gdip_rect_create(Rect *rect)
 {
     VALUE r = typeddata_alloc<Rect, &tRectangle>(cRectangle);
     Rect *rect_r = Data_Ptr<Rect *>(r);
@@ -913,7 +913,7 @@ gdip_rect_union(VALUE self, VALUE other)
 }
 
 
-static VALUE
+VALUE
 gdip_rectf_create(float x, float y, float width, float height)
 {
     VALUE r = typeddata_alloc<RectF, &tRectangleF>(cRectangleF);
@@ -925,8 +925,8 @@ gdip_rectf_create(float x, float y, float width, float height)
     return r;
 }
 
-static VALUE
-gdip_rectf_create(RectF *rect=NULL)
+VALUE
+gdip_rectf_create(RectF *rect)
 {
     VALUE r = typeddata_alloc<RectF, &tRectangleF>(cRectangleF);
     RectF *rect_r = Data_Ptr<RectF *>(r);

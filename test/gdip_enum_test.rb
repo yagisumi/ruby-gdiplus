@@ -359,6 +359,74 @@ class GdiplusEnumIntTest < Test::Unit::TestCase
     assert_equal(5, TextRenderingHint.ClearTypeGridFit.to_i)
     assert_match(/ClearTypeGridFit/, TextRenderingHint.ClearTypeGridFit.inspect)
   end
+  
+  def test_CompositingMode
+    assert_equal(0, CompositingMode.SourceOver.to_i)
+    assert_match(/SourceOver/, CompositingMode.SourceOver.inspect)
+    assert_equal(1, CompositingMode.SourceCopy.to_i)
+    assert_match(/SourceCopy/, CompositingMode.SourceCopy.inspect)
+  end
+
+  def test_CompositingQuality
+    assert_equal(-1, CompositingQuality.Invalid.to_i)
+    assert_match(/Invalid/, CompositingQuality.Invalid.inspect)
+    assert_equal(0, CompositingQuality.Default.to_i)
+    assert_match(/Default/, CompositingQuality.Default.inspect)
+    assert_equal(1, CompositingQuality.HighSpeed.to_i)
+    assert_match(/HighSpeed/, CompositingQuality.HighSpeed.inspect)
+    assert_equal(2, CompositingQuality.HighQuality.to_i)
+    assert_match(/HighQuality/, CompositingQuality.HighQuality.inspect)
+    assert_equal(3, CompositingQuality.GammaCorrected.to_i)
+    assert_match(/GammaCorrected/, CompositingQuality.GammaCorrected.inspect)
+    assert_equal(4, CompositingQuality.AssumeLinear.to_i)
+    assert_match(/AssumeLinear/, CompositingQuality.AssumeLinear.inspect)
+  end
+
+  def test_FillMode
+    assert_equal(0, FillMode.Alternate.to_i)
+    assert_match(/Alternate/, FillMode.Alternate.inspect)
+    assert_equal(1, FillMode.Winding.to_i)
+    assert_match(/Winding/, FillMode.Winding.inspect)
+  end
+
+  def test_GraphicsUnit
+    assert_equal(0, GraphicsUnit.World.to_i)
+    assert_match(/World/, GraphicsUnit.World.inspect)
+    assert_equal(1, GraphicsUnit.Display.to_i)
+    assert_match(/Display/, GraphicsUnit.Display.inspect)
+    assert_equal(2, GraphicsUnit.Pixel.to_i)
+    assert_match(/Pixel/, GraphicsUnit.Pixel.inspect)
+    assert_equal(3, GraphicsUnit.Point.to_i)
+    assert_match(/Point/, GraphicsUnit.Point.inspect)
+    assert_equal(4, GraphicsUnit.Inch.to_i)
+    assert_match(/Inch/, GraphicsUnit.Inch.inspect)
+    assert_equal(5, GraphicsUnit.Document.to_i)
+    assert_match(/Document/, GraphicsUnit.Document.inspect)
+    assert_equal(6, GraphicsUnit.Millimeter.to_i)
+    assert_match(/Millimeter/, GraphicsUnit.Millimeter.inspect)
+  end
+  
+  def test_InterpolationMode
+    assert_equal(-1, InterpolationMode.Invalid.to_i)
+    assert_match(/Invalid/, InterpolationMode.Invalid.inspect)
+    assert_equal(0, InterpolationMode.Default.to_i)
+    assert_match(/Default/, InterpolationMode.Default.inspect)
+    assert_equal(1, InterpolationMode.LowQuality.to_i)
+    assert_match(/LowQuality/, InterpolationMode.LowQuality.inspect)
+    assert_equal(2, InterpolationMode.HighQuality.to_i)
+    assert_match(/HighQuality/, InterpolationMode.HighQuality.inspect)
+    assert_equal(3, InterpolationMode.Bilinear.to_i)
+    assert_match(/Bilinear/, InterpolationMode.Bilinear.inspect)
+    assert_equal(4, InterpolationMode.Bicubic.to_i)
+    assert_match(/Bicubic/, InterpolationMode.Bicubic.inspect)
+    assert_equal(5, InterpolationMode.NearestNeighbor.to_i)
+    assert_match(/NearestNeighbor/, InterpolationMode.NearestNeighbor.inspect)
+    assert_equal(6, InterpolationMode.HighQualityBilinear.to_i)
+    assert_match(/HighQualityBilinear/, InterpolationMode.HighQualityBilinear.inspect)
+    assert_equal(7, InterpolationMode.HighQualityBicubic.to_i)
+    assert_match(/HighQualityBicubic/, InterpolationMode.HighQualityBicubic.inspect)
+  end
+
 end
 
 __END__

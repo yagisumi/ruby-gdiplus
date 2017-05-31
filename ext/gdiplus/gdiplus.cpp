@@ -29,6 +29,11 @@ VALUE cGenericFontFamily;
 VALUE cPixelOffsetMode;
 VALUE cSmoothingMode;
 VALUE cTextRenderingHint;
+VALUE cCompositingMode;
+VALUE cCompositingQuality;
+VALUE cFillMode;
+VALUE cGraphicsUnit;
+VALUE cInterpolationMode;
 
 VALUE cEncoder;
 VALUE cEncoderValue;
