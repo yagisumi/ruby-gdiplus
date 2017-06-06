@@ -84,6 +84,7 @@ class GdiplusRectangleTest < Test::Unit::TestCase
     rect.Height = 400
     assert_equal(100, rect.X)
     assert_equal(rect.Left, rect.X)
+    assert_equal(rect.left, rect.x)
     assert_equal(200, rect.Y)
     assert_equal(rect.Top, rect.Y)
     assert_equal(300, rect.Width)
@@ -137,6 +138,7 @@ class GdiplusRectangleTest < Test::Unit::TestCase
     rect.Height = 400.0
     assert_equal(100.0, rect.X)
     assert_equal(rect.Left, rect.X)
+    assert_equal(rect.left, rect.x)
     assert_equal(200.0, rect.Y)
     assert_equal(rect.Top, rect.Y)
     assert_equal(300.0, rect.Width)

@@ -144,13 +144,13 @@ gdip_icinfo_mark(gdipImageCodecInfo *icinfo)
 const rb_data_type_t tImageCodecInfo = _MAKE_DATA_TYPE(
     "ImageCodecInfo", RUBY_DATA_FUNC(gdip_icinfo_mark), GDIP_DEFAULT_FREE(gdipImageCodecInfo), &typeddata_size<ImageCodecInfo>, NULL, &cImageCodecInfo);
 
-static VALUE gdip_icinfo_codecname(VALUE);
-static VALUE gdip_icinfo_dllname(VALUE);
-static VALUE gdip_icinfo_formatdesc(VALUE);
-static VALUE gdip_icinfo_filenameext(VALUE);
-static VALUE gdip_icinfo_mimetype(VALUE);
-static VALUE gdip_icinfo_sigpat(VALUE);
-static VALUE gdip_icinfo_sigmask(VALUE);
+static VALUE gdip_icinfo_get_codec_name(VALUE);
+static VALUE gdip_icinfo_get_dll_name(VALUE);
+static VALUE gdip_icinfo_get_format_description(VALUE);
+static VALUE gdip_icinfo_get_filename_extension(VALUE);
+static VALUE gdip_icinfo_get_mime_type(VALUE);
+static VALUE gdip_icinfo_get_signature_patterns(VALUE);
+static VALUE gdip_icinfo_get_signature_masks(VALUE);
 
 static VALUE
 gdip_icinfo_create(ImageCodecInfo *icinfo)
@@ -158,13 +158,13 @@ gdip_icinfo_create(ImageCodecInfo *icinfo)
     VALUE v = typeddata_alloc<gdipImageCodecInfo, &tImageCodecInfo>(cImageCodecInfo);
     Data_Ptr_Set_Data(v, icinfo);
     // I don't know how long the memories of string members survive, so I will copy them.
-    gdip_icinfo_codecname(v);
-    gdip_icinfo_dllname(v);
-    gdip_icinfo_formatdesc(v);
-    gdip_icinfo_filenameext(v);
-    gdip_icinfo_mimetype(v);
-    gdip_icinfo_sigpat(v);
-    gdip_icinfo_sigmask(v);
+    gdip_icinfo_get_codec_name(v);
+    gdip_icinfo_get_dll_name(v);
+    gdip_icinfo_get_format_description(v);
+    gdip_icinfo_get_filename_extension(v);
+    gdip_icinfo_get_mime_type(v);
+    gdip_icinfo_get_signature_patterns(v);
+    gdip_icinfo_get_signature_masks(v);
 
     return v;
 }
@@ -174,7 +174,7 @@ gdip_icinfo_create(ImageCodecInfo *icinfo)
  * @return [Gdiplus::Guid]
  */
 static VALUE
-gdip_icinfo_clsid(VALUE self)
+gdip_icinfo_get_clsid(VALUE self)
 {
     gdipImageCodecInfo *icinfo = Data_Ptr<gdipImageCodecInfo *>(self);
     if (icinfo->_clsid) return icinfo->_clsid;
@@ -190,7 +190,7 @@ gdip_icinfo_clsid(VALUE self)
  * @return [Gdiplus::Guid]
  */
 static VALUE
-gdip_icinfo_formatid(VALUE self)
+gdip_icinfo_get_format_id(VALUE self)
 {
     gdipImageCodecInfo *icinfo = Data_Ptr<gdipImageCodecInfo *>(self);
     if (icinfo->_formatid) return icinfo->_formatid;
@@ -206,7 +206,7 @@ gdip_icinfo_formatid(VALUE self)
  * @return [String]
  */
 static VALUE
-gdip_icinfo_codecname(VALUE self)
+gdip_icinfo_get_codec_name(VALUE self)
 {
     gdipImageCodecInfo *icinfo = Data_Ptr<gdipImageCodecInfo *>(self);
     if (icinfo->_codecname) return icinfo->_codecname;
@@ -222,7 +222,7 @@ gdip_icinfo_codecname(VALUE self)
  * @return [String]
  */
 static VALUE
-gdip_icinfo_dllname(VALUE self)
+gdip_icinfo_get_dll_name(VALUE self)
 {
     gdipImageCodecInfo *icinfo = Data_Ptr<gdipImageCodecInfo *>(self);
     if (icinfo->_dllname) return icinfo->_dllname;
@@ -238,7 +238,7 @@ gdip_icinfo_dllname(VALUE self)
  * @return [String]
  */
 static VALUE
-gdip_icinfo_formatdesc(VALUE self)
+gdip_icinfo_get_format_description(VALUE self)
 {
     gdipImageCodecInfo *icinfo = Data_Ptr<gdipImageCodecInfo *>(self);
     if (icinfo->_formatdesc) return icinfo->_formatdesc;
@@ -254,7 +254,7 @@ gdip_icinfo_formatdesc(VALUE self)
  * @return [String]
  */
 static VALUE
-gdip_icinfo_filenameext(VALUE self)
+gdip_icinfo_get_filename_extension(VALUE self)
 {
     gdipImageCodecInfo *icinfo = Data_Ptr<gdipImageCodecInfo *>(self);
     if (icinfo->_filenameext) return icinfo->_filenameext;
@@ -270,7 +270,7 @@ gdip_icinfo_filenameext(VALUE self)
  * @return [String]
  */
 static VALUE
-gdip_icinfo_mimetype(VALUE self)
+gdip_icinfo_get_mime_type(VALUE self)
 {
     gdipImageCodecInfo *icinfo = Data_Ptr<gdipImageCodecInfo *>(self);
     if (icinfo->_mimetype) return icinfo->_mimetype;
@@ -286,7 +286,7 @@ gdip_icinfo_mimetype(VALUE self)
  * @return [Integer]
  */
 static VALUE
-gdip_icinfo_flags(VALUE self)
+gdip_icinfo_get_flags(VALUE self)
 {
     ImageCodecInfo *icinfo = Data_Ptr<ImageCodecInfo *>(self);
     return RB_UINT2NUM(icinfo->Flags);
@@ -297,7 +297,7 @@ gdip_icinfo_flags(VALUE self)
  * @return [Integer]
  */
 static VALUE
-gdip_icinfo_version(VALUE self)
+gdip_icinfo_get_version(VALUE self)
 {
     ImageCodecInfo *icinfo = Data_Ptr<ImageCodecInfo *>(self);
     return RB_UINT2NUM(icinfo->Version);
@@ -310,15 +310,15 @@ static VALUE
 gdip_icinfo_inspect(VALUE self)
 {
     ImageCodecInfo *icinfo = Data_Ptr<ImageCodecInfo *>(self);
-    VALUE clsid = gdip_icinfo_clsid(self);
+    VALUE clsid = gdip_icinfo_get_clsid(self);
     VALUE clsid_str = gdip_guid_to_s(clsid);
-    VALUE formatid = gdip_icinfo_formatid(self);
+    VALUE formatid = gdip_icinfo_get_format_id(self);
     VALUE formatid_str = gdip_guid_to_s(formatid);
-    VALUE dllname = gdip_icinfo_dllname(self);
-    VALUE codecname = gdip_icinfo_codecname(self);
-    VALUE formatdesc = gdip_icinfo_formatdesc(self);
-    VALUE ext = gdip_icinfo_filenameext(self);
-    VALUE mime = gdip_icinfo_mimetype(self);
+    VALUE dllname = gdip_icinfo_get_dll_name(self);
+    VALUE codecname = gdip_icinfo_get_codec_name(self);
+    VALUE formatdesc = gdip_icinfo_get_format_description(self);
+    VALUE ext = gdip_icinfo_get_filename_extension(self);
+    VALUE mime = gdip_icinfo_get_mime_type(self);
 
     VALUE r = util_utf8_sprintf(
         "#<%s Clsid={%s} FormatID={%s} CodecName=\"%s\" DllName=\"%s\" FormatDescription=\"%s\" FilenameExtension=\"%s\" MimeType=\"%s\" Flags=0x%08lx, Version=%d>", 
@@ -334,7 +334,7 @@ gdip_icinfo_inspect(VALUE self)
  * @return [Array<String>] (e.g. <code>["GIF89a", "GIF87a"]</code>)
  */
 static VALUE
-gdip_icinfo_sigpat(VALUE self)
+gdip_icinfo_get_signature_patterns(VALUE self)
 {
     gdipImageCodecInfo *icinfo = Data_Ptr<gdipImageCodecInfo *>(self);
     if (icinfo->_sigpat) return icinfo->_sigpat;
@@ -357,7 +357,7 @@ gdip_icinfo_sigpat(VALUE self)
  * @return [Array<String>] (e.g. <code>["\xFF\xFF\xFF\xFF\xFF\xFF", "\xFF\xFF\xFF\xFF\xFF\xFF"]</code>)
  */
 static VALUE
-gdip_icinfo_sigmask(VALUE self)
+gdip_icinfo_get_signature_masks(VALUE self)
 {
     gdipImageCodecInfo *icinfo = Data_Ptr<gdipImageCodecInfo *>(self);
     if (icinfo->_sigmask) return icinfo->_sigmask;
@@ -1048,7 +1048,7 @@ gdip_encprm_imageitems_init(VALUE self, VALUE value)
 }
 
 static VALUE
-gdip_encprm_guid(VALUE self)
+gdip_encprm_get_encoder(VALUE self)
 {
     gdipEncoderParameter *encprm = Data_Ptr<gdipEncoderParameter *>(self);
     VALUE r = gdip_enum_get<GUID *>(cEncoder, &encprm->Guid);
@@ -1056,7 +1056,7 @@ gdip_encprm_guid(VALUE self)
 }
 
 static VALUE
-gdip_encprm_type(VALUE self)
+gdip_encprm_get_type(VALUE self)
 {
     gdipEncoderParameter *encprm = Data_Ptr<gdipEncoderParameter *>(self);
     VALUE r = gdip_enum_get<int>(cEncoderParameterValueType, encprm->Type);
@@ -1064,7 +1064,7 @@ gdip_encprm_type(VALUE self)
 }
 
 static VALUE
-gdip_encprm_num(VALUE self)
+gdip_encprm_get_number_of_values(VALUE self)
 {
     gdipEncoderParameter *encprm = Data_Ptr<gdipEncoderParameter *>(self);
     int num = gdip_encprm_size(encprm);
@@ -1072,7 +1072,7 @@ gdip_encprm_num(VALUE self)
 }
 
 static VALUE
-gdip_encprm_value(VALUE self)
+gdip_encprm_get_value(VALUE self)
 {
     gdipEncoderParameter *encprm = Data_Ptr<gdipEncoderParameter *>(self);
     return encprm->values;
@@ -1255,7 +1255,7 @@ gdip_encprms_inspect(VALUE self)
  * 
  */
 static VALUE
-gdip_encprms_param(VALUE self)
+gdip_encprms_get_param(VALUE self)
 {
     gdipEncoderParameters *gpencprms = Data_Ptr<gdipEncoderParameters *>(self);
     VALUE r;
@@ -1422,6 +1422,9 @@ gdip_encprms_build_struct(VALUE v)
 }
 
 #if GDIPLUS_DEBUG
+/**
+ * @private
+ */
 static VALUE
 gdip_encprms_build_and_create_for_debug(VALUE self)
 {
@@ -1463,53 +1466,38 @@ Init_codec()
     cImageCodecInfo = rb_define_class_under(mGdiplus, "ImageCodecInfo", rb_cObject);
     //rb_define_alloc_func(cImageCodecInfo, &typeddata_alloc<gdipImageCodecInfo, &tImageCodecInfo>);
     rb_undef_alloc_func(cImageCodecInfo);
-    rb_define_method(cImageCodecInfo, "clsid", RUBY_METHOD_FUNC(gdip_icinfo_clsid), 0);
-    rb_define_method(cImageCodecInfo, "Clsid", RUBY_METHOD_FUNC(gdip_icinfo_clsid), 0);
-    rb_define_method(cImageCodecInfo, "format_id", RUBY_METHOD_FUNC(gdip_icinfo_formatid), 0);
-    rb_define_method(cImageCodecInfo, "FormatID", RUBY_METHOD_FUNC(gdip_icinfo_formatid), 0);
-    rb_define_method(cImageCodecInfo, "codec_name", RUBY_METHOD_FUNC(gdip_icinfo_codecname), 0);
-    rb_define_method(cImageCodecInfo, "CodecName", RUBY_METHOD_FUNC(gdip_icinfo_codecname), 0);
-    rb_define_method(cImageCodecInfo, "dll_name", RUBY_METHOD_FUNC(gdip_icinfo_dllname), 0);
-    rb_define_method(cImageCodecInfo, "DllName", RUBY_METHOD_FUNC(gdip_icinfo_dllname), 0);
-    rb_define_method(cImageCodecInfo, "format_description", RUBY_METHOD_FUNC(gdip_icinfo_formatdesc), 0);
-    rb_define_method(cImageCodecInfo, "FormatDescription", RUBY_METHOD_FUNC(gdip_icinfo_formatdesc), 0);
-    rb_define_method(cImageCodecInfo, "filename_extension", RUBY_METHOD_FUNC(gdip_icinfo_filenameext), 0);
-    rb_define_method(cImageCodecInfo, "FilenameExtension", RUBY_METHOD_FUNC(gdip_icinfo_filenameext), 0);
-    rb_define_method(cImageCodecInfo, "mime_type", RUBY_METHOD_FUNC(gdip_icinfo_mimetype), 0);
-    rb_define_method(cImageCodecInfo, "MimeType", RUBY_METHOD_FUNC(gdip_icinfo_mimetype), 0);
-    rb_define_method(cImageCodecInfo, "version", RUBY_METHOD_FUNC(gdip_icinfo_version), 0);
-    rb_define_method(cImageCodecInfo, "Version", RUBY_METHOD_FUNC(gdip_icinfo_version), 0);
-    rb_define_method(cImageCodecInfo, "flags", RUBY_METHOD_FUNC(gdip_icinfo_flags), 0);
-    rb_define_method(cImageCodecInfo, "Flags", RUBY_METHOD_FUNC(gdip_icinfo_flags), 0);
-    rb_define_method(cImageCodecInfo, "signature_patterns", RUBY_METHOD_FUNC(gdip_icinfo_sigpat), 0);
-    rb_define_method(cImageCodecInfo, "SignaturePatterns", RUBY_METHOD_FUNC(gdip_icinfo_sigpat), 0);
-    rb_define_method(cImageCodecInfo, "signature_masks", RUBY_METHOD_FUNC(gdip_icinfo_sigmask), 0);
-    rb_define_method(cImageCodecInfo, "SignatureMasks", RUBY_METHOD_FUNC(gdip_icinfo_sigmask), 0);
+    ATTR_R(cImageCodecInfo, Clsid, clsid, icinfo);
+    ATTR_R(cImageCodecInfo, FormatID, format_id, icinfo);
+    ATTR_R(cImageCodecInfo, CodecName, codec_name, icinfo);
+    ATTR_R(cImageCodecInfo, DllName, dll_name, icinfo);
+    ATTR_R(cImageCodecInfo, FormatDescription, format_description, icinfo);
+    ATTR_R(cImageCodecInfo, FilenameExtension, filename_extension, icinfo);
+    ATTR_R(cImageCodecInfo, MimeType, mime_type, icinfo);
+    ATTR_R(cImageCodecInfo, Version, version, icinfo);
+    ATTR_R(cImageCodecInfo, Flags, flags, icinfo);
+    ATTR_R(cImageCodecInfo, SignaturePatterns, signature_patterns, icinfo);
+    ATTR_R(cImageCodecInfo, SignatureMasks, signature_masks, icinfo);
     
     rb_define_method(cImageCodecInfo, "GetEncoderParameterList", RUBY_METHOD_FUNC(gdip_icinfo_prmlist), 0);
-    rb_define_method(cImageCodecInfo, "parameter_list", RUBY_METHOD_FUNC(gdip_icinfo_prmlist), 0);
+    rb_define_alias(cImageCodecInfo, "parameter_list", "GetEncoderParameterList");
     rb_define_method(cImageCodecInfo, "inspect", RUBY_METHOD_FUNC(gdip_icinfo_inspect), 0);
 
-    rb_define_singleton_method(cImageCodecInfo, "image_encoders", RUBY_METHOD_FUNC(gdip_icinfo_s_image_encoders), 0);
     rb_define_singleton_method(cImageCodecInfo, "GetImageEncoders", RUBY_METHOD_FUNC(gdip_icinfo_s_image_encoders), 0);
-    rb_define_singleton_method(cImageCodecInfo, "image_decoders", RUBY_METHOD_FUNC(gdip_icinfo_s_image_decoders), 0);
+    rb_define_alias(rb_singleton_class(cImageCodecInfo), "image_encoders", "GetImageEncoders");
     rb_define_singleton_method(cImageCodecInfo, "GetImageDecoders", RUBY_METHOD_FUNC(gdip_icinfo_s_image_decoders), 0);
+    rb_define_alias(rb_singleton_class(cImageCodecInfo), "image_decoders", "GetImageDecoders");
 
     cEncoderParameter = rb_define_class_under(mGdiplus, "EncoderParameter", rb_cObject);
     rb_define_alloc_func(cEncoderParameter, gdip_encprm_alloc);
     rb_define_method(cEncoderParameter, "initialize", RUBY_METHOD_FUNC(gdip_encprm_init), -1);
     rb_define_method(cEncoderParameter, "inspect", RUBY_METHOD_FUNC(gdip_encprm_inspect), 0);
-    rb_define_method(cEncoderParameter, "Encoder", RUBY_METHOD_FUNC(gdip_encprm_guid), 0);
-    rb_define_method(cEncoderParameter, "encoder", RUBY_METHOD_FUNC(gdip_encprm_guid), 0);
-    rb_define_method(cEncoderParameter, "ValueType", RUBY_METHOD_FUNC(gdip_encprm_type), 0);
-    rb_define_method(cEncoderParameter, "Type", RUBY_METHOD_FUNC(gdip_encprm_type), 0);
-    rb_define_method(cEncoderParameter, "value_type", RUBY_METHOD_FUNC(gdip_encprm_type), 0);
-    rb_define_method(cEncoderParameter, "type", RUBY_METHOD_FUNC(gdip_encprm_type), 0);
-    rb_define_method(cEncoderParameter, "NumberOfValues", RUBY_METHOD_FUNC(gdip_encprm_num), 0);
-    rb_define_method(cEncoderParameter, "number_of_values", RUBY_METHOD_FUNC(gdip_encprm_num), 0);
-    rb_define_method(cEncoderParameter, "Value", RUBY_METHOD_FUNC(gdip_encprm_value), 0);
-    rb_define_method(cEncoderParameter, "value", RUBY_METHOD_FUNC(gdip_encprm_value), 0);
-    rb_define_method(cEncoderParameter, "values", RUBY_METHOD_FUNC(gdip_encprm_value), 0);
+    
+    ATTR_R(cEncoderParameter, Encoder, encoder, encprm);
+    ATTR_R(cEncoderParameter, Type, type, encprm);
+    ATTR_R(cEncoderParameter, ValueType, value_type, encprm, type);
+    ATTR_R(cEncoderParameter, NumberOfValues, number_of_values, encprm);
+    ATTR_R(cEncoderParameter, Value, value, encprm);
+    rb_define_alias(cEncoderParameter, "values", "Value");
 
     VALUE cEncoderParameterQuality = rb_define_class_under(mGdiplus, "EncoderParameterQuality", cEncoderParameter);
     rb_define_method(cEncoderParameterQuality, "initialize", RUBY_METHOD_FUNC(gdip_encprm_quality_init), 1);
@@ -1555,9 +1543,11 @@ Init_codec()
     rb_define_alloc_func(cEncoderParameters, &typeddata_alloc<gdipEncoderParameters, &tEncoderParameters>);
     rb_define_method(cEncoderParameters, "initialize", RUBY_METHOD_FUNC(gdip_encprms_init), 0);
     rb_define_method(cEncoderParameters, "inspect", RUBY_METHOD_FUNC(gdip_encprms_inspect), 0);
-    rb_define_method(cEncoderParameters, "Param", RUBY_METHOD_FUNC(gdip_encprms_param), 0);
-    rb_define_method(cEncoderParameters, "param", RUBY_METHOD_FUNC(gdip_encprms_param), 0);
-    rb_define_method(cEncoderParameters, "params", RUBY_METHOD_FUNC(gdip_encprms_param), 0);
+    ATTR_R(cEncoderParameters, Param, param, encprms);
+    rb_define_alias(cEncoderParameters, "params", "Param");
+    //rb_define_method(cEncoderParameters, "Param", RUBY_METHOD_FUNC(gdip_encprms_get_param), 0);
+    //rb_define_method(cEncoderParameters, "param", RUBY_METHOD_FUNC(gdip_encprms_get_param), 0);
+    //rb_define_method(cEncoderParameters, "params", RUBY_METHOD_FUNC(gdip_encprms_get_param), 0);
     rb_define_method(cEncoderParameters, "add", RUBY_METHOD_FUNC(gdip_encprms_add), 1);
     #if GDIPLUS_DEBUG
     rb_define_method(cEncoderParameters, "build_and_create_for_debug", RUBY_METHOD_FUNC(gdip_encprms_build_and_create_for_debug), 0);

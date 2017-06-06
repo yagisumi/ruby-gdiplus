@@ -605,6 +605,11 @@ Init_InterpolationMode()
 
 /* Encoder */
 
+/**
+ *
+ * @return [String]
+ * 
+ */
 static VALUE
 gdip_enumguid_inspect(VALUE self)
 {

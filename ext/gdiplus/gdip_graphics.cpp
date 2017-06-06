@@ -17,6 +17,11 @@ gdip_graphics_create(Graphics *g)
     return r;
 }
 
+/**
+ * Gets the rectangle of clipping region.
+ * @return [RectangleF]
+ * 
+ */
 static VALUE
 gdip_graphics_get_clip_bounds(VALUE self)
 {
@@ -28,6 +33,11 @@ gdip_graphics_get_clip_bounds(VALUE self)
     return gdip_rectf_create(&rect);
 }
 
+/**
+ * Gets or sets the compositing mode of this graphics.
+ * @return [Gdiplus::CompositingMode]
+ * 
+ */
 static VALUE
 gdip_graphics_get_compositing_mode(VALUE self)
 {
@@ -47,6 +57,11 @@ gdip_graphics_set_compositing_mode(VALUE self, VALUE v)
     return self;
 }
 
+/**
+ * Gets or sets the rendering quality.
+ * @return [Gdiplus::CompositingQuality]
+ * 
+ */
 static VALUE
 gdip_graphics_get_compositing_quality(VALUE self)
 {
@@ -66,6 +81,11 @@ gdip_graphics_set_compositing_quality(VALUE self, VALUE v)
     return self;
 }
 
+/**
+ * Gets the horizontal resolution of this Graphics.
+ * @return [Float]
+ * 
+ */
 static VALUE
 gdip_graphics_get_dpi_x(VALUE self)
 {
@@ -74,6 +94,11 @@ gdip_graphics_get_dpi_x(VALUE self)
     return SINGLE2NUM(g->GetDpiX());
 }
 
+/**
+ * Gets the vertical resolution of this Graphics.
+ * @return [Float]
+ * 
+ */
 static VALUE
 gdip_graphics_get_dpi_y(VALUE self)
 {
@@ -82,6 +107,11 @@ gdip_graphics_get_dpi_y(VALUE self)
     return SINGLE2NUM(g->GetDpiY());
 }
 
+/**
+ * Gets or sets the interpolation mode.
+ * @return [Gdiplus::InterpolationMode]
+ * 
+ */
 static VALUE
 gdip_graphics_get_interpolation_mode(VALUE self)
 {
@@ -101,6 +131,11 @@ gdip_graphics_set_interpolation_mode(VALUE self, VALUE v)
     return self;
 }
 
+/**
+ * Whether the clipping region of this Graphics is empty.
+ * @return [Boolean]
+ * 
+ */
 static VALUE
 gdip_graphics_get_is_clip_empty(VALUE self)
 {
@@ -109,6 +144,11 @@ gdip_graphics_get_is_clip_empty(VALUE self)
     return (g->IsClipEmpty()) ? Qtrue : Qfalse;
 }
 
+/**
+ * Whether the visible clipping region of this Graphics is empty.
+ * @return [Boolean]
+ * 
+ */
 static VALUE
 gdip_graphics_get_is_visible_clip_empty(VALUE self)
 {
@@ -117,6 +157,11 @@ gdip_graphics_get_is_visible_clip_empty(VALUE self)
     return (g->IsVisibleClipEmpty()) ? Qtrue : Qfalse;
 }
 
+/**
+ * Gets or sets the page scale.
+ * @return [Float]
+ * 
+ */
 static VALUE
 gdip_graphics_get_page_scale(VALUE self)
 {
@@ -137,6 +182,11 @@ gdip_graphics_set_page_scale(VALUE self, VALUE v)
     return self;
 }
 
+/**
+ * Gets or sets the page unit.
+ * @return [GraphicsUnit]
+ * 
+ */
 static VALUE
 gdip_graphics_get_page_unit(VALUE self)
 {
@@ -156,7 +206,11 @@ gdip_graphics_set_page_unit(VALUE self, VALUE v)
     return self;
 }
 
-
+/**
+ * Gets or set the PixelOffsetMode.
+ * @return [Gdiplus::PixelOffsetMode]
+ * 
+ */
 static VALUE
 gdip_graphics_get_pixel_offset_mode(VALUE self)
 {
@@ -176,6 +230,11 @@ gdip_graphics_set_pixel_offset_mode(VALUE self, VALUE v)
     return self;
 }
 
+/**
+ * Gets or sets the rendering origin of this graphics for hatch brushes.
+ * @return [Point]
+ * 
+ */
 static VALUE
 gdip_graphics_get_rendering_origin(VALUE self)
 {
@@ -203,6 +262,11 @@ gdip_graphics_set_rendering_origin(VALUE self, VALUE v)
     return self;
 }
 
+/**
+ * Gets or sets the soothing mode of this graphics.
+ * @return [Gdiplus::SmoothingMode]
+ * 
+ */
 static VALUE
 gdip_graphics_get_smoothing_mode(VALUE self)
 {
@@ -221,6 +285,11 @@ gdip_graphics_set_smoothing_mode(VALUE self, VALUE mode)
     return self;
 }
 
+/**
+ * Gets or sets the text contrast.
+ * @return [Integer] This value should be between 0 and 12.
+ * 
+ */
 static VALUE
 gdip_graphics_get_text_contrast(VALUE self)
 {
@@ -254,6 +323,11 @@ gdip_graphics_set_text_contrast(VALUE self, VALUE v)
     return self;
 }
 
+/**
+ * Gets or sets the text rendering mode for this graphics.
+ * @return [Gdiplus::TextRenderingHint]
+ * 
+ */
 static VALUE
 gdip_graphics_get_text_rendering_hint(VALUE self)
 {
@@ -278,6 +352,11 @@ gdip_graphics_set_text_rendering_hint(VALUE self, VALUE v)
     return self;
 }
 
+/**
+ * Gets the VisibleClipBounds.
+ * @return [RectangleF]
+ * 
+ */
 static VALUE
 gdip_graphics_get_visible_clip_bounds(VALUE self)
 {
@@ -293,6 +372,25 @@ gdip_graphics_get_visible_clip_bounds(VALUE self)
 // METHOD
 //
 
+/**
+ * @example
+ *   bmp.draw {|g|
+ *     g.DrawRectangle(pen, rect)
+ *     g.DrawRectangle(pen, 10, 10, 300, 200)
+ *     g.DrawRectangle(pen, 100.0, 100.0, 60.0, 30.0)
+ *   }
+ * @return [self]
+ * @overload DrawRectangle(pen, rectangle)
+ *   @param pen [Pen]
+ *   @param rectangle [Rectangle or RectangleF]
+ * @overload DrawRectangle(pen, x, y, width, height)
+ *   @param pen [Pen]
+ *   @param x [Integer or Float]
+ *   @param y [Integer or Float]
+ *   @param width [Integer or Float]
+ *   @param height [Integer or Float]
+ *   
+ */
 static VALUE
 gdip_graphics_draw_rectangle(int argc, VALUE *argv, VALUE self)
 {
@@ -335,7 +433,25 @@ gdip_graphics_draw_rectangle(int argc, VALUE *argv, VALUE self)
     return self;
 }
 
-
+/**
+ * @example
+ *   bmp.draw {|g|
+ *     g.FillRectangle(brush, rect)
+ *     g.FillRectangle(brush, 10, 10, 300, 200)
+ *     g.FillRectangle(brush, 100.0, 100.0, 60.0, 30.0)
+ *   }
+ * @return [self]
+ * @overload FillRectangle(brush, rectangle)
+ *   @param brush [Brush]
+ *   @param rectangle [Rectangle or RectangleF]
+ * @overload FillRectangle(brush, x, y, width, height)
+ *   @param brush [Brush]
+ *   @param x [Integer or Float]
+ *   @param y [Integer or Float]
+ *   @param width [Integer or Float]
+ *   @param height [Integer or Float]
+ *   
+ */
 static VALUE
 gdip_graphics_fill_rectangle(int argc, VALUE *argv, VALUE self)
 {
@@ -378,6 +494,25 @@ gdip_graphics_fill_rectangle(int argc, VALUE *argv, VALUE self)
     return self;
 }
 
+/**
+ * @example
+ *   bmp.draw {|g|
+ *     g.DrawLine(pen, point1, point2)
+ *     g.DrawLine(pen, 10, 10, 50, 60)
+ *     g.DrawLine(pen, 30.0, 100.0, 60.0, 100.0)
+ *   }
+ * @return [self]
+ * @overload DrawLine(pen, point1, point2)
+ *   @param pen [Pen]
+ *   @param point1 [Point or PointF]
+ *   @param point2 [Point or PointF]
+ * @overload DrawLine(pen, x1, y1, x2, y2)
+ *   @param pen [Pen]
+ *   @param x1 [Integer or Float]
+ *   @param y1 [Integer or Float]
+ *   @param x2 [Integer or Float]
+ *   @param y2 [Integer or Float]
+ */
 static VALUE
 gdip_graphics_draw_line(int argc, VALUE *argv, VALUE self)
 {
@@ -421,6 +556,17 @@ gdip_graphics_draw_line(int argc, VALUE *argv, VALUE self)
     return self;
 }
 
+/**
+ * @example
+ *   points = [Point.new(0, 10), Point.new(30, 30), Point.new(100, 30)]
+ *   bmp.draw {|g|
+ *     g.DrawLines(pen, points)
+ *   }
+ * @overload DrawLines(pen, points)
+ *   @param pen [Pen]
+ *   @param points [Array<Point or PointF>]
+ * @return [self]
+ */
 static VALUE
 gdip_graphics_draw_lines(VALUE self, VALUE pen_v, VALUE ary)
 {
@@ -491,6 +637,31 @@ gdip_graphics_draw_lines(VALUE self, VALUE pen_v, VALUE ary)
     return self;
 }
 
+/**
+ * @example
+ *   points = []
+ *   points << Point.new(100, 100)
+ *   points << Point.new(200, 100)
+ *   points << Point.new(200, 200)
+ *   points << Point.new(100, 200)
+ *   bmp {|g|
+ *     g.DrawCurve(pen, points);
+ *   }
+ * @overload DrawCurve(pen, points)
+ *   @param pen [Pen]
+ *   @param points [Array<Point or PointF>]
+ * @overload DrawCurve(pen, points, tention)
+ *   @param pen [Pen]
+ *   @param points [Array<Point or PointF>]
+ *   @param tention [Float] 0.0-1.0
+ * @overload DrawCurve(pen, points, offset, num, tention)
+ *   @param pen [Pen]
+ *   @param points [Array<Point or PointF>]
+ *   @param offset [Integer] start index of points
+ *   @param num [Integer] number of segments
+ *   @param tention [Float] 0.0-1.0
+ * @return [self]
+ */
 static VALUE
 gdip_graphics_draw_curve(int argc, VALUE *argv, VALUE self)
 {
@@ -615,6 +786,24 @@ gdip_graphics_draw_curve(int argc, VALUE *argv, VALUE self)
     return self;
 }
 
+/**
+ * @example
+ *   bmp.draw {|g|
+ *     g.DrawEllipse(pen, rect)
+ *     g.DrawEllipse(pen, 30, 30, 100, 100)
+ *     g.DrawEllipse(pen, 100.0, 100.0, 50.0, 50.0)
+ *   }
+ * @overload DrawEllipse(pen, rectangle)
+ *   @param pen [Pen]
+ *   @param rectangle [Rectangle or RectangleF]
+ * @overload DrawEllipse(pen, x, y, width, height)
+ *   @param pen [Pen]
+ *   @param x [Integer or Float]
+ *   @param y [Integer or Float]
+ *   @param width [Integer or Float]
+ *   @param height [Integer or Float]
+ * @return [self]
+ */
 static VALUE
 gdip_graphics_draw_ellipse(int argc, VALUE *argv, VALUE self)
 {
@@ -657,7 +846,24 @@ gdip_graphics_draw_ellipse(int argc, VALUE *argv, VALUE self)
     return self;
 }
 
-
+/**
+ * @example
+ *   bmp.draw {|g|
+ *     g.FillEllipse(brush, rect)
+ *     g.FillEllipse(brush, 30, 30, 100, 100)
+ *     g.FillEllipse(brush, 100.0, 100.0, 50.0, 50.0)
+ *   }
+ * @overload FillEllipse(brush, rectangle)
+ *   @param pen [Brush]
+ *   @param rectangle [Rectangle or RectangleF]
+ * @overload FillEllipse(brush, x, y, width, height)
+ *   @param pen [Brush]
+ *   @param x [Integer or Float]
+ *   @param y [Integer or Float]
+ *   @param width [Integer or Float]
+ *   @param height [Integer or Float]
+ * @return [self]
+ */
 static VALUE
 gdip_graphics_fill_ellipse(int argc, VALUE *argv, VALUE self)
 {
@@ -706,72 +912,35 @@ Init_graphics()
     cGraphics = rb_define_class_under(mGdiplus, "Graphics", rb_cObject);
     rb_undef_alloc_func(cGraphics);
 
-    rb_define_method(cGraphics, "ClipBounds", RUBY_METHOD_FUNC(gdip_graphics_get_clip_bounds), 0);
-    rb_define_method(cGraphics, "clip_bounds", RUBY_METHOD_FUNC(gdip_graphics_get_clip_bounds), 0);
-    rb_define_method(cGraphics, "CompositingMode", RUBY_METHOD_FUNC(gdip_graphics_get_compositing_mode), 0);
-    rb_define_method(cGraphics, "compositing_mode", RUBY_METHOD_FUNC(gdip_graphics_get_compositing_mode), 0);
-    rb_define_method(cGraphics, "CompositingMode=", RUBY_METHOD_FUNC(gdip_graphics_set_compositing_mode), 1);
-    rb_define_method(cGraphics, "compositing_mode=", RUBY_METHOD_FUNC(gdip_graphics_set_compositing_mode), 1);
-    rb_define_method(cGraphics, "CompositingQuality", RUBY_METHOD_FUNC(gdip_graphics_get_compositing_quality), 0);
-    rb_define_method(cGraphics, "compositing_quality", RUBY_METHOD_FUNC(gdip_graphics_get_compositing_quality), 0);
-    rb_define_method(cGraphics, "CompositingQuality=", RUBY_METHOD_FUNC(gdip_graphics_set_compositing_quality), 1);
-    rb_define_method(cGraphics, "compositing_quality=", RUBY_METHOD_FUNC(gdip_graphics_set_compositing_quality), 1);
-    rb_define_method(cGraphics, "DpiX", RUBY_METHOD_FUNC(gdip_graphics_get_dpi_x), 0);
-    rb_define_method(cGraphics, "dpi_x", RUBY_METHOD_FUNC(gdip_graphics_get_dpi_x), 0);
-    rb_define_method(cGraphics, "DpiY", RUBY_METHOD_FUNC(gdip_graphics_get_dpi_y), 0);
-    rb_define_method(cGraphics, "dpi_y", RUBY_METHOD_FUNC(gdip_graphics_get_dpi_y), 0);
-    rb_define_method(cGraphics, "InterpolationMode", RUBY_METHOD_FUNC(gdip_graphics_get_interpolation_mode), 0);
-    rb_define_method(cGraphics, "interpolation_mode", RUBY_METHOD_FUNC(gdip_graphics_get_interpolation_mode), 0);
-    rb_define_method(cGraphics, "InterpolationMode=", RUBY_METHOD_FUNC(gdip_graphics_set_interpolation_mode), 1);
-    rb_define_method(cGraphics, "interpolation_mode=", RUBY_METHOD_FUNC(gdip_graphics_set_interpolation_mode), 1);
-    rb_define_method(cGraphics, "IsClipEmpty", RUBY_METHOD_FUNC(gdip_graphics_get_is_clip_empty), 0);
-    rb_define_method(cGraphics, "is_clip_empty?", RUBY_METHOD_FUNC(gdip_graphics_get_is_clip_empty), 0);
-    rb_define_method(cGraphics, "IsVisibleClipEmpty", RUBY_METHOD_FUNC(gdip_graphics_get_is_visible_clip_empty), 0);
-    rb_define_method(cGraphics, "is_visible_clip_empty?", RUBY_METHOD_FUNC(gdip_graphics_get_is_visible_clip_empty), 0);
-    rb_define_method(cGraphics, "PageScale", RUBY_METHOD_FUNC(gdip_graphics_get_page_scale), 0);
-    rb_define_method(cGraphics, "page_scale", RUBY_METHOD_FUNC(gdip_graphics_get_page_scale), 0);
-    rb_define_method(cGraphics, "PageScale=", RUBY_METHOD_FUNC(gdip_graphics_set_page_scale), 1);
-    rb_define_method(cGraphics, "page_scale=", RUBY_METHOD_FUNC(gdip_graphics_set_page_scale), 1);
-    rb_define_method(cGraphics, "PageUnit", RUBY_METHOD_FUNC(gdip_graphics_get_page_unit), 0);
-    rb_define_method(cGraphics, "page_unit", RUBY_METHOD_FUNC(gdip_graphics_get_page_unit), 0);
-    rb_define_method(cGraphics, "PageUnit=", RUBY_METHOD_FUNC(gdip_graphics_set_page_unit), 1);
-    rb_define_method(cGraphics, "page_unit=", RUBY_METHOD_FUNC(gdip_graphics_set_page_unit), 1);
-    rb_define_method(cGraphics, "PixelOffsetMode", RUBY_METHOD_FUNC(gdip_graphics_get_pixel_offset_mode), 0);
-    rb_define_method(cGraphics, "pixelOffset_mode", RUBY_METHOD_FUNC(gdip_graphics_get_pixel_offset_mode), 0);
-    rb_define_method(cGraphics, "PixelOffsetMode=", RUBY_METHOD_FUNC(gdip_graphics_set_pixel_offset_mode), 1);
-    rb_define_method(cGraphics, "pixelOffset_mode=", RUBY_METHOD_FUNC(gdip_graphics_set_pixel_offset_mode), 1);
-    rb_define_method(cGraphics, "RenderingOrigin", RUBY_METHOD_FUNC(gdip_graphics_get_rendering_origin), 0);
-    rb_define_method(cGraphics, "rendering_origin", RUBY_METHOD_FUNC(gdip_graphics_get_rendering_origin), 0);
-    rb_define_method(cGraphics, "RenderingOrigin=", RUBY_METHOD_FUNC(gdip_graphics_set_rendering_origin), 1);
-    rb_define_method(cGraphics, "rendering_origin=", RUBY_METHOD_FUNC(gdip_graphics_set_rendering_origin), 1);
-    rb_define_method(cGraphics, "SmoothingMode", RUBY_METHOD_FUNC(gdip_graphics_get_smoothing_mode), 0);
-    rb_define_method(cGraphics, "smoothing_mode", RUBY_METHOD_FUNC(gdip_graphics_get_smoothing_mode), 0);
-    rb_define_method(cGraphics, "SmoothingMode=", RUBY_METHOD_FUNC(gdip_graphics_set_smoothing_mode), 1);
-    rb_define_method(cGraphics, "smoothing_mode=", RUBY_METHOD_FUNC(gdip_graphics_set_smoothing_mode), 1);
-    rb_define_method(cGraphics, "TextContrast", RUBY_METHOD_FUNC(gdip_graphics_get_text_contrast), 0);
-    rb_define_method(cGraphics, "text_contrast", RUBY_METHOD_FUNC(gdip_graphics_get_text_contrast), 0);
-    rb_define_method(cGraphics, "TextContrast=", RUBY_METHOD_FUNC(gdip_graphics_set_text_contrast), 1);
-    rb_define_method(cGraphics, "text_contrast=", RUBY_METHOD_FUNC(gdip_graphics_set_text_contrast), 1);
-    rb_define_method(cGraphics, "TextRenderingHint", RUBY_METHOD_FUNC(gdip_graphics_get_text_rendering_hint), 0);
-    rb_define_method(cGraphics, "text_rendering_hint", RUBY_METHOD_FUNC(gdip_graphics_get_text_rendering_hint), 0);
-    rb_define_method(cGraphics, "TextRenderingHint=", RUBY_METHOD_FUNC(gdip_graphics_set_text_rendering_hint), 1);
-    rb_define_method(cGraphics, "text_rendering_hint=", RUBY_METHOD_FUNC(gdip_graphics_set_text_rendering_hint), 1);
-    rb_define_method(cGraphics, "VisibleClipBounds", RUBY_METHOD_FUNC(gdip_graphics_get_visible_clip_bounds), 0);
-    rb_define_method(cGraphics, "visible_clip_bounds", RUBY_METHOD_FUNC(gdip_graphics_get_visible_clip_bounds), 0);
+    ATTR_R(cGraphics, ClipBounds, clip_bounds, graphics);
+    ATTR_RW(cGraphics, CompositingMode, compositing_mode, graphics);
+    ATTR_RW(cGraphics, CompositingQuality, compositing_quality, graphics);
+    ATTR_R(cGraphics, DpiX, dpi_x, graphics);
+    ATTR_R(cGraphics, DpiY, dpi_y, graphics);
+    ATTR_RW(cGraphics, InterpolationMode, interpolation_mode, graphics);
+    ATTR_R_Q(cGraphics, IsClipEmpty, is_clip_empty, graphics);
+    ATTR_R_Q(cGraphics, IsVisibleClipEmpty, is_visible_clip_empty, graphics);
+    ATTR_RW(cGraphics, PageScale, page_scale, graphics);
+    ATTR_RW(cGraphics, PageUnit, page_unit, graphics);
+    ATTR_RW(cGraphics, PixelOffsetMode, pixel_offset_mode, graphics);
+    ATTR_RW(cGraphics, RenderingOrigin, rendering_origin, graphics);
+    ATTR_RW(cGraphics, SmoothingMode, smoothing_mode, graphics);
+    ATTR_RW(cGraphics, TextContrast, text_contrast, graphics);
+    ATTR_RW(cGraphics, TextRenderingHint, text_rendering_hint, graphics);
+    ATTR_R(cGraphics, VisibleClipBounds, visible_clip_bounds, graphics);
     
-
     rb_define_method(cGraphics, "DrawRectangle", RUBY_METHOD_FUNC(gdip_graphics_draw_rectangle), -1);
-    rb_define_method(cGraphics, "draw_rectangle", RUBY_METHOD_FUNC(gdip_graphics_draw_rectangle), -1);
+    rb_define_alias(cGraphics, "draw_rectangle", "DrawRectangle");
     rb_define_method(cGraphics, "FillRectangle", RUBY_METHOD_FUNC(gdip_graphics_fill_rectangle), -1);
-    rb_define_method(cGraphics, "fill_rectangle", RUBY_METHOD_FUNC(gdip_graphics_fill_rectangle), -1);
+    rb_define_alias(cGraphics, "fill_rectangle", "FillRectangle");
     rb_define_method(cGraphics, "DrawLine", RUBY_METHOD_FUNC(gdip_graphics_draw_line), -1);
-    rb_define_method(cGraphics, "draw_line", RUBY_METHOD_FUNC(gdip_graphics_draw_line), -1);
+    rb_define_alias(cGraphics, "draw_line", "DrawLine");
     rb_define_method(cGraphics, "DrawLines", RUBY_METHOD_FUNC(gdip_graphics_draw_lines), 2);
-    rb_define_method(cGraphics, "draw_lines", RUBY_METHOD_FUNC(gdip_graphics_draw_lines), 2);
+    rb_define_alias(cGraphics, "draw_lines", "DrawLines");
     rb_define_method(cGraphics, "DrawEllipse", RUBY_METHOD_FUNC(gdip_graphics_draw_ellipse), -1);
-    rb_define_method(cGraphics, "draw_ellipse", RUBY_METHOD_FUNC(gdip_graphics_draw_ellipse), -1);
+    rb_define_alias(cGraphics, "draw_ellipse", "DrawEllipse");
     rb_define_method(cGraphics, "FillEllipse", RUBY_METHOD_FUNC(gdip_graphics_fill_ellipse), -1);
-    rb_define_method(cGraphics, "fill_ellipse", RUBY_METHOD_FUNC(gdip_graphics_fill_ellipse), -1);
+    rb_define_alias(cGraphics, "fill_ellipse", "FillEllipse");
     rb_define_method(cGraphics, "DrawCurve", RUBY_METHOD_FUNC(gdip_graphics_draw_curve), -1);
-    rb_define_method(cGraphics, "DrawCurve", RUBY_METHOD_FUNC(gdip_graphics_draw_curve), -1);
+    rb_define_alias(cGraphics, "draw_curve", "DrawCurve");
 }

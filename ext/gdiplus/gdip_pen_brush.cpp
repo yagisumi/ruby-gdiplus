@@ -13,10 +13,10 @@ const rb_data_type_t tPen = _MAKE_DATA_TYPE(
 /**
  *
  * @overload initialize(color, width=1.0)
- *   @param color [Color or Integer]
+ *   @param color [Gdiplus::Color or Integer]
  *   @param width [Integer or Float]
  * @overload initialize(brush, width=1.0)
- *   @param brush [Brush]
+ *   @param brush [Gdiplus::Brush]
  *   @param width [Integer or Float]
  *
  */
@@ -59,8 +59,8 @@ gdip_pen_init(int argc, VALUE *argv, VALUE self)
 }
 
 /**
- *
- *   @return [Float]
+ * Gets or sets the width of this pen.
+ * @return [Float]
  */
 static VALUE
 gdip_pen_get_width(VALUE self)
@@ -75,7 +75,7 @@ gdip_pen_get_width(VALUE self)
 
 /**
  *
- *   @param width [Float or Integer]
+ * @param width [Float or Integer]
  */
 static VALUE
 gdip_pen_set_width(VALUE self, VALUE width)
@@ -91,8 +91,8 @@ gdip_pen_set_width(VALUE self, VALUE width)
 }
 
 /**
- *
- *   @return [Float]
+ * Gets or sets a dash pattern offset.
+ * @return [Float]
  */
 static VALUE
 gdip_pen_get_dash_offset(VALUE self)
@@ -123,8 +123,8 @@ gdip_pen_set_dash_offset(VALUE self, VALUE offset)
 }
 
 /**
- *
- *   @return [Float]
+ * Gets or Sets a miter limit.
+ * @return [Float]
  */
 static VALUE
 gdip_pen_get_miter_limit(VALUE self)
@@ -155,9 +155,8 @@ gdip_pen_set_miter_limit(VALUE self, VALUE limit)
 }
 
 /**
- *
- * @return [Color]
- * 
+ * Gets or sets the color of this pen.
+ * @return [Gdiplus::Color]
  */
 static VALUE
 gdip_pen_get_color(VALUE self)
@@ -185,8 +184,8 @@ gdip_pen_set_color(VALUE self, VALUE color)
  }
 
 /**
- *
- *   @return [PenType]
+ * Gets the type of this pen.
+ * @return [Gdiplus::PenType]
  */
 static VALUE
 gdip_pen_get_pen_type(VALUE self)
@@ -197,9 +196,9 @@ gdip_pen_get_pen_type(VALUE self)
 }
 
 /**
- *
+ * Gets or sets a compound array.
  * @return [Array<Float>]
- * 
+ * @note Do not use this with a Inset alignment. 
  */
 static VALUE
 gdip_pen_get_compound_array(VALUE self)
@@ -289,9 +288,8 @@ gdip_pen_set_compound_array(VALUE self, VALUE ary)
 }
 
 /**
- *
+ * Gets or sets a dash pattern.
  * @return [Array<Float>]
- * 
  */
 static VALUE
 gdip_pen_get_dash_pattern(VALUE self)
@@ -322,7 +320,6 @@ gdip_pen_get_dash_pattern(VALUE self)
 /**
  *
  * @param ary [Array<Float>]
- * 
  */
 static VALUE
 gdip_pen_set_dash_pattern(VALUE self, VALUE ary)
@@ -372,9 +369,8 @@ gdip_pen_set_dash_pattern(VALUE self, VALUE ary)
 }
 
 /**
- *
- *   @return [PenAlignment]
- *
+ * Gets or sets the alignment of this pen.
+ * @return [Gdiplus::PenAlignment]
  */
 static VALUE
 gdip_pen_get_alignment(VALUE self)
@@ -386,8 +382,7 @@ gdip_pen_get_alignment(VALUE self)
 
 /**
  *
- *   @param align [PenAlignment]
- *
+ * @param align [PenAlignment]
  */
 static VALUE
 gdip_pen_set_alignment(VALUE self, VALUE align)
@@ -400,16 +395,15 @@ gdip_pen_set_alignment(VALUE self, VALUE align)
         _WARNING("Do not use PenAlignment.Inset with CompoundArray");
     }
     else {
-        pen->SetAlignment(pa);
-        Check_LastStatus(pen);
+        Status status = pen->SetAlignment(pa);
+        Check_Status(status);
     }
     return self;
 }
 
 /**
- *
- *   @return [DashCap]
- *
+ * Gets or sets a DashCap.
+ * @return [Gdiplus::DashCap]
  */
 static VALUE
 gdip_pen_get_dash_cap(VALUE self)
@@ -422,7 +416,6 @@ gdip_pen_get_dash_cap(VALUE self)
 /**
  *
  *   @param cap [DashCap]
- *
  */
 static VALUE
 gdip_pen_set_dash_cap(VALUE self, VALUE cap)
@@ -437,9 +430,8 @@ gdip_pen_set_dash_cap(VALUE self, VALUE cap)
 }
 
 /**
- *
- *   @return [DashStyle]
- *
+ * Gets or sets a DashStyel.
+ * @return [Gdiplus::DashStyle]
  */
 static VALUE
 gdip_pen_get_dash_style(VALUE self)
@@ -467,9 +459,8 @@ gdip_pen_set_dash_style(VALUE self, VALUE style)
 }
 
 /**
- *
- *   @return [LineCap]
- *
+ * Gets or sets a LineCap.
+ * @return [Gdiplus::LineCap]
  */
 static VALUE
 gdip_pen_get_end_cap(VALUE self)
@@ -480,9 +471,8 @@ gdip_pen_get_end_cap(VALUE self)
 }
 
 /**
- *
- *   @param cap [LineCap]
- *
+ * Gets or sets a LineCap.
+ * @param cap [Gdiplus::LineCap]
  */
 static VALUE
 gdip_pen_set_end_cap(VALUE self, VALUE cap)
@@ -497,9 +487,8 @@ gdip_pen_set_end_cap(VALUE self, VALUE cap)
 }
 
 /**
- *
- *   @return [LineJoin]
- *
+ * Gets or sets a LineJoin.
+ * @return [Gdiplus::LineJoin]
  */
 static VALUE
 gdip_pen_get_line_join(VALUE self)
@@ -527,9 +516,8 @@ gdip_pen_set_line_join(VALUE self, VALUE join)
 }
 
 /**
- *
- *   @return [LineCap]
- *
+ * Gets or sets a LineCap.
+ * @return [Gdiplus::LineCap]
  */
 static VALUE
 gdip_pen_get_start_cap(VALUE self)
@@ -566,8 +554,8 @@ const rb_data_type_t tBrush = _MAKE_DATA_TYPE(
     "Brush", 0, GDIP_OBJ_FREE(Brush *), NULL, NULL, &cBrush);
 
 /**
- *
- *   @return [PenType]
+ * Gets the tyep of this brush.
+ * @return [Gdiplus::BrushType]
  */
 static VALUE
 gdip_brush_get_brush_type(VALUE self)
@@ -579,9 +567,14 @@ gdip_brush_get_brush_type(VALUE self)
 
 /**
  *
- * @overload initialize(color)
- *   @param color [Color or Integer]
- * 
+ * @param color [Gdiplus::Color, Integer]
+ * @example
+ *   include Gdiplus
+ *   color = Color.new(255, 127, 63)
+ *   brush = SolidBrush.new(color)
+ *   brush = SolidBrush.new(0xFF006699)
+ *   brush = SolidBrush.new(Color.Red)
+ *   brush = SolidBrush.new(:Green)
  */
 static VALUE
 gdip_solidbrush_init(VALUE self, VALUE color)
@@ -598,9 +591,8 @@ gdip_solidbrush_init(VALUE self, VALUE color)
 }
 
 /**
- *
- * @return [Color]
- * 
+ * Gets or sets the color of this brush.
+ * @return [Gdiplus::Color]
  */
  static VALUE
 gdip_solidbrush_get_color(VALUE self)
@@ -628,7 +620,34 @@ gdip_solidbrush_set_color(VALUE self, VALUE color)
     return self;
 }
 
-
+/**
+ * Document-class: Gdiplus::Pen
+ * Pen.
+ * @example
+ *   include Gdiplus
+ *   bitmap = Bitmap.new(300, 300)
+ *   bitmap.draw {|g|
+ *     pen = Pen.new(0x99ff3333, 10)
+ *     pen.StartCap = :ArrowAnchor
+ *     pen.EndCap = :ArrowAnchor
+ *     g.DrawLine(pen, 30, 30, 270, 30)
+ *     pen.color = :Green
+ *     pen.LineJoin = LineJoin.Round
+ *     pen.width = 3
+ *     g.DrawRectangle(pen, 100, 100, 100, 100)
+ *   }
+ */
+/**
+ * Document-class: Gdiplus::SolidBrush
+ * SolidBrush
+ * @example
+ *   include Gdiplus
+ *   bitmap = Bitmap.new(300, 300)
+ *   bitmap.draw {|g|
+ *     brush = SolidBrush.new(Color.Blue)
+ *     g.FillRectangle(brush, 100, 100, 100, 100)
+ *   }
+ */
 void
 Init_pen_brush()
 {
@@ -636,72 +655,29 @@ Init_pen_brush()
     rb_define_alloc_func(cPen, &typeddata_alloc_null<&tPen>);
     rb_define_method(cPen, "initialize", RUBY_METHOD_FUNC(gdip_pen_init), -1);
     rb_define_method(cPen, "gdiplus_id", RUBY_METHOD_FUNC(gdip_obj_id), 0);
-    rb_define_method(cPen, "width", RUBY_METHOD_FUNC(gdip_pen_get_width), 0);
-    rb_define_method(cPen, "width=", RUBY_METHOD_FUNC(gdip_pen_set_width), 1);
-    rb_define_method(cPen, "Width", RUBY_METHOD_FUNC(gdip_pen_get_width), 0);
-    rb_define_method(cPen, "Width=", RUBY_METHOD_FUNC(gdip_pen_set_width), 1);
-    rb_define_method(cPen, "color", RUBY_METHOD_FUNC(gdip_pen_get_color), 0);
-    rb_define_method(cPen, "color=", RUBY_METHOD_FUNC(gdip_pen_set_color), 1);
-    rb_define_method(cPen, "Color", RUBY_METHOD_FUNC(gdip_pen_get_color), 0);
-    rb_define_method(cPen, "Color=", RUBY_METHOD_FUNC(gdip_pen_set_color), 1);
-    rb_define_method(cPen, "PenType", RUBY_METHOD_FUNC(gdip_pen_get_pen_type), 0);
-    rb_define_method(cPen, "pen_type", RUBY_METHOD_FUNC(gdip_pen_get_pen_type), 0);
-    rb_define_method(cPen, "compound_array", RUBY_METHOD_FUNC(gdip_pen_get_compound_array), 0);
-    rb_define_method(cPen, "compound_array=", RUBY_METHOD_FUNC(gdip_pen_set_compound_array), 1);
-    rb_define_method(cPen, "CompoundArray", RUBY_METHOD_FUNC(gdip_pen_get_compound_array), 0);
-    rb_define_method(cPen, "CompoundArray=", RUBY_METHOD_FUNC(gdip_pen_set_compound_array), 1);
-    rb_define_method(cPen, "dash_pattern", RUBY_METHOD_FUNC(gdip_pen_get_dash_pattern), 0);
-    rb_define_method(cPen, "dash_pattern=", RUBY_METHOD_FUNC(gdip_pen_set_dash_pattern), 1);
-    rb_define_method(cPen, "DashPattern", RUBY_METHOD_FUNC(gdip_pen_get_dash_pattern), 0);
-    rb_define_method(cPen, "DashPattern=", RUBY_METHOD_FUNC(gdip_pen_set_dash_pattern), 1);
-    rb_define_method(cPen, "dash_offset", RUBY_METHOD_FUNC(gdip_pen_get_dash_offset), 0);
-    rb_define_method(cPen, "dash_offset=", RUBY_METHOD_FUNC(gdip_pen_set_dash_offset), 1);
-    rb_define_method(cPen, "DashOffset", RUBY_METHOD_FUNC(gdip_pen_get_dash_offset), 0);
-    rb_define_method(cPen, "DashOffset=", RUBY_METHOD_FUNC(gdip_pen_set_dash_offset), 1);
-    rb_define_method(cPen, "miter_limit", RUBY_METHOD_FUNC(gdip_pen_get_miter_limit), 0);
-    rb_define_method(cPen, "miter_limit=", RUBY_METHOD_FUNC(gdip_pen_set_miter_limit), 1);
-    rb_define_method(cPen, "MiterLimit", RUBY_METHOD_FUNC(gdip_pen_get_miter_limit), 0);
-    rb_define_method(cPen, "MiterLimit=", RUBY_METHOD_FUNC(gdip_pen_set_miter_limit), 1);
-
-    rb_define_method(cPen, "Alignment", RUBY_METHOD_FUNC(gdip_pen_get_alignment), 0);
-    rb_define_method(cPen, "alignment", RUBY_METHOD_FUNC(gdip_pen_get_alignment), 0);
-    rb_define_method(cPen, "Alignment=", RUBY_METHOD_FUNC(gdip_pen_set_alignment), 1);
-    rb_define_method(cPen, "alignment=", RUBY_METHOD_FUNC(gdip_pen_set_alignment), 1);
-    rb_define_method(cPen, "DashCap", RUBY_METHOD_FUNC(gdip_pen_get_dash_cap), 0);
-    rb_define_method(cPen, "dash_cap", RUBY_METHOD_FUNC(gdip_pen_get_dash_cap), 0);
-    rb_define_method(cPen, "DashCap=", RUBY_METHOD_FUNC(gdip_pen_set_dash_cap), 1);
-    rb_define_method(cPen, "dash_cap=", RUBY_METHOD_FUNC(gdip_pen_set_dash_cap), 1);
-    rb_define_method(cPen, "DashStyle", RUBY_METHOD_FUNC(gdip_pen_get_dash_style), 0);
-    rb_define_method(cPen, "dash_style", RUBY_METHOD_FUNC(gdip_pen_get_dash_style), 0);
-    rb_define_method(cPen, "DashStyle=", RUBY_METHOD_FUNC(gdip_pen_set_dash_style), 1);
-    rb_define_method(cPen, "dash_style=", RUBY_METHOD_FUNC(gdip_pen_set_dash_style), 1);
-    rb_define_method(cPen, "EndCap", RUBY_METHOD_FUNC(gdip_pen_get_end_cap), 0);
-    rb_define_method(cPen, "end_cap", RUBY_METHOD_FUNC(gdip_pen_get_end_cap), 0);
-    rb_define_method(cPen, "EndCap=", RUBY_METHOD_FUNC(gdip_pen_set_end_cap), 1);
-    rb_define_method(cPen, "end_cap=", RUBY_METHOD_FUNC(gdip_pen_set_end_cap), 1);
-    rb_define_method(cPen, "LineJoin", RUBY_METHOD_FUNC(gdip_pen_get_line_join), 0);
-    rb_define_method(cPen, "line_join", RUBY_METHOD_FUNC(gdip_pen_get_line_join), 0);
-    rb_define_method(cPen, "LineJoin=", RUBY_METHOD_FUNC(gdip_pen_set_line_join), 1);
-    rb_define_method(cPen, "line_join=", RUBY_METHOD_FUNC(gdip_pen_set_line_join), 1);
-    rb_define_method(cPen, "StartCap", RUBY_METHOD_FUNC(gdip_pen_get_start_cap), 0);
-    rb_define_method(cPen, "start_cap", RUBY_METHOD_FUNC(gdip_pen_get_start_cap), 0);
-    rb_define_method(cPen, "StartCap=", RUBY_METHOD_FUNC(gdip_pen_set_start_cap), 1);
-    rb_define_method(cPen, "start_cap=", RUBY_METHOD_FUNC(gdip_pen_set_start_cap), 1);
+    ATTR_RW(cPen, Width, width, pen);
+    ATTR_RW(cPen, Color, color, pen);
+    ATTR_R(cPen, PenType, pen_type, pen);
+    ATTR_RW(cPen, CompoundArray, compound_array, pen);
+    ATTR_RW(cPen, DashPattern, dash_pattern, pen);
+    ATTR_RW(cPen, DashOffset, dash_offset, pen);
+    ATTR_RW(cPen, MiterLimit, miter_limit, pen);
+    ATTR_RW(cPen, Alignment, alignment, pen);
+    ATTR_RW(cPen, DashCap, dash_cap, pen);
+    ATTR_RW(cPen, DashStyle, dash_style, pen);
+    ATTR_RW(cPen, EndCap, end_cap, pen);
+    ATTR_RW(cPen, LineJoin, line_join, pen);
+    ATTR_RW(cPen, StartCap, start_cap, pen);
 
     cBrush = rb_define_class_under(mGdiplus, "Brush", rb_cObject);
     rb_undef_alloc_func(cBrush);
-    rb_define_method(cBrush, "BrushType", RUBY_METHOD_FUNC(gdip_brush_get_brush_type), 0);
-    rb_define_method(cBrush, "brush_type", RUBY_METHOD_FUNC(gdip_brush_get_brush_type), 0);
-    
+    ATTR_R(cBrush, BrushType, brush_type, brush);
 
     cSolidBrush = rb_define_class_under(mGdiplus, "SolidBrush", cBrush);
     rb_define_alloc_func(cSolidBrush, &typeddata_alloc_null<&tBrush>);
     rb_define_method(cSolidBrush, "initialize", RUBY_METHOD_FUNC(gdip_solidbrush_init), 1);
     rb_define_method(cSolidBrush, "gdiplus_id", RUBY_METHOD_FUNC(gdip_obj_id), 0);
-    rb_define_method(cSolidBrush, "color", RUBY_METHOD_FUNC(gdip_solidbrush_get_color), 0);
-    rb_define_method(cSolidBrush, "color=", RUBY_METHOD_FUNC(gdip_solidbrush_set_color), 1);
-    rb_define_method(cSolidBrush, "Color", RUBY_METHOD_FUNC(gdip_solidbrush_get_color), 0);
-    rb_define_method(cSolidBrush, "Color=", RUBY_METHOD_FUNC(gdip_solidbrush_set_color), 1);
+    ATTR_RW(cSolidBrush, Color, color, solidbrush);
 }
 
 // ToDo: Pen#Transform

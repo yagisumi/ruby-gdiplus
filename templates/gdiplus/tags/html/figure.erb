@@ -1,0 +1,10 @@
+<p class="tag_title"><%= (defined?(@label) && @label) ? @label : YARD::Tags::Library.labels[@name] %>:</p>
+<div class="figures">
+  <% object.tags("figure").each do |tag| %>
+    <div class="figure">
+      <% if tag.text && !tag.text.empty? %>
+        <img class="figure" src="<%= h(@img_dir + tag.text) %>">
+      <% end %>
+    </div>
+  <% end %>
+</div>

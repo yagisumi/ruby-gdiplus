@@ -34,6 +34,13 @@ gdip_point_create(int x, int y)
     return r;
 }
 
+/**
+ *
+ * @overload initialize()
+ * @overload initialize(x, y)
+ *   @param x [Integer]
+ *   @param y [Integer]
+ */
 static VALUE
 gdip_point_init(int argc, VALUE *argv, VALUE self)
 {
@@ -52,6 +59,9 @@ gdip_point_init(int argc, VALUE *argv, VALUE self)
     return self;
 }
 
+/**
+ * @return [String]
+ */
 static VALUE
 gdip_point_inspect(VALUE self)
 {
@@ -60,6 +70,10 @@ gdip_point_inspect(VALUE self)
     return r;
 }
 
+/**
+ * Gets or sets the x-coordinate of this point.
+ * @return [Integer]
+ */
 static VALUE
 gdip_point_get_x(VALUE self)
 {
@@ -80,6 +94,10 @@ gdip_point_set_x(VALUE self, VALUE num)
     return self;
 }
 
+/**
+ * Gets or sets the y-coordinate of this point.
+ * @return [Integer]
+ */
 static VALUE
 gdip_point_get_y(VALUE self)
 {
@@ -100,6 +118,12 @@ gdip_point_set_y(VALUE self, VALUE num)
     return self;
 }
 
+
+/**
+ * Compares two points.
+ * @param other [Point]
+ * @return [Boolean]
+ */
 static VALUE
 gdip_point_equal(VALUE self, VALUE other)
 {
@@ -112,6 +136,12 @@ gdip_point_equal(VALUE self, VALUE other)
     }
 }
 
+
+/**
+ * Adds another point to this point.
+ * @param other [Point]
+ * @return [Point]
+ */
 static VALUE
 gdip_point_add(VALUE self, VALUE other)
 {
@@ -130,6 +160,11 @@ gdip_point_add(VALUE self, VALUE other)
     }
 }
 
+/**
+ * Subtracts another point from this point.
+ * @param other [Point]
+ * @return [Point]
+ */
 static VALUE
 gdip_point_sub(VALUE self, VALUE other)
 {
@@ -158,6 +193,13 @@ gdip_pointf_create(float x, float y)
     return r;
 }
 
+/**
+ *
+ * @overload initialize()
+ * @overload initialize(x, y)
+ *   @param x [Float]
+ *   @param y [Float]
+ */
 static VALUE
 gdip_pointf_init(int argc, VALUE *argv, VALUE self)
 {
@@ -179,6 +221,9 @@ gdip_pointf_init(int argc, VALUE *argv, VALUE self)
     return self;
 }
 
+/**
+ * @return [String]
+ */
 static VALUE
 gdip_pointf_inspect(VALUE self)
 {
@@ -187,6 +232,10 @@ gdip_pointf_inspect(VALUE self)
     return r;
 }
 
+/**
+ * Gets or sets the x-coordinate of this point.
+ * @return [Float]
+ */
 static VALUE
 gdip_pointf_get_x(VALUE self)
 {
@@ -207,6 +256,10 @@ gdip_pointf_set_x(VALUE self, VALUE num)
     return self;
 }
 
+/**
+ * Gets or sets the y-coordinate of this point.
+ * @return [Float]
+ */
 static VALUE
 gdip_pointf_get_y(VALUE self)
 {
@@ -227,6 +280,11 @@ gdip_pointf_set_y(VALUE self, VALUE num)
     return self;
 }
 
+/**
+ * Compares two points.
+ * @param other [PointF]
+ * @return [Boolean]
+ */
 static VALUE
 gdip_pointf_equal(VALUE self, VALUE other)
 {
@@ -239,6 +297,11 @@ gdip_pointf_equal(VALUE self, VALUE other)
     }
 }
 
+/**
+ * Adds another point to this point.
+ * @param other [PointF]
+ * @return [PointF]
+ */
 static VALUE
 gdip_pointf_add(VALUE self, VALUE other)
 {
@@ -257,6 +320,11 @@ gdip_pointf_add(VALUE self, VALUE other)
     }
 }
 
+/**
+ * Subtracts another point from this point.
+ * @param other [PointF]
+ * @return [PointF]
+ */
 static VALUE
 gdip_pointf_sub(VALUE self, VALUE other)
 {
@@ -285,6 +353,13 @@ gdip_size_create(int width, int height)
     return r;
 }
 
+/**
+ *
+ * @overload initialize()
+ * @overload initialize(width, height)
+ *   @param width [Integer]
+ *   @param height [Integer]
+ */
 static VALUE
 gdip_size_init(int argc, VALUE *argv, VALUE self)
 {
@@ -304,7 +379,11 @@ gdip_size_init(int argc, VALUE *argv, VALUE self)
     return self;
 }
 
-
+/**
+ *
+ * @return [String]
+ * 
+ */
 static VALUE
 gdip_size_inspect(VALUE self)
 {
@@ -313,7 +392,10 @@ gdip_size_inspect(VALUE self)
     return r;
 }
 
-
+/**
+ * Gets or sets the width of this size.
+ * @return [Integer]
+ */
 static VALUE
 gdip_size_get_width(VALUE self)
 {
@@ -334,6 +416,10 @@ gdip_size_set_width(VALUE self, VALUE num)
     return self;
 }
 
+/**
+ * Gets or sets the height of this size.
+ * @return [Integer]
+ */
 static VALUE
 gdip_size_get_height(VALUE self)
 {
@@ -354,6 +440,12 @@ gdip_size_set_height(VALUE self, VALUE num)
     return self;
 }
 
+
+/**
+ * Compare two sizes.
+ * @param other [Size]
+ * @return [Boolean]
+ */
 static VALUE
 gdip_size_equal(VALUE self, VALUE other)
 {
@@ -366,6 +458,11 @@ gdip_size_equal(VALUE self, VALUE other)
     }
 }
 
+/**
+ * Adds another size to this size.
+ * @param other [Size]
+ * @return [Size]
+ */
 static VALUE
 gdip_size_add(VALUE self, VALUE other)
 {
@@ -384,6 +481,11 @@ gdip_size_add(VALUE self, VALUE other)
     }
 }
 
+/**
+ * Subtracts another size from this size.
+ * @param other [Size]
+ * @return [Size]
+ */
 static VALUE
 gdip_size_sub(VALUE self, VALUE other)
 {
@@ -413,6 +515,13 @@ gdip_sizef_create(float width, float height)
     return r;
 }
 
+/**
+ *
+ * @overload initialize()
+ * @overload initialize(width, height)
+ *   @param width [Float]
+ *   @param height [Float]
+ */
 static VALUE
 gdip_sizef_init(int argc, VALUE *argv, VALUE self)
 {
@@ -435,6 +544,12 @@ gdip_sizef_init(int argc, VALUE *argv, VALUE self)
     return self;
 }
 
+
+/**
+ *
+ * @return [String]
+ * 
+ */
 static VALUE
 gdip_sizef_inspect(VALUE self)
 {
@@ -443,6 +558,10 @@ gdip_sizef_inspect(VALUE self)
     return r;
 }
 
+/**
+ * Gets or sets the width of this size.
+ * @return [Float]
+ */
 static VALUE
 gdip_sizef_get_width(VALUE self)
 {
@@ -463,6 +582,10 @@ gdip_sizef_set_width(VALUE self, VALUE num)
     return self;
 }
 
+/**
+ * Gets or sets the height of this size.
+ * @return [Float]
+ */
 static VALUE
 gdip_sizef_get_height(VALUE self)
 {
@@ -483,6 +606,11 @@ gdip_sizef_set_height(VALUE self, VALUE num)
     return self;
 }
 
+/**
+ * Compare two sizes.
+ * @param other [SizeF]
+ * @return [Boolean]
+ */
 static VALUE
 gdip_sizef_equal(VALUE self, VALUE other)
 {
@@ -495,6 +623,11 @@ gdip_sizef_equal(VALUE self, VALUE other)
     }
 }
 
+/**
+ * Adds another size to this size.
+ * @param other [SizeF]
+ * @return [SizeF]
+ */
 static VALUE
 gdip_sizef_add(VALUE self, VALUE other)
 {
@@ -513,6 +646,11 @@ gdip_sizef_add(VALUE self, VALUE other)
     }
 }
 
+/**
+ * Subtracts another size from this size.
+ * @param other [SizeF]
+ * @return [SizeF]
+ */
 static VALUE
 gdip_sizef_sub(VALUE self, VALUE other)
 {
@@ -557,6 +695,15 @@ gdip_rect_create(Rect *rect)
     return r;
 }
 
+/**
+ *
+ * @overload initialize()
+ * @overload initialize(x, y, width, height)
+ *   @param x [Integer]
+ *   @param y [Integer]
+ *   @param width [Integer]
+ *   @param height [Integer]
+ */
 static VALUE
 gdip_rect_init(int argc, VALUE *argv, VALUE self)
 {
@@ -577,6 +724,15 @@ gdip_rect_init(int argc, VALUE *argv, VALUE self)
     return self;
 }
 
+/**
+ * Creates a new rectangle.
+ * FromLTRB(left, top, right, bottom)
+ * @param left [Integer]
+ * @param top [Integer]
+ * @param right [Integer]
+ * @param bottom [Integer]
+ * @return [Gdiplus::Rectangle]
+ */
 static VALUE
 gdip_rect_s_from_ltrb(VALUE self, VALUE left, VALUE top, VALUE right, VALUE bottom)
 {
@@ -586,6 +742,9 @@ gdip_rect_s_from_ltrb(VALUE self, VALUE left, VALUE top, VALUE right, VALUE bott
     return gdip_rect_create(RB_NUM2INT(left), RB_NUM2INT(top), RB_NUM2INT(right) - RB_NUM2INT(left), RB_NUM2INT(bottom) - RB_NUM2INT(top));
 }
 
+/**
+ * @return [String]
+ */
 static VALUE
 gdip_rect_inspect(VALUE self)
 {
@@ -594,6 +753,10 @@ gdip_rect_inspect(VALUE self)
     return r;
 }
 
+/**
+ * Gets or sets the x coordinate of the upper-left corner of this rectangle.
+ * @return [Integer]
+ */
 static VALUE
 gdip_rect_get_x(VALUE self)
 {
@@ -614,6 +777,10 @@ gdip_rect_set_x(VALUE self, VALUE num)
     return self;
 }
 
+/**
+ * Gets or sets the y coordinate of the upper-left corner of this rectangle.
+ * @return [Integer]
+ */
 static VALUE
 gdip_rect_get_y(VALUE self)
 {
@@ -634,6 +801,10 @@ gdip_rect_set_y(VALUE self, VALUE num)
     return self;
 }
 
+/**
+ * Gets or sets the width of this rectangle.
+ * @return [Integer]
+ */
 static VALUE
 gdip_rect_get_width(VALUE self)
 {
@@ -654,6 +825,10 @@ gdip_rect_set_width(VALUE self, VALUE num)
     return self;
 }
 
+/**
+ * Gets or sets the height of this rectangle.
+ * @return [Integer]
+ */
 static VALUE
 gdip_rect_get_height(VALUE self)
 {
@@ -675,6 +850,10 @@ gdip_rect_set_height(VALUE self, VALUE num)
     return self;
 }
 
+/**
+ * Gets the x coordinate of the right edge of this rectangle.
+ * @return [Integer]
+ */
 static VALUE
 gdip_rect_get_right(VALUE self)
 {
@@ -682,6 +861,10 @@ gdip_rect_get_right(VALUE self)
     return RB_INT2NUM(rect->X + rect->Width);
 }
 
+/**
+ * Gets the y coordinate of the bottom edge of this rectangle.
+ * @return [Integer]
+ */
 static VALUE
 gdip_rect_get_bottom(VALUE self)
 {
@@ -689,6 +872,10 @@ gdip_rect_get_bottom(VALUE self)
     return RB_INT2NUM(rect->Y + rect->Height);
 }
 
+/**
+ * Gets or sets the point of the upper left corner of this rectangle.
+ * @return [Gdiplus::Point]
+ */
 static VALUE
 gdip_rect_get_location(VALUE self)
 {
@@ -711,7 +898,10 @@ gdip_rect_set_location(VALUE self, VALUE loc)
     return self;
 }
 
-
+/**
+ * Gets or sets the size of this rectangle.
+ * @return [Gdiplus::Size]
+ */
 static VALUE
 gdip_rect_get_size(VALUE self)
 {
@@ -734,6 +924,10 @@ gdip_rect_set_size(VALUE self, VALUE size)
     return self;
 }
 
+/**
+ * Compares this and other rectangles.
+ * @return [Boolean]
+ */
 static VALUE
 gdip_rect_equal(VALUE self, VALUE other)
 {
@@ -747,6 +941,15 @@ gdip_rect_equal(VALUE self, VALUE other)
     }
 }
 
+/**
+ * Whether a point or rectangle is within this rectangle.
+ * @return [Boolean]
+ * @overload Contains(obj)
+ *   @param obj [Gdiplus::Point, Gdiplus::Rectangle]
+ * @overload Contains(x, y)
+ *   @param x [Integer]
+ *   @param y [Integer]
+ */
 static VALUE
 gdip_rect_contains(int argc, VALUE *argv, VALUE self)
 {
@@ -778,6 +981,16 @@ gdip_rect_contains(int argc, VALUE *argv, VALUE self)
     return Qfalse;
 }
 
+/**
+ * Enlarges this rectangle.
+ * @return [self]
+ * @see #inflate
+ * @overload Inflate(size)
+ *   @param size [Gdiplus::Size]
+ * @overload Inflate(width, height)
+ *   @param width [Integer]
+ *   @param height [Integer]
+ */
 static VALUE
 gdip_rect_inflate_bang(int argc, VALUE *argv, VALUE self)
 {
@@ -810,6 +1023,15 @@ gdip_rect_inflate_bang(int argc, VALUE *argv, VALUE self)
 }
 
 
+/**
+ * Returns a rectangle enlarged from this rectangle.
+ * @return [Gdiplus::Rectangle]
+ * @overload inflate(size)
+ *   @param size [Gdiplus::Size]
+ * @overload inflate(width, height)
+ *   @param width [Integer]
+ *   @param height [Integer]
+ */
 static VALUE
 gdip_rect_inflate(int argc, VALUE *argv, VALUE self)
 {
@@ -850,6 +1072,11 @@ gdip_rect_inflate(int argc, VALUE *argv, VALUE self)
     return Qnil;
 }
 
+/**
+ * Whether another rectangle intersects this rectangle.
+ * @param other [Gdiplus::Rectangle]
+ * @return [Boolean]
+ */
 static VALUE
 gdip_rect_intersects_with(VALUE self, VALUE other)
 {
@@ -864,6 +1091,11 @@ gdip_rect_intersects_with(VALUE self, VALUE other)
     }
 }
 
+/**
+ * Replaces this rectangle with the intersection of this and another rectangles.
+ * @param other [Gdiplus::Rectangle]
+ * @return [self]
+ */
 static VALUE
 gdip_rect_intersect_bang(VALUE self, VALUE other)
 {
@@ -878,6 +1110,11 @@ gdip_rect_intersect_bang(VALUE self, VALUE other)
     return self;
 }
 
+/**
+ * Returns a rectangle that is the intersection of this and another rectangles.
+ * @param other [Gdiplus::Rectangle]
+ * @return [Gdiplus::Rectangle]
+ */
 static VALUE
 gdip_rect_intersect(VALUE self, VALUE other)
 {
@@ -895,6 +1132,11 @@ gdip_rect_intersect(VALUE self, VALUE other)
     }
 }
 
+/**
+ * Returns a rectangle that contains the union of this and another rectangles.
+ * @param other [Gdiplus::Rectangle]
+ * @return [Gdiplus::Rectangle]
+ */
 static VALUE
 gdip_rect_union(VALUE self, VALUE other)
 {
@@ -939,6 +1181,15 @@ gdip_rectf_create(RectF *rect)
     return r;
 }
 
+/**
+ *
+ * @overload initialize()
+ * @overload initialize(x, y, width, height)
+ *   @param x [Float]
+ *   @param y [Float]
+ *   @param width [Float]
+ *   @param height [Float]
+ */
 static VALUE
 gdip_rectf_init(int argc, VALUE *argv, VALUE self)
 {
@@ -959,6 +1210,15 @@ gdip_rectf_init(int argc, VALUE *argv, VALUE self)
     return self;
 }
 
+/**
+ * Creates a new rectangle.
+ * FromLTRB(left, top, right, bottom)
+ * @param left [Float]
+ * @param top [Float]
+ * @param right [Float]
+ * @param bottom [Float]
+ * @return [Gdiplus::RectangleF]
+ */
 static VALUE
 gdip_rectf_s_from_ltrb(VALUE self, VALUE left, VALUE top, VALUE right, VALUE bottom)
 {
@@ -968,6 +1228,9 @@ gdip_rectf_s_from_ltrb(VALUE self, VALUE left, VALUE top, VALUE right, VALUE bot
     return gdip_rectf_create(NUM2SINGLE(left), NUM2SINGLE(top), NUM2SINGLE(right) - NUM2SINGLE(left), NUM2SINGLE(bottom) - NUM2SINGLE(top));
 }
 
+/**
+ * @return [String]
+ */
 static VALUE
 gdip_rectf_inspect(VALUE self)
 {
@@ -976,6 +1239,10 @@ gdip_rectf_inspect(VALUE self)
     return r;
 }
 
+/**
+ * Gets or sets the x coordinate of the upper-left corner of this rectangle.
+ * @return [Float]
+ */
 static VALUE
 gdip_rectf_get_x(VALUE self)
 {
@@ -996,6 +1263,10 @@ gdip_rectf_set_x(VALUE self, VALUE num)
     return self;
 }
 
+/**
+ * Gets or sets the y coordinate of the upper-left corner of this rectangle.
+ * @return [Float]
+ */
 static VALUE
 gdip_rectf_get_y(VALUE self)
 {
@@ -1016,6 +1287,10 @@ gdip_rectf_set_y(VALUE self, VALUE num)
     return self;
 }
 
+/**
+ * Gets or sets the width of this rectangle.
+ * @return [Float]
+ */
 static VALUE
 gdip_rectf_get_width(VALUE self)
 {
@@ -1036,6 +1311,10 @@ gdip_rectf_set_width(VALUE self, VALUE num)
     return self;
 }
 
+/**
+ * Gets or sets the height of this rectangle.
+ * @return [Integer]
+ */
 static VALUE
 gdip_rectf_get_height(VALUE self)
 {
@@ -1057,6 +1336,10 @@ gdip_rectf_set_height(VALUE self, VALUE num)
     return self;
 }
 
+/**
+ * Gets the x coordinate of the right edge of this rectangle.
+ * @return [Float]
+ */
 static VALUE
 gdip_rectf_get_right(VALUE self)
 {
@@ -1064,6 +1347,10 @@ gdip_rectf_get_right(VALUE self)
     return SINGLE2NUM(rect->X + rect->Width);
 }
 
+/**
+ * Gets the y coordinate of the bottom edge of this rectangle.
+ * @return [Float]
+ */
 static VALUE
 gdip_rectf_get_bottom(VALUE self)
 {
@@ -1071,6 +1358,10 @@ gdip_rectf_get_bottom(VALUE self)
     return SINGLE2NUM(rect->Y + rect->Height);
 }
 
+/**
+ * Gets or sets the point of the upper left corner of this rectangle.
+ * @return [Gdiplus::PointF]
+ */
 static VALUE
 gdip_rectf_get_location(VALUE self)
 {
@@ -1093,7 +1384,10 @@ gdip_rectf_set_location(VALUE self, VALUE loc)
     return self;
 }
 
-
+/**
+ * Gets or sets the size of this rectangle.
+ * @return [Gdiplus::SizeF]
+ */
 static VALUE
 gdip_rectf_get_size(VALUE self)
 {
@@ -1116,6 +1410,10 @@ gdip_rectf_set_size(VALUE self, VALUE size)
     return self;
 }
 
+/**
+ * Compares this and other rectangles.
+ * @return [Boolean]
+ */
 static VALUE
 gdip_rectf_equal(VALUE self, VALUE other)
 {
@@ -1129,6 +1427,15 @@ gdip_rectf_equal(VALUE self, VALUE other)
     }
 }
 
+/**
+ * Whether a point or rectangle is within this rectangle.
+ * @return [Boolean]
+ * @overload Contains(obj)
+ *   @param obj [Gdiplus::PointF, Gdiplus::RectangleF]
+ * @overload Contains(x, y)
+ *   @param x [Float]
+ *   @param y [Float]
+ */
 static VALUE
 gdip_rectf_contains(int argc, VALUE *argv, VALUE self)
 {
@@ -1160,6 +1467,16 @@ gdip_rectf_contains(int argc, VALUE *argv, VALUE self)
     return Qfalse;
 }
 
+/**
+ * Enlarges this rectangle.
+ * @return [self]
+ * @see #inflate
+ * @overload Inflate(size)
+ *   @param size [Gdiplus::SizeF]
+ * @overload Inflate(width, height)
+ *   @param width [Float]
+ *   @param height [Float]
+ */
 static VALUE
 gdip_rectf_inflate_bang(int argc, VALUE *argv, VALUE self)
 {
@@ -1191,7 +1508,15 @@ gdip_rectf_inflate_bang(int argc, VALUE *argv, VALUE self)
     return self;
 }
 
-
+/**
+ * Returns a rectangle enlarged from this rectangle.
+ * @return [Gdiplus::RectangleF]
+ * @overload inflate(size)
+ *   @param size [Gdiplus::SizeF]
+ * @overload inflate(width, height)
+ *   @param width [Float]
+ *   @param height [Float]
+ */
 static VALUE
 gdip_rectf_inflate(int argc, VALUE *argv, VALUE self)
 {
@@ -1232,6 +1557,11 @@ gdip_rectf_inflate(int argc, VALUE *argv, VALUE self)
     return Qnil;
 }
 
+/**
+ * Whether another rectangle intersects this rectangle.
+ * @param other [Gdiplus::RectangleF]
+ * @return [Boolean]
+ */
 static VALUE
 gdip_rectf_intersects_with(VALUE self, VALUE other)
 {
@@ -1246,6 +1576,11 @@ gdip_rectf_intersects_with(VALUE self, VALUE other)
     }
 }
 
+/**
+ * Replaces this rectangle with the intersection of this and another rectangles.
+ * @param other [Gdiplus::RectangleF]
+ * @return [self]
+ */
 static VALUE
 gdip_rectf_intersect_bang(VALUE self, VALUE other)
 {
@@ -1260,6 +1595,11 @@ gdip_rectf_intersect_bang(VALUE self, VALUE other)
     return self;
 }
 
+/**
+ * Returns a rectangle that is the intersection of this and another rectangles.
+ * @param other [Gdiplus::RectangleF]
+ * @return [Gdiplus::RectangleF]
+ */
 static VALUE
 gdip_rectf_intersect(VALUE self, VALUE other)
 {
@@ -1277,6 +1617,11 @@ gdip_rectf_intersect(VALUE self, VALUE other)
     }
 }
 
+/**
+ * Returns a rectangle that contains the union of this and another rectangles.
+ * @param other [Gdiplus::RectangleF]
+ * @return [Gdiplus::RectangleF]
+ */
 static VALUE
 gdip_rectf_union(VALUE self, VALUE other)
 {
@@ -1317,155 +1662,105 @@ Init_rectangle()
 
     rb_define_method(cPoint, "initialize", RUBY_METHOD_FUNC(gdip_point_init), -1);
     rb_define_method(cPoint, "inspect", RUBY_METHOD_FUNC(gdip_point_inspect), 0);
-    rb_define_method(cPoint, "x", RUBY_METHOD_FUNC(gdip_point_get_x), 0);
-    rb_define_method(cPoint, "X", RUBY_METHOD_FUNC(gdip_point_get_x), 0);
-    rb_define_method(cPoint, "x=", RUBY_METHOD_FUNC(gdip_point_set_x), 1);
-    rb_define_method(cPoint, "X=", RUBY_METHOD_FUNC(gdip_point_set_x), 1);
-    rb_define_method(cPoint, "y", RUBY_METHOD_FUNC(gdip_point_get_y), 0);
-    rb_define_method(cPoint, "Y", RUBY_METHOD_FUNC(gdip_point_get_y), 0);
-    rb_define_method(cPoint, "y=", RUBY_METHOD_FUNC(gdip_point_set_y), 1);
-    rb_define_method(cPoint, "Y=", RUBY_METHOD_FUNC(gdip_point_set_y), 1);
+    ATTR_RW(cPoint, X, x, point);
+    ATTR_RW(cPoint, Y, y, point);
     rb_define_method(cPoint, "==", RUBY_METHOD_FUNC(gdip_point_equal), 1);
     rb_define_method(cPoint, "+", RUBY_METHOD_FUNC(gdip_point_add), 1);
     rb_define_method(cPoint, "-", RUBY_METHOD_FUNC(gdip_point_sub), 1);
 
     rb_define_method(cPointF, "initialize", RUBY_METHOD_FUNC(gdip_pointf_init), -1);
     rb_define_method(cPointF, "inspect", RUBY_METHOD_FUNC(gdip_pointf_inspect), 0);
-    rb_define_method(cPointF, "x", RUBY_METHOD_FUNC(gdip_pointf_get_x), 0);
-    rb_define_method(cPointF, "X", RUBY_METHOD_FUNC(gdip_pointf_get_x), 0);
-    rb_define_method(cPointF, "x=", RUBY_METHOD_FUNC(gdip_pointf_set_x), 1);
-    rb_define_method(cPointF, "X=", RUBY_METHOD_FUNC(gdip_pointf_set_x), 1);
-    rb_define_method(cPointF, "y", RUBY_METHOD_FUNC(gdip_pointf_get_y), 0);
-    rb_define_method(cPointF, "Y", RUBY_METHOD_FUNC(gdip_pointf_get_y), 0);
-    rb_define_method(cPointF, "y=", RUBY_METHOD_FUNC(gdip_pointf_set_y), 1);
-    rb_define_method(cPointF, "Y=", RUBY_METHOD_FUNC(gdip_pointf_set_y), 1);
+    ATTR_RW(cPointF, X, x, pointf);
+    ATTR_RW(cPointF, Y, y, pointf);
     rb_define_method(cPointF, "==", RUBY_METHOD_FUNC(gdip_pointf_equal), 1);
     rb_define_method(cPointF, "+", RUBY_METHOD_FUNC(gdip_pointf_add), 1);
     rb_define_method(cPointF, "-", RUBY_METHOD_FUNC(gdip_pointf_sub), 1);
 
     rb_define_method(cSize, "initialize", RUBY_METHOD_FUNC(gdip_size_init), -1);
     rb_define_method(cSize, "inspect", RUBY_METHOD_FUNC(gdip_size_inspect), 0);
-    rb_define_method(cSize, "width", RUBY_METHOD_FUNC(gdip_size_get_width), 0);
-    rb_define_method(cSize, "Width", RUBY_METHOD_FUNC(gdip_size_get_width), 0);
-    rb_define_method(cSize, "width=", RUBY_METHOD_FUNC(gdip_size_set_width), 1);
-    rb_define_method(cSize, "Width=", RUBY_METHOD_FUNC(gdip_size_set_width), 1);
-    rb_define_method(cSize, "height", RUBY_METHOD_FUNC(gdip_size_get_height), 0);
-    rb_define_method(cSize, "Height", RUBY_METHOD_FUNC(gdip_size_get_height), 0);
-    rb_define_method(cSize, "height=", RUBY_METHOD_FUNC(gdip_size_set_height), 1);
-    rb_define_method(cSize, "Height=", RUBY_METHOD_FUNC(gdip_size_set_height), 1);
+    ATTR_RW(cSize, Width, width, size);
+    ATTR_RW(cSize, Height, height, size);
     rb_define_method(cSize, "==", RUBY_METHOD_FUNC(gdip_size_equal), 1);
     rb_define_method(cSize, "+", RUBY_METHOD_FUNC(gdip_size_add), 1);
     rb_define_method(cSize, "-", RUBY_METHOD_FUNC(gdip_size_sub), 1);
 
     rb_define_method(cSizeF, "initialize", RUBY_METHOD_FUNC(gdip_sizef_init), -1);
     rb_define_method(cSizeF, "inspect", RUBY_METHOD_FUNC(gdip_sizef_inspect), 0);
-    rb_define_method(cSizeF, "width", RUBY_METHOD_FUNC(gdip_sizef_get_width), 0);
-    rb_define_method(cSizeF, "Width", RUBY_METHOD_FUNC(gdip_sizef_get_width), 0);
-    rb_define_method(cSizeF, "width=", RUBY_METHOD_FUNC(gdip_sizef_set_width), 1);
-    rb_define_method(cSizeF, "Width=", RUBY_METHOD_FUNC(gdip_sizef_set_width), 1);
-    rb_define_method(cSizeF, "height", RUBY_METHOD_FUNC(gdip_sizef_get_height), 0);
-    rb_define_method(cSizeF, "Height", RUBY_METHOD_FUNC(gdip_sizef_get_height), 0);
-    rb_define_method(cSizeF, "height=", RUBY_METHOD_FUNC(gdip_sizef_set_height), 1);
-    rb_define_method(cSizeF, "Height=", RUBY_METHOD_FUNC(gdip_sizef_set_height), 1);
+    ATTR_RW(cSizeF, Width, width, sizef);
+    ATTR_RW(cSizeF, Height, height, sizef);
     rb_define_method(cSizeF, "==", RUBY_METHOD_FUNC(gdip_sizef_equal), 1);
     rb_define_method(cSizeF, "+", RUBY_METHOD_FUNC(gdip_sizef_add), 1);
     rb_define_method(cSizeF, "-", RUBY_METHOD_FUNC(gdip_sizef_sub), 1);
 
     rb_define_singleton_method(cRectangle, "FromLTRB", RUBY_METHOD_FUNC(gdip_rect_s_from_ltrb), 4);
+    rb_define_alias(rb_singleton_class(cRectangle), "from_ltrb", "FromLTRB");
     rb_define_method(cRectangle, "initialize", RUBY_METHOD_FUNC(gdip_rect_init), -1);
     rb_define_method(cRectangle, "inspect", RUBY_METHOD_FUNC(gdip_rect_inspect), 0);
-    rb_define_method(cRectangle, "x", RUBY_METHOD_FUNC(gdip_rect_get_x), 0);
-    rb_define_method(cRectangle, "X", RUBY_METHOD_FUNC(gdip_rect_get_x), 0);
-    rb_define_method(cRectangle, "x=", RUBY_METHOD_FUNC(gdip_rect_set_x), 1);
-    rb_define_method(cRectangle, "X=", RUBY_METHOD_FUNC(gdip_rect_set_x), 1);
-    rb_define_method(cRectangle, "left", RUBY_METHOD_FUNC(gdip_rect_get_x), 0);
-    rb_define_method(cRectangle, "Left", RUBY_METHOD_FUNC(gdip_rect_get_x), 0);
-    rb_define_method(cRectangle, "y", RUBY_METHOD_FUNC(gdip_rect_get_y), 0);
-    rb_define_method(cRectangle, "Y", RUBY_METHOD_FUNC(gdip_rect_get_y), 0);
-    rb_define_method(cRectangle, "y=", RUBY_METHOD_FUNC(gdip_rect_set_y), 1);
-    rb_define_method(cRectangle, "Y=", RUBY_METHOD_FUNC(gdip_rect_set_y), 1);
-    rb_define_method(cRectangle, "top", RUBY_METHOD_FUNC(gdip_rect_get_y), 0);
-    rb_define_method(cRectangle, "Top", RUBY_METHOD_FUNC(gdip_rect_get_y), 0);
-    rb_define_method(cRectangle, "width", RUBY_METHOD_FUNC(gdip_rect_get_width), 0);
-    rb_define_method(cRectangle, "Width", RUBY_METHOD_FUNC(gdip_rect_get_width), 0);
-    rb_define_method(cRectangle, "width=", RUBY_METHOD_FUNC(gdip_rect_set_width), 1);
-    rb_define_method(cRectangle, "Width=", RUBY_METHOD_FUNC(gdip_rect_set_width), 1);
-    rb_define_method(cRectangle, "height", RUBY_METHOD_FUNC(gdip_rect_get_height), 0);
-    rb_define_method(cRectangle, "Height", RUBY_METHOD_FUNC(gdip_rect_get_height), 0);
-    rb_define_method(cRectangle, "height=", RUBY_METHOD_FUNC(gdip_rect_set_height), 1);
-    rb_define_method(cRectangle, "Height=", RUBY_METHOD_FUNC(gdip_rect_set_height), 1);
-    rb_define_method(cRectangle, "right", RUBY_METHOD_FUNC(gdip_rect_get_right), 0);
-    rb_define_method(cRectangle, "Right", RUBY_METHOD_FUNC(gdip_rect_get_right), 0);
-    rb_define_method(cRectangle, "bottom", RUBY_METHOD_FUNC(gdip_rect_get_bottom), 0);
-    rb_define_method(cRectangle, "Bottom", RUBY_METHOD_FUNC(gdip_rect_get_bottom), 0);
-    rb_define_method(cRectangle, "location", RUBY_METHOD_FUNC(gdip_rect_get_location), 0);
-    rb_define_method(cRectangle, "Location", RUBY_METHOD_FUNC(gdip_rect_get_location), 0);
-    rb_define_method(cRectangle, "location=", RUBY_METHOD_FUNC(gdip_rect_set_location), 1);
-    rb_define_method(cRectangle, "Location=", RUBY_METHOD_FUNC(gdip_rect_set_location), 1);
-    rb_define_method(cRectangle, "size", RUBY_METHOD_FUNC(gdip_rect_get_size), 0);
-    rb_define_method(cRectangle, "Size", RUBY_METHOD_FUNC(gdip_rect_get_size), 0);
-    rb_define_method(cRectangle, "size=", RUBY_METHOD_FUNC(gdip_rect_set_size), 1);
-    rb_define_method(cRectangle, "Size=", RUBY_METHOD_FUNC(gdip_rect_set_size), 1);
+    ATTR_RW(cRectangle, X, x, rect);
+    /**
+     * Gets the x coordinate the left edge of this rectangle.
+     * @return [Float]
+     */
+    ATTR_R(cRectangle, Left, left, rect, x);
+    ATTR_RW(cRectangle, Y, y, rect);
+    /**
+     * Gets the y coordinate the top edge of this rectangle.
+     * @return [Float]
+     */
+    ATTR_R(cRectangle, Top, top, rect, y);
+    ATTR_RW(cRectangle, Width, width, rect);
+    ATTR_RW(cRectangle, Height, height, rect);
+    ATTR_R(cRectangle, Right, right, rect);
+    ATTR_R(cRectangle, Bottom, bottom, rect);
+    ATTR_RW(cRectangle, Location, location, rect);
+    ATTR_RW(cRectangle, Size, size, rect);
     rb_define_method(cRectangle, "==", RUBY_METHOD_FUNC(gdip_rect_equal), 1);
     rb_define_method(cRectangle, "Contains", RUBY_METHOD_FUNC(gdip_rect_contains), -1);
-    rb_define_method(cRectangle, "contains?", RUBY_METHOD_FUNC(gdip_rect_contains), -1);
+    rb_define_alias(cRectangle, "contains?", "Contains");
     rb_define_method(cRectangle, "Inflate", RUBY_METHOD_FUNC(gdip_rect_inflate_bang), -1);
-    rb_define_method(cRectangle, "inflate!", RUBY_METHOD_FUNC(gdip_rect_inflate_bang), -1);
+    rb_define_alias(cRectangle, "inflate!", "Inflate");
     rb_define_method(cRectangle, "inflate", RUBY_METHOD_FUNC(gdip_rect_inflate), -1);
     rb_define_method(cRectangle, "IntersectsWith", RUBY_METHOD_FUNC(gdip_rect_intersects_with), 1);
-    rb_define_method(cRectangle, "intersects_with?", RUBY_METHOD_FUNC(gdip_rect_intersects_with), 1);
+    rb_define_alias(cRectangle, "intersects_with?", "IntersectsWith");
     rb_define_method(cRectangle, "Intersect", RUBY_METHOD_FUNC(gdip_rect_intersect_bang), 1);
-    rb_define_method(cRectangle, "intersect!", RUBY_METHOD_FUNC(gdip_rect_intersect_bang), 1);
+    rb_define_alias(cRectangle, "intersect!", "Intersect");
     rb_define_method(cRectangle, "intersect", RUBY_METHOD_FUNC(gdip_rect_intersect), 1);
     rb_define_method(cRectangle, "Union", RUBY_METHOD_FUNC(gdip_rect_union), 1);
-    rb_define_method(cRectangle, "union", RUBY_METHOD_FUNC(gdip_rect_union), 1);
+    rb_define_alias(cRectangle, "union", "Union");
 
     rb_define_singleton_method(cRectangleF, "FromLTRB", RUBY_METHOD_FUNC(gdip_rectf_s_from_ltrb), 4);
+    rb_define_alias(rb_singleton_class(cRectangleF), "from_ltrb", "FromLTRB");
     rb_define_method(cRectangleF, "initialize", RUBY_METHOD_FUNC(gdip_rectf_init), -1);
     rb_define_method(cRectangleF, "inspect", RUBY_METHOD_FUNC(gdip_rectf_inspect), 0);
-    rb_define_method(cRectangleF, "x", RUBY_METHOD_FUNC(gdip_rectf_get_x), 0);
-    rb_define_method(cRectangleF, "X", RUBY_METHOD_FUNC(gdip_rectf_get_x), 0);
-    rb_define_method(cRectangleF, "x=", RUBY_METHOD_FUNC(gdip_rectf_set_x), 1);
-    rb_define_method(cRectangleF, "X=", RUBY_METHOD_FUNC(gdip_rectf_set_x), 1);
-    rb_define_method(cRectangleF, "left", RUBY_METHOD_FUNC(gdip_rectf_get_x), 0);
-    rb_define_method(cRectangleF, "Left", RUBY_METHOD_FUNC(gdip_rectf_get_x), 0);
-    rb_define_method(cRectangleF, "y", RUBY_METHOD_FUNC(gdip_rectf_get_y), 0);
-    rb_define_method(cRectangleF, "Y", RUBY_METHOD_FUNC(gdip_rectf_get_y), 0);
-    rb_define_method(cRectangleF, "y=", RUBY_METHOD_FUNC(gdip_rectf_set_y), 1);
-    rb_define_method(cRectangleF, "Y=", RUBY_METHOD_FUNC(gdip_rectf_set_y), 1);
-    rb_define_method(cRectangleF, "top", RUBY_METHOD_FUNC(gdip_rectf_get_y), 0);
-    rb_define_method(cRectangleF, "Top", RUBY_METHOD_FUNC(gdip_rectf_get_y), 0);
-    rb_define_method(cRectangleF, "width", RUBY_METHOD_FUNC(gdip_rectf_get_width), 0);
-    rb_define_method(cRectangleF, "Width", RUBY_METHOD_FUNC(gdip_rectf_get_width), 0);
-    rb_define_method(cRectangleF, "width=", RUBY_METHOD_FUNC(gdip_rectf_set_width), 1);
-    rb_define_method(cRectangleF, "Width=", RUBY_METHOD_FUNC(gdip_rectf_set_width), 1);
-    rb_define_method(cRectangleF, "height", RUBY_METHOD_FUNC(gdip_rectf_get_height), 0);
-    rb_define_method(cRectangleF, "Height", RUBY_METHOD_FUNC(gdip_rectf_get_height), 0);
-    rb_define_method(cRectangleF, "height=", RUBY_METHOD_FUNC(gdip_rectf_set_height), 1);
-    rb_define_method(cRectangleF, "Height=", RUBY_METHOD_FUNC(gdip_rectf_set_height), 1);
-    rb_define_method(cRectangleF, "right", RUBY_METHOD_FUNC(gdip_rectf_get_right), 0);
-    rb_define_method(cRectangleF, "Right", RUBY_METHOD_FUNC(gdip_rectf_get_right), 0);
-    rb_define_method(cRectangleF, "bottom", RUBY_METHOD_FUNC(gdip_rectf_get_bottom), 0);
-    rb_define_method(cRectangleF, "Bottom", RUBY_METHOD_FUNC(gdip_rectf_get_bottom), 0);
-    rb_define_method(cRectangleF, "location", RUBY_METHOD_FUNC(gdip_rectf_get_location), 0);
-    rb_define_method(cRectangleF, "Location", RUBY_METHOD_FUNC(gdip_rectf_get_location), 0);
-    rb_define_method(cRectangleF, "location=", RUBY_METHOD_FUNC(gdip_rectf_set_location), 1);
-    rb_define_method(cRectangleF, "Location=", RUBY_METHOD_FUNC(gdip_rectf_set_location), 1);
-    rb_define_method(cRectangleF, "size", RUBY_METHOD_FUNC(gdip_rectf_get_size), 0);
-    rb_define_method(cRectangleF, "Size", RUBY_METHOD_FUNC(gdip_rectf_get_size), 0);
-    rb_define_method(cRectangleF, "size=", RUBY_METHOD_FUNC(gdip_rectf_set_size), 1);
-    rb_define_method(cRectangleF, "Size=", RUBY_METHOD_FUNC(gdip_rectf_set_size), 1);
+    ATTR_RW(cRectangleF, X, x, rectf);
+    /**
+     * Gets the x coordinate the left edge of this rectangle.
+     * @return [Float]
+     */
+    ATTR_R(cRectangleF, Left, left, rectf, x);
+    ATTR_RW(cRectangleF, Y, y, rectf);
+    /**
+     * Gets the y coordinate the top edge of this rectangle.
+     * @return [Float]
+     */
+    ATTR_R(cRectangleF, Top, top, rectf, y);
+    ATTR_RW(cRectangleF, Width, width, rectf);
+    ATTR_RW(cRectangleF, Height, height, rectf);
+    ATTR_R(cRectangleF, Right, right, rectf);
+    ATTR_R(cRectangleF, Bottom, bottom, rectf);
+    ATTR_RW(cRectangleF, Location, location, rectf);
+    ATTR_RW(cRectangleF, Size, size, rectf);
     rb_define_method(cRectangleF, "==", RUBY_METHOD_FUNC(gdip_rectf_equal), 1);
     rb_define_method(cRectangleF, "Contains", RUBY_METHOD_FUNC(gdip_rectf_contains), -1);
-    rb_define_method(cRectangleF, "contains?", RUBY_METHOD_FUNC(gdip_rectf_contains), -1);
+    rb_define_alias(cRectangleF, "contains?", "Contains");
     rb_define_method(cRectangleF, "Inflate", RUBY_METHOD_FUNC(gdip_rectf_inflate_bang), -1);
-    rb_define_method(cRectangleF, "inflate!", RUBY_METHOD_FUNC(gdip_rectf_inflate_bang), -1);
+    rb_define_alias(cRectangleF, "inflate!", "Inflate");
     rb_define_method(cRectangleF, "inflate", RUBY_METHOD_FUNC(gdip_rectf_inflate), -1);
     rb_define_method(cRectangleF, "IntersectsWith", RUBY_METHOD_FUNC(gdip_rectf_intersects_with), 1);
-    rb_define_method(cRectangleF, "intersects_with?", RUBY_METHOD_FUNC(gdip_rectf_intersects_with), 1);
+    rb_define_alias(cRectangleF, "intersects_with?", "IntersectsWith");
     rb_define_method(cRectangleF, "Intersect", RUBY_METHOD_FUNC(gdip_rectf_intersect_bang), 1);
-    rb_define_method(cRectangleF, "intersect!", RUBY_METHOD_FUNC(gdip_rectf_intersect_bang), 1);
+    rb_define_alias(cRectangleF, "intersect!", "Intersect");
     rb_define_method(cRectangleF, "intersect", RUBY_METHOD_FUNC(gdip_rectf_intersect), 1);
     rb_define_method(cRectangleF, "Union", RUBY_METHOD_FUNC(gdip_rectf_union), 1);
-    rb_define_method(cRectangleF, "union", RUBY_METHOD_FUNC(gdip_rectf_union), 1);
+    rb_define_alias(cRectangleF, "union", "Union");
 }

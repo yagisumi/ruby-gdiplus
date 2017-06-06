@@ -19,8 +19,8 @@ end
 require "yard"
 YARD::Rake::YardocTask.new(:doc) do |t|
   require_relative "lib/gdiplus/yard_gdiplus_handler"
+  t.options.push(*%w[--no-private -p templates -t gdiplus --tag figure:Figure])
   t.files = FileList['lib/**/*.rb', 'ext/**/*.cpp']
-  t.verifier = YARD::Verifier.new('!object.tag(:private) && (object.namespace.type == :proxy || !object.namespace.tag(:private))')
 end
 
 require "rake/extensiontask"

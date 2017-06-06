@@ -430,16 +430,12 @@ Init_color()
     rb_define_method(cColor, "inspect", RUBY_METHOD_FUNC(gdip_color_inspect), 0);
     rb_define_method(cColor, "to_i", RUBY_METHOD_FUNC(gdip_color_to_i), 0);
     rb_define_method(cColor, "==", RUBY_METHOD_FUNC(gdip_color_equal), 1);
-    rb_define_method(cColor, "A", RUBY_METHOD_FUNC(gdip_color_get_a), 0);
-    rb_define_method(cColor, "a", RUBY_METHOD_FUNC(gdip_color_get_a), 0);
-    rb_define_method(cColor, "R", RUBY_METHOD_FUNC(gdip_color_get_r), 0);
-    rb_define_method(cColor, "r", RUBY_METHOD_FUNC(gdip_color_get_r), 0);
-    rb_define_method(cColor, "G", RUBY_METHOD_FUNC(gdip_color_get_g), 0);
-    rb_define_method(cColor, "g", RUBY_METHOD_FUNC(gdip_color_get_g), 0);
-    rb_define_method(cColor, "B", RUBY_METHOD_FUNC(gdip_color_get_b), 0);
-    rb_define_method(cColor, "b", RUBY_METHOD_FUNC(gdip_color_get_b), 0);
+    ATTR_R(cColor, A, a, color);
+    ATTR_R(cColor, R, r, color);
+    ATTR_R(cColor, G, g, color);
+    ATTR_R(cColor, B, b, color);
     rb_define_singleton_method(cColor, "FromArgb", RUBY_METHOD_FUNC(gdip_color_s_from_argb), -1);
-    rb_define_singleton_method(cColor, "from_argb", RUBY_METHOD_FUNC(gdip_color_s_from_argb), -1);
+    rb_define_alias(rb_singleton_class(cColor), "from_argb", "FromArgb");
 
     Init_color_constants();
 }

@@ -177,6 +177,36 @@ VALUE util_utf8_str_new_from_wstr(const wchar_t * wstr);
 bool util_extname(VALUE str, char (&ext)[6]);
 
 
+#define ATTR_R4(klass, Name, name_, prefix) \
+    do { \
+        rb_define_method(klass, #Name, RUBY_METHOD_FUNC(gdip_ ## prefix ## _get_ ## name_), 0); \
+        rb_define_method(klass, #name_, RUBY_METHOD_FUNC(gdip_ ## prefix ## _get_ ## name_), 0); \
+    } \
+    while (0)
+#define ATTR_R5(klass, Name, name_, prefix, fname) \
+    do { \
+        rb_define_method(klass, #Name, RUBY_METHOD_FUNC(gdip_ ## prefix ## _get_ ## fname), 0); \
+        rb_define_method(klass, #name_, RUBY_METHOD_FUNC(gdip_ ## prefix ## _get_ ## fname), 0); \
+    } \
+    while (0)
+#define ATTR_R_Q(klass, Name, name_, prefix) \
+    do { \
+        rb_define_method(klass, #Name, RUBY_METHOD_FUNC(gdip_ ## prefix ## _get_ ## name_), 0); \
+        rb_define_method(klass, #name_"?", RUBY_METHOD_FUNC(gdip_ ## prefix ## _get_ ## name_), 0); \
+    } \
+    while (0)
+#define ATTR_RW(klass, Name, name_, prefix) \
+    do { \
+        rb_define_method(klass, #Name, RUBY_METHOD_FUNC(gdip_ ## prefix ## _get_ ## name_), 0); \
+        rb_define_method(klass, #name_, RUBY_METHOD_FUNC(gdip_ ## prefix ## _get_ ## name_), 0); \
+        rb_define_method(klass, #Name"=", RUBY_METHOD_FUNC(gdip_ ## prefix ## _set_ ## name_), 1); \
+        rb_define_method(klass, #name_"=", RUBY_METHOD_FUNC(gdip_ ## prefix ## _set_ ## name_), 1); \
+    } \
+    while (0)
+
+#define GET_MACRO(a) GET_MACRO2 a
+#define GET_MACRO2(_1,_2,_3,_4,_5,NAME,...) NAME
+#define ATTR_R(...) GET_MACRO((__VA_ARGS__, ATTR_R5, ATTR_R4))(__VA_ARGS__)
 
 /* Debug */
 // #define GDIPLUS_DEBUG 1 // moved in extconf.rb
