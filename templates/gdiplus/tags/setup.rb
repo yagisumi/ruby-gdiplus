@@ -2,7 +2,11 @@
 def init
   tags = Tags::Library.visible_tags - [:abstract, :deprecated, :note, :todo]
   create_tag_methods(tags - [:example, :option, :overload, :see])
-  sections :index, tags.map {|t| t.to_s.tr('.', '_').to_sym }
+  otags = object.tags.map {|t| t.tag_name.tr('.', '_').to_sym }.select {|t| tags.include? t }
+  otags = (otags + tags).uniq
+  #sections :index, tags.map {|t| t.to_s.tr('.', '_').to_sym }
+  sections :index, otags
+  
   sections.any(:overload).push(T('docstring'))
 end
 

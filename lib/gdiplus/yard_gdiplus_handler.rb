@@ -35,6 +35,23 @@ class GdiplusEnumHandler < YARD::Handlers::C::Base
 end
 
 # @private
+class GdiplusClassMethodAliasHandler < YARD::Handlers::C::Base
+  MATCH2 = /rb_define_alias
+             \s*\(\s*rb_singleton_class\s*\(\s*([\w\.]+)\s*\)\s*,
+             \s*"([^"]+)",
+             \s*"([^"]+)"\s*\)/xm
+  handles MATCH2
+  statement_class BodyStatement
+
+  process do
+    statement.source.scan(MATCH2) do |var_name, new_name, old_name|
+      var_name = "rb_cObject" if var_name == "rb_mKernel"
+      handle_alias(var_name, new_name, old_name, :class)
+    end
+  end
+end
+
+# @private
 class GdiplusAttrHandler < YARD::Handlers::C::Base
   MATCH_ATTR_R4 = /ATTR_R\((\w+), (\w+), (\w+), (\w+)\)/
   MATCH_ATTR_R5 = /ATTR_R\((\w+), (\w+), (\w+), (\w+), (\w+)\)/
@@ -72,13 +89,51 @@ class GdiplusAttrHandler < YARD::Handlers::C::Base
   
 end
 
+
+$superclass_path_map = {
+  "cEnumInt" => "Gdiplus::Internals::EnumInt",
+  "cImage" => "Gdiplus::Image",
+  "cGuid" => "Gdiplus::Guid",
+  "cBrush" => "Gdiplus::Brush",
+}
+
+# Copyright (c) 2007-2016 Loren Segal
 # @private
 module YARD
   module Handlers
     module C
       module HandlerMethods
+        ### modified to use variable name to class path mapping ($superclass_path_map)
+        def handle_class(var_name, class_name, parent, in_module = nil)
+          parent = nil if parent == "0"
+          namespace = in_module ? ensure_variable_defined!(in_module) : Registry.root
+          if namespace.nil?
+            raise Parser::UndocumentableError,
+              "class #{class_name}. Cannot find definition for parent namespace."
+          end
+
+          register ClassObject.new(namespace, class_name) do |obj|
+            if parent
+              parent_class = namespace_for_variable(parent)
+              if parent_class.is_a?(Proxy)
+                if path = ($superclass_path_map || {})[parent]
+                  obj.superclass = path
+                else
+                  obj.superclass = "::#{parent_class.path}"
+                end
+                obj.superclass.type = :class
+              else
+                obj.superclass = parent_class
+              end
+            end
+
+            namespaces[var_name] = obj
+            register_file_info(obj, statement.file, statement.line)
+          end
+        end
+        
+        ### modified the condition of @return insertion
         def handle_method(scope, var_name, name, func_name, _source_file = nil)
-          #p [:metho, scope, var_name, name, func_name, _source_file]
           visibility = :public
           case scope
           when "singleton_method"; scope = :class
@@ -107,10 +162,79 @@ module YARD
               obj.add_tag(Tags::Tag.new(:return, '', 'Boolean'))
             end
           end
-        end # handle_method
+        end
         
+        ### modified to accept a scope parameter
+        def handle_alias(var_name, new_name, old_name, scope = :instance)
+          namespace = namespace_for_variable(var_name)
+          return if namespace.nil?
+          new_meth = new_name.to_sym
+          old_meth = old_name.to_sym
+          old_obj = namespace.child(:name => old_meth, :scope => scope)
+          new_obj = register MethodObject.new(namespace, new_meth, scope) do |o|
+            register_visibility(o, visibility)
+            register_file_info(o, statement.file, statement.line)
+          end
+
+          if old_obj
+            new_obj.signature = old_obj.signature
+            new_obj.source = old_obj.source
+            new_obj.docstring = old_obj.docstring
+            new_obj.docstring.object = new_obj
+          else
+            new_obj.signature = "def #{new_meth}" # this is all we know.
+          end
+
+          namespace.aliases[new_obj] = old_meth
+        end
       end
+      
+    end
+  end
+  
+  # @private
+  ### modified to link types with not method but class in tags
+  module Templates::Helpers
+    module HtmlHelper
+      def format_types(typelist, brackets = true)
+        return unless typelist.is_a?(Array)
+        @in_format_types = true
+        list = typelist.map do |type|
+          type = type.gsub(/([<>])/) { h($1) }
+          type = type.gsub(/([\w:]+)/) { $1 == "lt" || $1 == "gt" ? $1 : linkify($1, $1) }
+          "<tt>" + type + "</tt>"
+        end
+        @in_format_types = false
+        list.empty? ? "" : (brackets ? "(#{list.join(", ")})" : list.join(", "))
+      end
+      
+      def link_object(obj, title = nil, anchor = nil, relative = true)
+        return title if obj.nil?
+        obj = Registry.resolve(object, obj, true, true, @in_format_types ? :class : nil) if obj.is_a?(String)
+        if title
+          title = title.to_s
+        elsif object.is_a?(CodeObjects::Base)
+          # Check if we're linking to a class method in the current
+          # object. If we are, create a title in the format of
+          # "CurrentClass.method_name"
+          if obj.is_a?(CodeObjects::MethodObject) && obj.scope == :class && obj.parent == object
+            title = h([object.name, obj.sep, obj.name].join)
+          elsif obj.title != obj.path
+            title = h(obj.title)
+          else
+            title = h(object.relative_path(obj))
+          end
+        else
+          title = h(obj.title)
+        end
+        return title unless serializer
+        return title if obj.is_a?(CodeObjects::Proxy)
+
+        link = url_for(obj, anchor, relative)
+        link = link ? link_url(link, title, :title => h("#{obj.title} (#{obj.type})")) : title
+        "<span class='object_link'>" + link + "</span>"
+      end
+      
     end
   end
 end
-

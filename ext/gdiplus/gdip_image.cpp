@@ -232,7 +232,7 @@ gdip_image_get_vertical_resolution(VALUE self)
 
 /**
  * Gets the PixelFormat of this image.
- * @return [Gdiplus::PixelFormat]
+ * @return [PixelFormat]
  * 
  */
 static VALUE

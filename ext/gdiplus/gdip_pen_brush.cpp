@@ -156,7 +156,7 @@ gdip_pen_set_miter_limit(VALUE self, VALUE limit)
 
 /**
  * Gets or sets the color of this pen.
- * @return [Gdiplus::Color]
+ * @return [Color]
  */
 static VALUE
 gdip_pen_get_color(VALUE self)
@@ -185,7 +185,7 @@ gdip_pen_set_color(VALUE self, VALUE color)
 
 /**
  * Gets the type of this pen.
- * @return [Gdiplus::PenType]
+ * @return [PenType]
  */
 static VALUE
 gdip_pen_get_pen_type(VALUE self)
@@ -370,7 +370,7 @@ gdip_pen_set_dash_pattern(VALUE self, VALUE ary)
 
 /**
  * Gets or sets the alignment of this pen.
- * @return [Gdiplus::PenAlignment]
+ * @return [PenAlignment]
  */
 static VALUE
 gdip_pen_get_alignment(VALUE self)
@@ -403,7 +403,7 @@ gdip_pen_set_alignment(VALUE self, VALUE align)
 
 /**
  * Gets or sets a DashCap.
- * @return [Gdiplus::DashCap]
+ * @return [DashCap]
  */
 static VALUE
 gdip_pen_get_dash_cap(VALUE self)
@@ -431,7 +431,7 @@ gdip_pen_set_dash_cap(VALUE self, VALUE cap)
 
 /**
  * Gets or sets a DashStyel.
- * @return [Gdiplus::DashStyle]
+ * @return [DashStyle]
  */
 static VALUE
 gdip_pen_get_dash_style(VALUE self)
@@ -460,7 +460,7 @@ gdip_pen_set_dash_style(VALUE self, VALUE style)
 
 /**
  * Gets or sets a LineCap.
- * @return [Gdiplus::LineCap]
+ * @return [LineCap]
  */
 static VALUE
 gdip_pen_get_end_cap(VALUE self)
@@ -472,7 +472,7 @@ gdip_pen_get_end_cap(VALUE self)
 
 /**
  * Gets or sets a LineCap.
- * @param cap [Gdiplus::LineCap]
+ * @param cap [LineCap]
  */
 static VALUE
 gdip_pen_set_end_cap(VALUE self, VALUE cap)
@@ -488,7 +488,7 @@ gdip_pen_set_end_cap(VALUE self, VALUE cap)
 
 /**
  * Gets or sets a LineJoin.
- * @return [Gdiplus::LineJoin]
+ * @return [LineJoin]
  */
 static VALUE
 gdip_pen_get_line_join(VALUE self)
@@ -517,7 +517,7 @@ gdip_pen_set_line_join(VALUE self, VALUE join)
 
 /**
  * Gets or sets a LineCap.
- * @return [Gdiplus::LineCap]
+ * @return [LineCap]
  */
 static VALUE
 gdip_pen_get_start_cap(VALUE self)
@@ -555,7 +555,7 @@ const rb_data_type_t tBrush = _MAKE_DATA_TYPE(
 
 /**
  * Gets the tyep of this brush.
- * @return [Gdiplus::BrushType]
+ * @return [BrushType]
  */
 static VALUE
 gdip_brush_get_brush_type(VALUE self)
@@ -567,7 +567,7 @@ gdip_brush_get_brush_type(VALUE self)
 
 /**
  *
- * @param color [Gdiplus::Color, Integer]
+ * @param color [Color, Integer]
  * @example
  *   include Gdiplus
  *   color = Color.new(255, 127, 63)
@@ -592,7 +592,7 @@ gdip_solidbrush_init(VALUE self, VALUE color)
 
 /**
  * Gets or sets the color of this brush.
- * @return [Gdiplus::Color]
+ * @return [Color]
  */
  static VALUE
 gdip_solidbrush_get_color(VALUE self)

@@ -3,8 +3,9 @@ html {
   height: 100%;
 }
 body {
-  font-family: "Lucida Sans", "Lucida Grande", Verdana, Arial, sans-serif;
-  font-size: 13px;
+  /*font-family: "Lucida Sans", "Lucida Grande", Verdana, Arial, sans-serif;*/
+  /*font-size: 13px;*/
+  font-size: 15px;
   width: 100%;
   margin: 0;
   padding: 0;
@@ -12,7 +13,9 @@ body {
   display: -webkit-flex;
   display: -ms-flexbox;
 }
-
+h3 {
+  font-size: 15px;
+}
 #nav {
   position: relative;
   width: 100%;
@@ -108,7 +111,7 @@ h2 small a {
 .clear { clear: both; }
 .inline { display: inline; }
 .inline p:first-child { display: inline; }
-.docstring, .tags, #filecontents { font-size: 15px; line-height: 1.5145em; }
+.docstring, .tags, #filecontents { font-size: 15px; line-height: 1.2em; }
 .docstring p > code, .docstring p > tt, .tags p > code, .tags p > tt {
   color: #c7254e; background: #f9f2f4; padding: 2px 4px; font-size: 1em;
   border-radius: 4px;
@@ -164,7 +167,7 @@ h2 small a {
 .note.deprecated { background: #ffe5e5; border-color: #e9dada; }
 .note.title.deprecated { background: #ffe5e5; border-color: #e9dada; }
 .note.private { background: #ffffc5; border-color: #ececaa; }
-.note.title { padding: 3px 6px; font-size: 0.9em; font-family: "Lucida Sans", "Lucida Grande", Verdana, Arial, sans-serif; display: inline; }
+.note.title { padding: 3px 6px; /*font-size: 0.9em;*/ /*font-family: "Lucida Sans", "Lucida Grande", Verdana, Arial, sans-serif;*/ display: inline; }
 .summary_signature + .note.title { margin-left: 7px; }
 h1 .note.title { font-size: 0.5em; font-weight: normal; padding: 3px 5px; position: relative; top: -3px; text-transform: capitalize; }
 .note.title { background: #efefef; }
@@ -178,7 +181,7 @@ h1 .note.title { font-size: 0.5em; font-weight: normal; padding: 3px 5px; positi
 
 h3.inherited {
   font-style: italic;
-  font-family: "Lucida Sans", "Lucida Grande", Verdana, Arial, sans-serif;
+  /*font-family: "Lucida Sans", "Lucida Grande", Verdana, Arial, sans-serif;*/
   font-weight: normal;
   padding: 0;
   margin: 0;
@@ -244,17 +247,17 @@ ul.toplevel { list-style: none; padding-left: 0; font-size: 1.1em; }
 }
 
 dl.constants { margin-left: 10px; }
-dl.constants dt { font-weight: bold; font-size: 1.1em; margin-bottom: 5px; }
+dl.constants dt { font-weight: bold; /*font-size: 1.1em;*/ margin-bottom: 5px; }
 dl.constants dd { width: 75%; white-space: pre; font-family: monospace; margin-bottom: 18px; }
 dl.constants .docstring .note:first-child { margin-top: 5px; }
 
 .summary_desc {
   margin-left: 32px;
   display: block;
-  font-family: sans-serif;
-  font-size: 1.1em;
+  /*font-family: sans-serif;*/
+  /*font-size: 1.1em;*/
   margin-top: 8px;
-  line-height: 1.5145em;
+  line-height: 1.1em;
   margin-bottom: 0.8em;
 }
 .summary_desc tt { font-size: 0.9em; }
@@ -268,7 +271,7 @@ dl.constants .discussion *:last-child { margin-bottom: 0; }
 .method_details.first { border: 0; margin-top: 5px; }
 .method_details.first h3.signature { margin-top: 1em; }
 p.signature, h3.signature {
-  font-size: 1.1em; font-weight: normal; font-family: Monaco, Consolas, Courier, monospace;
+  /*font-size: 1.1em;*/ font-weight: normal; font-family: /*Monaco, Consolas, Courier,*/ monospace;
   padding: 6px 10px; margin-top: 1em;
   background: #E8F4FF; border: 1px solid #a3c5dd; border-radius: 5px;
   border-left-width: 4px;
@@ -287,23 +290,23 @@ p.signature, h3.signature {
 }
 /* **************************** */
 p.signature tt,
-h3.signature tt { font-family: Monaco, Consolas, Courier, monospace; }
+h3.signature tt { font-family: /*Monaco, Consolas, Courier,*/ monospace; }
 p.signature .overload,
 h3.signature .overload { display: block; }
 p.signature .extras,
-h3.signature .extras { font-weight: normal; font-family: sans-serif; color: #444; font-size: 1em; }
-h3.signature .extras { color: #B44A73; }
+h3.signature .extras { font-weight: normal; /*font-family: sans-serif*/; color: #444; font-size: 1em; }
+h3.signature .extras { color: #A4153E; }
 #instance_attr_details p.signature .not_defined_here,
 h3.signature .not_defined_here,
 p.signature .aliases,
-h3.signature .aliases { display: block; font-weight: normal; font-size: 0.9em; font-family: sans-serif; margin-top: 0px; color: #555; }
+h3.signature .aliases { display: block; font-weight: normal; /*font-size: 0.9em*/; /*font-family: sans-serif*/; margin-top: 0px; color: #555; }
 h3.signature .aliases {
   padding: 3px 8px 0;
 }
 p.signature .aliases .names,
-h3.signature .aliases .names { font-family: Monaco, Consolas, Courier, monospace; font-weight: bold; color: #000; font-size: 1.2em; }
+h3.signature .aliases .names { font-family: /*Monaco, Consolas, Courier,*/ monospace; font-weight: bold; color: #000; /*font-size: 1.2em;*/ }
 
-.tags .tag_title { font-size: 1.05em; margin-bottom: 0; font-weight: bold; }
+.tags .tag_title { /*font-size: 1.05em;*/ margin-bottom: 0; font-weight: bold; }
 .tags .tag_title tt { color: initial; padding: initial; background: initial; }
 .tags ul { margin-top: 5px; padding-left: 30px; list-style: square; }
 .tags ul li { margin-bottom: 3px; }
@@ -320,7 +323,7 @@ h3.signature .aliases .names { font-family: Monaco, Consolas, Courier, monospace
   padding: 2px 8px;
   background: #F1F8FF; border: 1px solid #d8d8e5; border-radius: 3px;
 }
-.tags .overload .signature { margin-left: -15px; font-family: monospace; display: block; font-size: 1.1em; }
+.tags .overload .signature { margin-left: -15px; font-family: monospace; display: block; /*font-size: 1.1em;*/ }
 .tags .overload .docstring { margin-top: 15px; }
 
 .defines { display: none; }
@@ -341,11 +344,11 @@ ul.summary {
   list-style: none;
   font-family: monospace;
   font-size: 1em;
-  line-height: 1.5em;
+  line-height: 1.6em;
   padding-left: 0px;
 }
 ul.summary a, ul.summary a:visited {
-  text-decoration: none; font-size: 1.1em;
+  text-decoration: none; /*font-size: 1.1em;*/
 }
 ul.summary li { margin-bottom: 5px; }
 
@@ -374,12 +377,12 @@ ul.summary.compact .summary_signature { padding: 5px 7px; padding-right: 4px; }
   color: #049;
 }
 
-p.inherited a { font-family: monospace; font-size: 0.9em; }
-p.inherited { word-spacing: 5px; font-size: 1.2em; }
+p.inherited a { font-family: monospace; /*font-size: 0.9em;*/ }
+p.inherited { word-spacing: 5px; /*font-size: 1.2em;*/ }
 
-p.children { font-size: 1.2em; }
-p.children a { font-size: 0.9em; }
-p.children strong { font-size: 0.8em; }
+p.children { /*font-size: 1.2em;*/ }
+p.children a { /*font-size: 0.9em;*/ }
+p.children strong { /*font-size: 0.8em;*/ }
 p.children strong.modules { padding-left: 5px; }
 
 ul.fullTree { display: none; padding-left: 0; list-style: none; margin-left: 0; margin-bottom: 10px; }

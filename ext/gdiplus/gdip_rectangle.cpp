@@ -731,7 +731,7 @@ gdip_rect_init(int argc, VALUE *argv, VALUE self)
  * @param top [Integer]
  * @param right [Integer]
  * @param bottom [Integer]
- * @return [Gdiplus::Rectangle]
+ * @return [Rectangle]
  */
 static VALUE
 gdip_rect_s_from_ltrb(VALUE self, VALUE left, VALUE top, VALUE right, VALUE bottom)
@@ -874,7 +874,7 @@ gdip_rect_get_bottom(VALUE self)
 
 /**
  * Gets or sets the point of the upper left corner of this rectangle.
- * @return [Gdiplus::Point]
+ * @return [Point]
  */
 static VALUE
 gdip_rect_get_location(VALUE self)
@@ -900,7 +900,7 @@ gdip_rect_set_location(VALUE self, VALUE loc)
 
 /**
  * Gets or sets the size of this rectangle.
- * @return [Gdiplus::Size]
+ * @return [Size]
  */
 static VALUE
 gdip_rect_get_size(VALUE self)
@@ -943,12 +943,12 @@ gdip_rect_equal(VALUE self, VALUE other)
 
 /**
  * Whether a point or rectangle is within this rectangle.
- * @return [Boolean]
  * @overload Contains(obj)
- *   @param obj [Gdiplus::Point, Gdiplus::Rectangle]
+ *   @param obj [Point, Rectangle]
  * @overload Contains(x, y)
  *   @param x [Integer]
  *   @param y [Integer]
+ * @return [Boolean]
  */
 static VALUE
 gdip_rect_contains(int argc, VALUE *argv, VALUE self)
@@ -983,13 +983,13 @@ gdip_rect_contains(int argc, VALUE *argv, VALUE self)
 
 /**
  * Enlarges this rectangle.
- * @return [self]
- * @see #inflate
  * @overload Inflate(size)
- *   @param size [Gdiplus::Size]
+ *   @param size [Size]
  * @overload Inflate(width, height)
  *   @param width [Integer]
  *   @param height [Integer]
+ * @return [self]
+ * @see #inflate
  */
 static VALUE
 gdip_rect_inflate_bang(int argc, VALUE *argv, VALUE self)
@@ -1025,12 +1025,12 @@ gdip_rect_inflate_bang(int argc, VALUE *argv, VALUE self)
 
 /**
  * Returns a rectangle enlarged from this rectangle.
- * @return [Gdiplus::Rectangle]
  * @overload inflate(size)
- *   @param size [Gdiplus::Size]
+ *   @param size [Size]
  * @overload inflate(width, height)
  *   @param width [Integer]
  *   @param height [Integer]
+ * @return [Rectangle]
  */
 static VALUE
 gdip_rect_inflate(int argc, VALUE *argv, VALUE self)
@@ -1074,7 +1074,7 @@ gdip_rect_inflate(int argc, VALUE *argv, VALUE self)
 
 /**
  * Whether another rectangle intersects this rectangle.
- * @param other [Gdiplus::Rectangle]
+ * @param other [Rectangle]
  * @return [Boolean]
  */
 static VALUE
@@ -1093,7 +1093,7 @@ gdip_rect_intersects_with(VALUE self, VALUE other)
 
 /**
  * Replaces this rectangle with the intersection of this and another rectangles.
- * @param other [Gdiplus::Rectangle]
+ * @param other [Rectangle]
  * @return [self]
  */
 static VALUE
@@ -1112,8 +1112,8 @@ gdip_rect_intersect_bang(VALUE self, VALUE other)
 
 /**
  * Returns a rectangle that is the intersection of this and another rectangles.
- * @param other [Gdiplus::Rectangle]
- * @return [Gdiplus::Rectangle]
+ * @param other [Rectangle]
+ * @return [Rectangle]
  */
 static VALUE
 gdip_rect_intersect(VALUE self, VALUE other)
@@ -1134,8 +1134,8 @@ gdip_rect_intersect(VALUE self, VALUE other)
 
 /**
  * Returns a rectangle that contains the union of this and another rectangles.
- * @param other [Gdiplus::Rectangle]
- * @return [Gdiplus::Rectangle]
+ * @param other [Rectangle]
+ * @return [Rectangle]
  */
 static VALUE
 gdip_rect_union(VALUE self, VALUE other)
@@ -1217,7 +1217,7 @@ gdip_rectf_init(int argc, VALUE *argv, VALUE self)
  * @param top [Float]
  * @param right [Float]
  * @param bottom [Float]
- * @return [Gdiplus::RectangleF]
+ * @return [RectangleF]
  */
 static VALUE
 gdip_rectf_s_from_ltrb(VALUE self, VALUE left, VALUE top, VALUE right, VALUE bottom)
@@ -1360,7 +1360,7 @@ gdip_rectf_get_bottom(VALUE self)
 
 /**
  * Gets or sets the point of the upper left corner of this rectangle.
- * @return [Gdiplus::PointF]
+ * @return [PointF]
  */
 static VALUE
 gdip_rectf_get_location(VALUE self)
@@ -1386,7 +1386,7 @@ gdip_rectf_set_location(VALUE self, VALUE loc)
 
 /**
  * Gets or sets the size of this rectangle.
- * @return [Gdiplus::SizeF]
+ * @return [SizeF]
  */
 static VALUE
 gdip_rectf_get_size(VALUE self)
@@ -1431,7 +1431,7 @@ gdip_rectf_equal(VALUE self, VALUE other)
  * Whether a point or rectangle is within this rectangle.
  * @return [Boolean]
  * @overload Contains(obj)
- *   @param obj [Gdiplus::PointF, Gdiplus::RectangleF]
+ *   @param obj [PointF, RectangleF]
  * @overload Contains(x, y)
  *   @param x [Float]
  *   @param y [Float]
@@ -1469,13 +1469,13 @@ gdip_rectf_contains(int argc, VALUE *argv, VALUE self)
 
 /**
  * Enlarges this rectangle.
- * @return [self]
- * @see #inflate
  * @overload Inflate(size)
- *   @param size [Gdiplus::SizeF]
+ *   @param size [SizeF]
  * @overload Inflate(width, height)
  *   @param width [Float]
  *   @param height [Float]
+ * @return [self]
+ * @see #inflate
  */
 static VALUE
 gdip_rectf_inflate_bang(int argc, VALUE *argv, VALUE self)
@@ -1510,12 +1510,12 @@ gdip_rectf_inflate_bang(int argc, VALUE *argv, VALUE self)
 
 /**
  * Returns a rectangle enlarged from this rectangle.
- * @return [Gdiplus::RectangleF]
  * @overload inflate(size)
- *   @param size [Gdiplus::SizeF]
+ *   @param size [SizeF]
  * @overload inflate(width, height)
  *   @param width [Float]
  *   @param height [Float]
+ * @return [RectangleF]
  */
 static VALUE
 gdip_rectf_inflate(int argc, VALUE *argv, VALUE self)
@@ -1559,7 +1559,7 @@ gdip_rectf_inflate(int argc, VALUE *argv, VALUE self)
 
 /**
  * Whether another rectangle intersects this rectangle.
- * @param other [Gdiplus::RectangleF]
+ * @param other [RectangleF]
  * @return [Boolean]
  */
 static VALUE
@@ -1578,7 +1578,7 @@ gdip_rectf_intersects_with(VALUE self, VALUE other)
 
 /**
  * Replaces this rectangle with the intersection of this and another rectangles.
- * @param other [Gdiplus::RectangleF]
+ * @param other [RectangleF]
  * @return [self]
  */
 static VALUE
@@ -1597,8 +1597,8 @@ gdip_rectf_intersect_bang(VALUE self, VALUE other)
 
 /**
  * Returns a rectangle that is the intersection of this and another rectangles.
- * @param other [Gdiplus::RectangleF]
- * @return [Gdiplus::RectangleF]
+ * @param other [RectangleF]
+ * @return [RectangleF]
  */
 static VALUE
 gdip_rectf_intersect(VALUE self, VALUE other)
@@ -1619,8 +1619,8 @@ gdip_rectf_intersect(VALUE self, VALUE other)
 
 /**
  * Returns a rectangle that contains the union of this and another rectangles.
- * @param other [Gdiplus::RectangleF]
- * @return [Gdiplus::RectangleF]
+ * @param other [RectangleF]
+ * @return [RectangleF]
  */
 static VALUE
 gdip_rectf_union(VALUE self, VALUE other)

@@ -332,6 +332,32 @@ typeddata_alloc_null(VALUE klass=Qnil)
     return r;
 }
 
+template<typename T, const rb_data_type_t *type>
+static T *
+alloc_array_of(VALUE ary, int& count)
+{
+    count = 0;
+    for (long i = 0; i < RARRAY_LEN(ary); ++i) {
+        VALUE elem = rb_ary_entry(ary, i);
+        if (_KIND_OF(elem, type)) {
+            count += 1;
+        }
+    }
+    if (count == 0) return NULL;
+
+    int idx = 0;
+    T *tary = static_cast<T *>(ruby_xcalloc(count, sizeof(T)));
+    for (long i = 0; i < RARRAY_LEN(ary); ++i) {
+        VALUE elem = rb_ary_entry(ary, i);
+        if (_KIND_OF(elem, type)) {
+            T *t = Data_Ptr<T *>(elem);
+            tary[idx] = *t;
+            idx += 1;
+        }
+    }
+    return tary;
+}
+
 template<typename T>
 static void
 gdip_default_free(void *ptr)

@@ -171,7 +171,7 @@ gdip_icinfo_create(ImageCodecInfo *icinfo)
 
 /*
  * Returns the Guid that identifies a specific codec.
- * @return [Gdiplus::Guid]
+ * @return [Guid]
  */
 static VALUE
 gdip_icinfo_get_clsid(VALUE self)
@@ -187,7 +187,7 @@ gdip_icinfo_get_clsid(VALUE self)
 
 /*
  * Returns the Guid that identifies the codec's format. 
- * @return [Gdiplus::Guid]
+ * @return [Guid]
  */
 static VALUE
 gdip_icinfo_get_format_id(VALUE self)
@@ -413,7 +413,7 @@ static VALUE decoders = Qnil;
 
 /*
  * Returns the image encoders.
- * @return [Array<Gdiplus::ImageCodecInfo>]
+ * @return [Array<ImageCodecInfo>]
  */
 static VALUE
 gdip_icinfo_s_image_encoders(VALUE self)
@@ -444,7 +444,7 @@ gdip_icinfo_s_image_encoders(VALUE self)
 
 /*
  * Returns the image decoders.
- * @return [Array<Gdiplus::ImageCodecInfo>]
+ * @return [Array<ImageCodecInfo>]
  */
 static VALUE
 gdip_icinfo_s_image_decoders(VALUE self)

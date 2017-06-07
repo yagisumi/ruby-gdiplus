@@ -35,7 +35,7 @@ gdip_graphics_get_clip_bounds(VALUE self)
 
 /**
  * Gets or sets the compositing mode of this graphics.
- * @return [Gdiplus::CompositingMode]
+ * @return [CompositingMode]
  * 
  */
 static VALUE
@@ -59,7 +59,7 @@ gdip_graphics_set_compositing_mode(VALUE self, VALUE v)
 
 /**
  * Gets or sets the rendering quality.
- * @return [Gdiplus::CompositingQuality]
+ * @return [CompositingQuality]
  * 
  */
 static VALUE
@@ -109,7 +109,7 @@ gdip_graphics_get_dpi_y(VALUE self)
 
 /**
  * Gets or sets the interpolation mode.
- * @return [Gdiplus::InterpolationMode]
+ * @return [InterpolationMode]
  * 
  */
 static VALUE
@@ -208,7 +208,7 @@ gdip_graphics_set_page_unit(VALUE self, VALUE v)
 
 /**
  * Gets or set the PixelOffsetMode.
- * @return [Gdiplus::PixelOffsetMode]
+ * @return [PixelOffsetMode]
  * 
  */
 static VALUE
@@ -264,7 +264,7 @@ gdip_graphics_set_rendering_origin(VALUE self, VALUE v)
 
 /**
  * Gets or sets the soothing mode of this graphics.
- * @return [Gdiplus::SmoothingMode]
+ * @return [SmoothingMode]
  * 
  */
 static VALUE
@@ -325,7 +325,7 @@ gdip_graphics_set_text_contrast(VALUE self, VALUE v)
 
 /**
  * Gets or sets the text rendering mode for this graphics.
- * @return [Gdiplus::TextRenderingHint]
+ * @return [TextRenderingHint]
  * 
  */
 static VALUE
@@ -379,7 +379,6 @@ gdip_graphics_get_visible_clip_bounds(VALUE self)
  *     g.DrawRectangle(pen, 10, 10, 300, 200)
  *     g.DrawRectangle(pen, 100.0, 100.0, 60.0, 30.0)
  *   }
- * @return [self]
  * @overload DrawRectangle(pen, rectangle)
  *   @param pen [Pen]
  *   @param rectangle [Rectangle or RectangleF]
@@ -389,6 +388,7 @@ gdip_graphics_get_visible_clip_bounds(VALUE self)
  *   @param y [Integer or Float]
  *   @param width [Integer or Float]
  *   @param height [Integer or Float]
+ * @return [self]
  *   
  */
 static VALUE
@@ -409,7 +409,7 @@ gdip_graphics_draw_rectangle(int argc, VALUE *argv, VALUE self)
             Rect *rect = Data_Ptr<Rect *>(argv[1]);
             g->DrawRectangle(pen, *rect);
         }
-        else if (_KIND_OF(argv[1], &tRectangle)) {
+        else if (_KIND_OF(argv[1], &tRectangleF)) {
             RectF *rect = Data_Ptr<RectF *>(argv[1]);
             g->DrawRectangle(pen, *rect);
         }
@@ -440,7 +440,6 @@ gdip_graphics_draw_rectangle(int argc, VALUE *argv, VALUE self)
  *     g.FillRectangle(brush, 10, 10, 300, 200)
  *     g.FillRectangle(brush, 100.0, 100.0, 60.0, 30.0)
  *   }
- * @return [self]
  * @overload FillRectangle(brush, rectangle)
  *   @param brush [Brush]
  *   @param rectangle [Rectangle or RectangleF]
@@ -450,6 +449,7 @@ gdip_graphics_draw_rectangle(int argc, VALUE *argv, VALUE self)
  *   @param y [Integer or Float]
  *   @param width [Integer or Float]
  *   @param height [Integer or Float]
+ * @return [self]
  *   
  */
 static VALUE
@@ -501,7 +501,6 @@ gdip_graphics_fill_rectangle(int argc, VALUE *argv, VALUE self)
  *     g.DrawLine(pen, 10, 10, 50, 60)
  *     g.DrawLine(pen, 30.0, 100.0, 60.0, 100.0)
  *   }
- * @return [self]
  * @overload DrawLine(pen, point1, point2)
  *   @param pen [Pen]
  *   @param point1 [Point or PointF]
@@ -512,6 +511,7 @@ gdip_graphics_fill_rectangle(int argc, VALUE *argv, VALUE self)
  *   @param y1 [Integer or Float]
  *   @param x2 [Integer or Float]
  *   @param y2 [Integer or Float]
+ * @return [self]
  */
 static VALUE
 gdip_graphics_draw_line(int argc, VALUE *argv, VALUE self)
@@ -573,7 +573,7 @@ gdip_graphics_draw_lines(VALUE self, VALUE pen_v, VALUE ary)
     if (!_KIND_OF(pen_v, &tPen)) {
         rb_raise(rb_eTypeError, "The first argument should be Pen.");
     }
-    if (!_RB_ARRAY_P(ary)) {
+    if (!_RB_ARRAY_P(ary) && RARRAY_LEN(ary) <= 0) {
         rb_raise(rb_eTypeError, "The second argument should be Array of Point or PointF.");
     }
 
@@ -581,59 +581,25 @@ gdip_graphics_draw_lines(VALUE self, VALUE pen_v, VALUE ary)
     Check_NULL(g, "The graphics object does not exist.");
     Pen *pen = Data_Ptr<Pen *>(pen_v);
 
-    if (RARRAY_LEN(ary) == 0) {
-        _VERBOSE("The array is empty.");
+    VALUE first = rb_ary_entry(ary, 0);
+    if (_KIND_OF(first, &tPoint)) {
+        int count;
+        Point *points = alloc_array_of<Point, &tPoint>(ary, count);
+        Status status = g->DrawLines(pen, points, count);
+        ruby_xfree(points);
+        Check_Status(status);
+    }
+    else if (_KIND_OF(first, &tPointF)) {
+        int count;
+        PointF *points = alloc_array_of<PointF, &tPointF>(ary, count);
+        Status status = g->DrawLines(pen, points, count);
+        ruby_xfree(points);
+        Check_Status(status);
     }
     else {
-        VALUE first = rb_ary_entry(ary, 0);
-        if (_KIND_OF(first, &tPoint)) {
-            int count = 0;
-            for (long i = 0; i < RARRAY_LEN(ary); ++i) {
-                VALUE elem = rb_ary_entry(ary, i);
-                if (_KIND_OF(elem, &tPoint)) {
-                    count += 1;
-                }
-            }
-            int idx = 0;
-            Point *points = static_cast<Point *>(ruby_xmalloc(count * sizeof(Point)));
-            for (long i = 0; i < RARRAY_LEN(ary); ++i) {
-                VALUE elem = rb_ary_entry(ary, i);
-                if (_KIND_OF(elem, &tPoint)) {
-                    Point *po = Data_Ptr<Point *>(elem);
-                    points[idx] = *po;
-                    idx += 1;
-                }
-            }
-            Status status = g->DrawLines(pen, points, count);
-            ruby_xfree(points);
-            Check_Status(status);
-        }
-        else if (_KIND_OF(first, &tPointF)) {
-            int count = 0;
-            for (long i = 0; i < RARRAY_LEN(ary); ++i) {
-                VALUE elem = rb_ary_entry(ary, i);
-                if (_KIND_OF(elem, &tPointF)) {
-                    count += 1;
-                }
-            }
-            int idx = 0;
-            PointF *points = static_cast<PointF *>(ruby_xmalloc(count * sizeof(PointF)));
-            for (long i = 0; i < RARRAY_LEN(ary); ++i) {
-                VALUE elem = rb_ary_entry(ary, i);
-                if (_KIND_OF(elem, &tPointF)) {
-                    PointF *po = Data_Ptr<PointF *>(elem);
-                    points[idx] = *po;
-                    idx += 1;
-                }
-            }
-            Status status = g->DrawLines(pen, points, count);
-            ruby_xfree(points);
-            Check_Status(status);
-        }
-        else {
-            rb_raise(rb_eTypeError, "The second argument should be Array of Point or PointF.");
-        }
+        rb_raise(rb_eTypeError, "The second argument should be Array of Point or PointF.");
     }
+    
     return self;
 }
 
@@ -647,19 +613,16 @@ gdip_graphics_draw_lines(VALUE self, VALUE pen_v, VALUE ary)
  *   bmp {|g|
  *     g.DrawCurve(pen, points);
  *   }
- * @overload DrawCurve(pen, points)
+ * @overload DrawCurve(pen, points, tension=0.5)
  *   @param pen [Pen]
  *   @param points [Array<Point or PointF>]
- * @overload DrawCurve(pen, points, tention)
- *   @param pen [Pen]
- *   @param points [Array<Point or PointF>]
- *   @param tention [Float] 0.0-1.0
- * @overload DrawCurve(pen, points, offset, num, tention)
+ *   @param tension [Float] 0.0-1.0
+ * @overload DrawCurve(pen, points, offset, num, tension=0.5)
  *   @param pen [Pen]
  *   @param points [Array<Point or PointF>]
  *   @param offset [Integer] start index of points
  *   @param num [Integer] number of segments
- *   @param tention [Float] 0.0-1.0
+ *   @param tension [Float] 0.0-1.0
  * @return [self]
  */
 static VALUE
@@ -671,7 +634,7 @@ gdip_graphics_draw_curve(int argc, VALUE *argv, VALUE self)
     if (!_KIND_OF(argv[0], &tPen)) {
         rb_raise(rb_eTypeError, "The first argument should be Pen.");
     }
-    if (!_RB_ARRAY_P(argv[1])) {
+    if (!_RB_ARRAY_P(argv[1]) || RARRAY_LEN(argv[1]) <= 0) {
         rb_raise(rb_eTypeError, "The second argument should be Array of Point or PointF.");
     }
     if (argc == 3 && !Float_p(argv[2])) {
@@ -693,96 +656,50 @@ gdip_graphics_draw_curve(int argc, VALUE *argv, VALUE self)
     Check_NULL(g, "The graphics object does not exist.");
     Pen *pen = Data_Ptr<Pen *>(argv[0]);
 
-    if (RARRAY_LEN(argv[1]) == 0) {
-        _VERBOSE("The array is empty.");
+    VALUE first = rb_ary_entry(argv[1], 0);
+    int offset = 0;
+    int num = 0;
+    if (argc > 3) {
+        offset = RB_NUM2INT(argv[2]);
+        num = RB_NUM2INT(argv[3]);
     }
-    else {
-        VALUE first = rb_ary_entry(argv[1], 0);
-        if (_KIND_OF(first, &tPoint)) {
-            
-            int count = 0;
-            for (long i = 0; i < RARRAY_LEN(argv[1]); ++i) {
-                VALUE elem = rb_ary_entry(argv[1], i);
-                if (_KIND_OF(elem, &tPoint)) {
-                    count += 1;
-                }
-            }
-            int idx = 0;
-            Point *points = static_cast<Point *>(ruby_xmalloc(count * sizeof(Point)));
-            for (long i = 0; i < RARRAY_LEN(argv[1]); ++i) {
-                VALUE elem = rb_ary_entry(argv[1], i);
-                if (_KIND_OF(elem, &tPoint)) {
-                    Point *po = Data_Ptr<Point *>(elem);
-                    points[idx] = *po;
-                    idx += 1;
-                }
-            }
-            Status status;
-            if (argc == 2) {
-                status = g->DrawCurve(pen, points, count);
-            }
-            else if (argc == 3) {
-                float tension = clamp(NUM2SINGLE(argv[2]), 0.0f, 1.0f);
-                status = g->DrawCurve(pen, points, count, tension);
-            }
-            else if (argc == 4) {
-                int offset = RB_NUM2INT(argv[2]);
-                int num = RB_NUM2INT(argv[3]);
-                status = g->DrawCurve(pen, points, count, offset, num, 0.5f);
-            }
-            else if (argc == 5) {
-                int offset = RB_NUM2INT(argv[2]);
-                int num = RB_NUM2INT(argv[3]);
-                float tension = clamp(NUM2SINGLE(argv[4]), 0.0f, 1.0f);
-                status = g->DrawCurve(pen, points, count, offset, num, tension);
-            }
-            ruby_xfree(points);
-            Check_Status(status);
-        }
-        else if (_KIND_OF(first, &tPointF)) {
-            int count = 0;
-            for (long i = 0; i < RARRAY_LEN(argv[1]); ++i) {
-                VALUE elem = rb_ary_entry(argv[1], i);
-                if (_KIND_OF(elem, &tPointF)) {
-                    count += 1;
-                }
-            }
-            int idx = 0;
-            PointF *points = static_cast<PointF *>(ruby_xmalloc(count * sizeof(PointF)));
-            for (long i = 0; i < RARRAY_LEN(argv[1]); ++i) {
-                VALUE elem = rb_ary_entry(argv[1], i);
-                if (_KIND_OF(elem, &tPointF)) {
-                    PointF *po = Data_Ptr<PointF *>(elem);
-                    points[idx] = *po;
-                    idx += 1;
-                }
-            }
-            Status status;
-            if (argc == 2) {
-                status = g->DrawCurve(pen, points, count);
-            }
-            else if (argc == 3) {
-                float tension = clamp(NUM2SINGLE(argv[2]), 0.0f, 1.0f);
-                status = g->DrawCurve(pen, points, count, tension);
-            }
-            else if (argc == 4) {
-                int offset = RB_NUM2INT(argv[2]);
-                int num = RB_NUM2INT(argv[3]);
-                status = g->DrawCurve(pen, points, count, offset, num, 0.5f);
-            }
-            else if (argc == 5) {
-                int offset = RB_NUM2INT(argv[2]);
-                int num = RB_NUM2INT(argv[3]);
-                float tension = clamp(NUM2SINGLE(argv[4]), 0.0f, 1.0f);
-                status = g->DrawCurve(pen, points, count, offset, num, tension);
-            }
-            ruby_xfree(points);
-            Check_Status(status);
+    float tension = 0.5f;
+    if (argc == 3) {
+        tension = clamp(NUM2SINGLE(argv[2]), 0.0f, 1.0f);
+    }
+    if (argc == 5) {
+        tension = clamp(NUM2SINGLE(argv[4]), 0.0f, 1.0f);
+    }
+    if (_KIND_OF(first, &tPoint)) {
+        int count;
+        Point *points = alloc_array_of<Point, &tPoint>(argv[1], count);
+        Status status;
+        if (argc > 3) {
+            status = g->DrawCurve(pen, points, count, offset, num, tension);
         }
         else {
-            rb_raise(rb_eTypeError, "The second argument should be Array of Point or PointF.");
+            status = g->DrawCurve(pen, points, count, tension);
         }
+        ruby_xfree(points);
+        Check_Status(status);
     }
+    else if (_KIND_OF(first, &tPointF)) {
+        int count;
+        PointF *points = alloc_array_of<PointF, &tPointF>(argv[1], count);
+        Status status;
+        if (argc > 3) {
+            status = g->DrawCurve(pen, points, count, offset, num, tension);
+        }
+        else {
+            status = g->DrawCurve(pen, points, count, tension);
+        }
+        ruby_xfree(points);
+        Check_Status(status);
+    }
+    else {
+        rb_raise(rb_eTypeError, "The second argument should be Array of Point or PointF.");
+    }
+
     return self;
 }
 
@@ -822,7 +739,7 @@ gdip_graphics_draw_ellipse(int argc, VALUE *argv, VALUE self)
             Rect *rect = Data_Ptr<Rect *>(argv[1]);
             g->DrawEllipse(pen, *rect);
         }
-        else if (_KIND_OF(argv[1], &tRectangle)) {
+        else if (_KIND_OF(argv[1], &tRectangleF)) {
             RectF *rect = Data_Ptr<RectF *>(argv[1]);
             g->DrawEllipse(pen, *rect);
         }
@@ -906,6 +823,147 @@ gdip_graphics_fill_ellipse(int argc, VALUE *argv, VALUE self)
     return self;
 }
 
+
+/**
+ * @overload DrawClosedCurve(pen, points, tension=0.5)
+ *   @param pen [Pen]
+ *   @param points [Array<Point or PointF>]
+ *   @param tension [Float] 0.0-1.0
+ *   @return [self]
+ * @example
+ *   bmp.draw {|g|
+ *     g.DrawClosedCurve(pen, points)
+ *   }
+ */
+static VALUE
+gdip_graphics_draw_closed_curve(int argc, VALUE *argv, VALUE self)
+{
+    VALUE v_pen;
+    VALUE v_ary;
+    VALUE v_tension = Qnil;
+    rb_scan_args(argc, argv, "21", &v_pen, &v_ary, &v_tension);
+
+    if (!_KIND_OF(v_pen, &tPen)) {
+        rb_raise(rb_eTypeError, "The first argument should be Pen.");
+    }
+
+    Graphics *g = Data_Ptr<Graphics *>(self);
+    Check_NULL(g, "The graphics object does not exist.");
+    Pen *pen = Data_Ptr<Pen *>(v_pen);
+    float tension = 0.5f;
+
+    if (!RB_NIL_P(v_tension)) {
+        if (Float_p(v_tension)) {
+            tension = clamp(NUM2SINGLE(v_tension), 0.0f, 1.0f);
+        }
+        else {
+            rb_raise(rb_eTypeError, "The third argument should be Float.");
+        }
+    }
+
+    if (_RB_ARRAY_P(v_ary) && RARRAY_LEN(v_ary) > 0) {
+        VALUE first = rb_ary_entry(v_ary, 0);
+        if (_KIND_OF(first, &tPoint)) {
+            int count;
+            Point *points = alloc_array_of<Point, &tPoint>(v_ary, count);
+            Status status = g->DrawClosedCurve(pen, points, count, tension);
+            ruby_xfree(points);
+            Check_Status(status);
+        }
+        else if (_KIND_OF(first, &tPointF)) {
+            int count;
+            PointF *points = alloc_array_of<PointF, &tPointF>(v_ary, count);
+            Status status = g->DrawClosedCurve(pen, points, count, tension);
+            ruby_xfree(points);
+            Check_Status(status);
+        }
+        else {
+            rb_raise(rb_eTypeError, "The second argument should be Array of Point or PointF.");
+        }
+    }
+    else {
+        rb_raise(rb_eTypeError, "The second argument should be Array of Point or PointF.");
+    }
+    return self;
+}
+
+/**
+ * @example
+ *   bmp.draw {|g|
+ *     g.FillClosedCurve(brush, points)
+ *   }
+ * @overload FillClosedCurve(brush, points)
+ *   @param brush [Brush]
+ *   @param points [Array<Point or PointF>]
+ * @overload FillClosedCurve(pen, points, fillmode, tension=0.5)
+ *   @param brush [Brush]
+ *   @param points [Array<Point or PointF>]
+ *   @param fillmode [FillMode]
+ *   @param tension [Float]
+ * @return [self]
+ */
+static VALUE
+gdip_graphics_fill_closed_curve(int argc, VALUE *argv, VALUE self)
+{
+    if (argc < 2 || 4 < argc) {
+        rb_raise(rb_eArgError, "wrong number of arguments (%d for 2..4)", argc);
+    }
+    if (_KIND_OF(argv[1], &tBrush)) {
+        rb_raise(rb_eTypeError, "The second argument should be Brush.");
+    }
+    if (_RB_ARRAY_P(argv[1]) && RARRAY_LEN(argv[1]) <= 0) {
+        rb_raise(rb_eTypeError, "The second argument should be Array of Point or PointF.");
+    }
+    if (argc == 4 && !Float_p(argv[3])) {
+        rb_raise(rb_eTypeError, "The fourth argument should be Float.");
+    }
+
+    Graphics *g = Data_Ptr<Graphics *>(self);
+    Check_NULL(g, "The graphics object does not exist.");
+    Brush *brush = Data_Ptr<Brush *>(argv[0]);
+
+    float tension = 0.5f;
+    if (argc == 4) {
+        tension = NUM2SINGLE(argv[3]);
+    }
+    FillMode fillmode = FillModeWinding;
+    if (argc > 2) {
+        fillmode = static_cast<FillMode>(gdip_arg_to_enumint(cFillMode, argv[2]));
+    }
+    
+    VALUE first = rb_ary_entry(argv[1], 0);
+    if (_KIND_OF(first, &tPoint)) {
+        int count;
+        Point *points = alloc_array_of<Point, &tPoint>(argv[1], count);
+        Status status;
+        if (argc > 2) {
+            status = g->FillClosedCurve(brush, points, count, fillmode, tension);
+        }
+        else {
+            status = g->FillClosedCurve(brush, points, count);
+        }
+        ruby_xfree(points);
+        Check_Status(status);
+    }
+    else if (_KIND_OF(first, &tPointF)) {
+        int count;
+        PointF *points = alloc_array_of<PointF, &tPointF>(argv[1], count);
+        Status status;
+        if (argc > 2) {
+            status = g->FillClosedCurve(brush, points, count, fillmode, tension);
+        }
+        else {
+            status = g->FillClosedCurve(brush, points, count);
+        }
+        ruby_xfree(points);
+        Check_Status(status);
+    }
+    else {
+        rb_raise(rb_eTypeError, "The second argument should be Array of Point or PointF.");
+    }
+
+}
+
 void
 Init_graphics()
 {
@@ -943,4 +1001,8 @@ Init_graphics()
     rb_define_alias(cGraphics, "fill_ellipse", "FillEllipse");
     rb_define_method(cGraphics, "DrawCurve", RUBY_METHOD_FUNC(gdip_graphics_draw_curve), -1);
     rb_define_alias(cGraphics, "draw_curve", "DrawCurve");
+    rb_define_method(cGraphics, "DrawClosedCurve", RUBY_METHOD_FUNC(gdip_graphics_draw_closed_curve), -1);
+    rb_define_alias(cGraphics, "draw_closed_curve", "DrawClosedCurve");
+    rb_define_method(cGraphics, "FillClosedCurve", RUBY_METHOD_FUNC(gdip_graphics_fill_closed_curve), -1);
+    rb_define_alias(cGraphics, "fill_closed_curve", "FillClosedCurve");
 }
