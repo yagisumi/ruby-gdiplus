@@ -7,6 +7,7 @@
 
 VALUE mGdiplus;
 VALUE mInternals;
+VALUE cGpObject;
 VALUE eGdiplus;
 
 VALUE cGuid;
@@ -140,12 +141,6 @@ gdiplus_end(VALUE self)
     gdiplus_shutdown();
 }
 
-VALUE
-gdip_obj_id(VALUE self)
-{
-    return (VALUE)(Data_Ptr_As<ID>(self)|FIXNUM_FLAG);
-}
-
 bool
 gdip_arg_to_double(VALUE v, double *dbl, bool do_raise)
 {
@@ -180,12 +175,25 @@ gdip_arg_to_single(VALUE v, float *flt, bool do_raise)
     return false;
 }
 
+static VALUE
+gdip_gpobject_object_id(VALUE self)
+{
+    if (RB_TYPE_P(self, RUBY_T_DATA)) {
+        return _RB_ID2NUM(Data_Ptr_As<ID>(self) >> 1);
+    }
+    else {
+        return _RB_ID2NUM(-1);
+    }
+}
+
 extern "C" void
 Init_gdiplus(void)
 {
     mGdiplus = rb_define_module("Gdiplus");
     eGdiplus = rb_define_class_under(mGdiplus, "GdiplusError", rb_eException);
     mInternals = rb_define_module_under(mGdiplus, "Internals");
+    cGpObject = rb_define_class_under(mInternals, "GpObject", rb_cObject);
+    rb_define_method(cGpObject, "gdiplus_id", RUBY_METHOD_FUNC(gdip_gpobject_object_id), 0);
 
     rb_set_end_proc(gdiplus_end, Qnil);
     gdiplus_init();

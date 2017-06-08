@@ -91,6 +91,7 @@ end
 
 
 $superclass_path_map = {
+  "cGpObject" => "Gdiplus::Internals::GpObject",
   "cEnumInt" => "Gdiplus::Internals::EnumInt",
   "cImage" => "Gdiplus::Image",
   "cGuid" => "Gdiplus::Guid",

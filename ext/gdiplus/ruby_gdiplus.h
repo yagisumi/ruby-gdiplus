@@ -22,6 +22,7 @@ using namespace Gdiplus;
 
 extern VALUE mGdiplus;
 extern VALUE mInternals;
+extern VALUE cGpObject;
 extern VALUE eGdiplus;
 
 extern VALUE cGuid;
@@ -126,7 +127,6 @@ void gdiplus_shutdown();
 
 bool gdip_arg_to_double(VALUE v, double *dbl, bool do_raise=true);
 bool gdip_arg_to_single(VALUE v, float *flt, bool do_raise=true);
-VALUE gdip_obj_id(VALUE self);
 
 static inline void GdiplusAddRef() { ++gdip_refcount; }
 static inline void GdiplusRelease() {

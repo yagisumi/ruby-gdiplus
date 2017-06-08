@@ -967,7 +967,7 @@ gdip_graphics_fill_closed_curve(int argc, VALUE *argv, VALUE self)
 void
 Init_graphics()
 {
-    cGraphics = rb_define_class_under(mGdiplus, "Graphics", rb_cObject);
+    cGraphics = rb_define_class_under(mGdiplus, "Graphics", cGpObject);
     rb_undef_alloc_func(cGraphics);
 
     ATTR_R(cGraphics, ClipBounds, clip_bounds, graphics);

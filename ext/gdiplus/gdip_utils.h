@@ -12,6 +12,12 @@
 #define _RB_FLOAT_P(v) RB_TYPE_P(v, RUBY_T_FLOAT)
 #define _RB_SYMBOL_P(v) RB_SYMBOL_P(v)
 
+#if SIZEOF_LONG_LONG == SIZEOF_VOIDP
+#define _RB_ID2NUM(v) ULL2NUM(v)
+#else
+#define _RB_ID2NUM(v) RB_ULONG2NUM(v)
+#endif
+
 static inline float
 NUM2SINGLE(VALUE num)
 {

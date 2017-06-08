@@ -286,7 +286,7 @@ void Init_image()
 {
     ext_clsid_table_init();
 
-    cImage = rb_define_class_under(mGdiplus, "Image", rb_cObject);
+    cImage = rb_define_class_under(mGdiplus, "Image", cGpObject);
     rb_undef_alloc_func(cImage);
     rb_define_method(cImage, "save", RUBY_METHOD_FUNC(gdip_image_save), -1);
     rb_define_method(cImage, "draw", RUBY_METHOD_FUNC(gdip_image_draw), 0);
