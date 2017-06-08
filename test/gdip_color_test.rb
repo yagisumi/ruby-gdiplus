@@ -7,8 +7,10 @@ class GdiplusColorTest < Test::Unit::TestCase
   def test_color_args
     assert_instance_of(Color, Color.new())
     assert_instance_of(Color, Color.new(0xff000000))
+    assert_instance_of(Color, Color.new(0xff000000))
     assert_instance_of(Color, Color.new(1.1)) # 1.1 has to_int
     assert_instance_of(Color, Color.new(128, Color.new(0xf0123456)))
+    assert_instance_of(Color, Color.new(128, :Red))
     assert_instance_of(Color, Color.new(255, 0, 0))
     assert_instance_of(Color, Color.new(200, 255, 0, 0))
     assert_raise(ArgumentError) { Color.new(1, 2, 3, 4, 5) }
@@ -19,9 +21,11 @@ class GdiplusColorTest < Test::Unit::TestCase
     assert_raise(TypeError) { Color.new(1, 2, 3, "4") }
     
     assert_instance_of(Color, Color.FromArgb())
+    assert_instance_of(Color, Color.from_argb())
     assert_instance_of(Color, Color.FromArgb(0xff000000))
     assert_instance_of(Color, Color.FromArgb(1.1)) # 1.1 has to_int
     assert_instance_of(Color, Color.FromArgb(128, Color.FromArgb(0xf0123456)))
+    assert_instance_of(Color, Color.from_argb(128, :Red))
     assert_instance_of(Color, Color.FromArgb(255, 0, 0))
     assert_instance_of(Color, Color.FromArgb(200, 255, 0, 0))
     assert_raise(ArgumentError) { Color.FromArgb(1, 2, 3, 4, 5) }
@@ -56,6 +60,7 @@ class GdiplusColorTest < Test::Unit::TestCase
     assert_equal(true, Color.new(0xffffffff) == 0xffffffff)
     assert_equal(false, Color.new == 1.1)
     assert_equal(false, Color.new == "1")
+    assert_equal(Color.Blue, Color.new(:Blue))
   end
   
   def test_color_property

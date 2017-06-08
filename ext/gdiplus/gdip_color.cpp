@@ -30,7 +30,7 @@ gdip_arg_to_color(VALUE v, Color *color, bool to_int, bool do_raise)
         return true;
     }
     else if (do_raise) {
-        rb_raise(rb_eTypeError, "The argument must be Color or Integer");
+        rb_raise(rb_eTypeError, "The argument should be Color or Integer");
     }
     return false;
 }
@@ -89,20 +89,31 @@ gdip_color_init(int argc, VALUE *argv, VALUE self)
             Data_Ptr_Set_As<ARGB>(self, RB_NUM2UINT(argv[0]));
         }
         else {
-            //rb_raise(rb_eTypeError, "The argument must be an Integer");
-            VALUE num = rb_to_int(argv[0]);
-            Data_Ptr_Set_As<ARGB>(self, RB_NUM2UINT(num));
+            Color color;
+            gdip_arg_to_color(argv[0], &color, true, true);
+            Data_Ptr_Set_As<ARGB>(self, color.GetValue());
         }
     }
     else if (argc == 2) {
-        if (Integer_p(argv[0]) && _KIND_OF(argv[1], &tColor)) {
-            ARGB argb = Data_Ptr_As<ARGB>(argv[1]);
-            DWORD a = NUM2UINT(argv[0]) & 0xff;
+        if (Integer_p(argv[0])) {
+            ARGB argb;
+            if (_KIND_OF(argv[1], &tColor)) {
+                argb = Data_Ptr_As<ARGB>(argv[1]);
+            }
+            else if (_RB_SYMBOL_P(argv[1])) {
+                Color color;
+                gdip_arg_to_color(argv[1], &color);
+                argb = color.GetValue();
+            }
+            else {
+                rb_raise(rb_eTypeError, "The second argument should be Color.");
+            }
+            DWORD a = RB_NUM2UINT(argv[0]) & 0xff;
             argb = argb & 0xffffff | a << 24;
             gdip_color_set_color(self, argb);
         }
         else {
-            rb_raise(rb_eTypeError, "wrong types of arguments");
+            rb_raise(rb_eTypeError, "The first argument should be Integer.");
         }
     }
     else if (argc == 3) {
@@ -113,7 +124,7 @@ gdip_color_init(int argc, VALUE *argv, VALUE self)
             gdip_color_set_color(self, r, g, b);
         }
         else {
-            rb_raise(rb_eTypeError, "All arguments must be Integer");
+            rb_raise(rb_eTypeError, "All arguments should be Integer.");
         }
     }
     else if (argc == 4) {
@@ -125,11 +136,11 @@ gdip_color_init(int argc, VALUE *argv, VALUE self)
             gdip_color_set_color(self, r, g, b, a);
         }
         else {
-            rb_raise(rb_eTypeError, "All arguments must be Integer");
+            rb_raise(rb_eTypeError, "All arguments should be Integer.");
         }
     }
     else {
-        rb_raise(rb_eArgError, "too many arguments");
+        rb_raise(rb_eArgError, "wrong number of arguments (%d for 0..4)", argc);
     }
 
     return self;
