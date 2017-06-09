@@ -175,6 +175,9 @@ gdip_arg_to_single(VALUE v, float *flt, bool do_raise)
     return false;
 }
 
+/**
+ * @return [Integer]
+ */
 static VALUE
 gdip_gpobject_object_id(VALUE self)
 {

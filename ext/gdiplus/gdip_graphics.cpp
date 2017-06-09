@@ -368,11 +368,27 @@ gdip_graphics_get_visible_clip_bounds(VALUE self)
     return gdip_rectf_create(&rect);
 }
 
-//
-// METHOD
-//
 
 /**
+ * @overload Clear(color)
+ *   Fills the whole with the specified color.
+ *   @param color [Color]
+ *   @return [self]
+ */
+static VALUE
+gdip_graphics_clear(VALUE self, VALUE color_v)
+{
+    Color color;
+    gdip_arg_to_color(color_v, &color, true, true);
+    Graphics *g = Data_Ptr<Graphics *>(self);
+    Check_NULL(g, "The graphics object does not exist.");
+    g->Clear(color);
+    return self;
+}
+
+
+/**
+ * @group Drawing Method Summary 
  * @example
  *   bmp.draw {|g|
  *     g.DrawRectangle(pen, rect)
@@ -404,6 +420,8 @@ gdip_graphics_draw_rectangle(int argc, VALUE *argv, VALUE self)
     Graphics *g = Data_Ptr<Graphics *>(self);
     Check_NULL(g, "The graphics object does not exist.");
     Pen *pen = Data_Ptr<Pen *>(argv[0]);
+    Check_NULL(pen, "The pen object does not exist.");
+
     if (argc == 2) {
         if (_KIND_OF(argv[1], &tRectangle)) {
             Rect *rect = Data_Ptr<Rect *>(argv[1]);
@@ -465,6 +483,8 @@ gdip_graphics_fill_rectangle(int argc, VALUE *argv, VALUE self)
     Graphics *g = Data_Ptr<Graphics *>(self);
     Check_NULL(g, "The graphics object does not exist.");
     Brush *brush = Data_Ptr<Brush *>(argv[0]);
+    Check_NULL(brush, "The brush object does not exist.");
+
     if (argc == 2) {
         if (_KIND_OF(argv[1], &tRectangle)) {
             Rect *rect = Data_Ptr<Rect *>(argv[1]);
@@ -526,6 +546,8 @@ gdip_graphics_draw_line(int argc, VALUE *argv, VALUE self)
     Graphics *g = Data_Ptr<Graphics *>(self);
     Check_NULL(g, "The graphics object does not exist.");
     Pen *pen = Data_Ptr<Pen *>(argv[0]);
+    Check_NULL(pen, "The pen object does not exist.");
+
     if (argc == 3) {
         if (_KIND_OF(argv[1], &tPoint) && _KIND_OF(argv[2], &tPoint)) {
             Point *po1 = Data_Ptr<Point *>(argv[1]);
@@ -580,6 +602,7 @@ gdip_graphics_draw_lines(VALUE self, VALUE pen_v, VALUE ary)
     Graphics *g = Data_Ptr<Graphics *>(self);
     Check_NULL(g, "The graphics object does not exist.");
     Pen *pen = Data_Ptr<Pen *>(pen_v);
+    Check_NULL(pen, "The pen object does not exist.");
 
     VALUE first = rb_ary_entry(ary, 0);
     if (_KIND_OF(first, &tPoint)) {
@@ -655,6 +678,7 @@ gdip_graphics_draw_curve(int argc, VALUE *argv, VALUE self)
     Graphics *g = Data_Ptr<Graphics *>(self);
     Check_NULL(g, "The graphics object does not exist.");
     Pen *pen = Data_Ptr<Pen *>(argv[0]);
+    Check_NULL(pen, "The pen object does not exist.");
 
     VALUE first = rb_ary_entry(argv[1], 0);
     int offset = 0;
@@ -734,6 +758,8 @@ gdip_graphics_draw_ellipse(int argc, VALUE *argv, VALUE self)
     Graphics *g = Data_Ptr<Graphics *>(self);
     Check_NULL(g, "The graphics object does not exist.");
     Pen *pen = Data_Ptr<Pen *>(argv[0]);
+    Check_NULL(pen, "The pen object does not exist.");
+
     if (argc == 2) {
         if (_KIND_OF(argv[1], &tRectangle)) {
             Rect *rect = Data_Ptr<Rect *>(argv[1]);
@@ -771,10 +797,10 @@ gdip_graphics_draw_ellipse(int argc, VALUE *argv, VALUE self)
  *     g.FillEllipse(brush, 100.0, 100.0, 50.0, 50.0)
  *   }
  * @overload FillEllipse(brush, rectangle)
- *   @param pen [Brush]
+ *   @param brush [Brush]
  *   @param rectangle [Rectangle or RectangleF]
  * @overload FillEllipse(brush, x, y, width, height)
- *   @param pen [Brush]
+ *   @param brush [Brush]
  *   @param x [Integer or Float]
  *   @param y [Integer or Float]
  *   @param width [Integer or Float]
@@ -793,7 +819,9 @@ gdip_graphics_fill_ellipse(int argc, VALUE *argv, VALUE self)
 
     Graphics *g = Data_Ptr<Graphics *>(self);
     Check_NULL(g, "The graphics object does not exist.");
-   Brush *brush = Data_Ptr<Brush *>(argv[0]);
+    Brush *brush = Data_Ptr<Brush *>(argv[0]);
+    Check_NULL(g, "The brush object does not exist.");
+
     if (argc == 2) {
         if (_KIND_OF(argv[1], &tRectangle)) {
             Rect *rect = Data_Ptr<Rect *>(argv[1]);
@@ -850,6 +878,7 @@ gdip_graphics_draw_closed_curve(int argc, VALUE *argv, VALUE self)
     Graphics *g = Data_Ptr<Graphics *>(self);
     Check_NULL(g, "The graphics object does not exist.");
     Pen *pen = Data_Ptr<Pen *>(v_pen);
+    Check_NULL(g, "The pen object does not exist.");
     float tension = 0.5f;
 
     if (!RB_NIL_P(v_tension)) {
@@ -921,8 +950,9 @@ gdip_graphics_fill_closed_curve(int argc, VALUE *argv, VALUE self)
     Graphics *g = Data_Ptr<Graphics *>(self);
     Check_NULL(g, "The graphics object does not exist.");
     Brush *brush = Data_Ptr<Brush *>(argv[0]);
-
+    Check_NULL(brush, "The brush object does not exist.");
     float tension = 0.5f;
+
     if (argc == 4) {
         tension = NUM2SINGLE(argv[3]);
     }
@@ -961,7 +991,89 @@ gdip_graphics_fill_closed_curve(int argc, VALUE *argv, VALUE self)
     else {
         rb_raise(rb_eTypeError, "The second argument should be Array of Point or PointF.");
     }
+    
+    return self;
+}
 
+/**
+ * @example
+ *   bmp.draw {|g|
+ *     g.DrawArc(pen, rect, -30, 60)
+ *     g.DrawArc(pen, 20, 20, 160, 160, 90.0, 180.0)
+ *     g.DrawArc(pen1, 20.0, 220.0, 160.0, 160.0, 90.0, 180.0)
+ *   }
+ * @overload DrawArc(pen, rect, start_angle, sweep_angle)
+ *   @param pen [Pen]
+ *   @param rect [Rectangle or RectangleF]
+ *   @param start_angle [Integer or Float]
+ *   @param sweep_angle [Integer or Float]
+ * @overload DrawArc(pen, x, y, width, height, start_angle, sweep_angle)
+ *   @param pen [Pen]
+ *   @param x [Integer or Float]
+ *   @param y [Integer or Float]
+ *   @param width [Integer or Float]
+ *   @param height [Integer or Float]
+ *   @param start_angle [Integer or Float]
+ *   @param sweep_angle [Integer or Float]
+ */
+static VALUE
+gdip_graphics_draw_arc(int argc, VALUE *argv, VALUE self)
+{
+    if (argc != 4 && argc != 7) {
+        rb_raise(rb_eArgError, "wrong number of arguments (%d for 4 or 7)", argc);
+    }
+    if (!_KIND_OF(argv[0], &tPen)) {
+        rb_raise(rb_eTypeError, "The first argument should be Pen.");
+    }
+
+    Graphics *g = Data_Ptr<Graphics *>(self);
+    Check_NULL(g, "The graphics object does not exist.");
+    Pen *pen = Data_Ptr<Pen *>(argv[0]);
+    Check_NULL(pen, "The pen object does not exist.");
+
+    float start_angle;
+    float sweep_angle;
+    if (argc == 4 && !gdip_arg_to_single(argv[2], &start_angle, false)) {
+        rb_raise(rb_eTypeError, "The argument of a start angle should be Integer or Float.");
+    }
+    if (argc == 4 && !gdip_arg_to_single(argv[3], &sweep_angle, false)) {
+        rb_raise(rb_eTypeError, "The argument of a sweep angle should be Integer or Float.");
+    }
+    if (argc == 7 && !gdip_arg_to_single(argv[5], &start_angle, false)) {
+        rb_raise(rb_eTypeError, "The argument of a start angle should be Integer or Float.");
+    }
+    if (argc == 7 && !gdip_arg_to_single(argv[6], &sweep_angle, false)) {
+        rb_raise(rb_eTypeError, "The argument of a sweep angle should be Integer or Float.");
+    }
+
+    Status status = Ok;
+    if (argc == 4) {
+        if (_KIND_OF(argv[1], &tRectangle)) {
+            Rect *rect = Data_Ptr<Rect *>(argv[1]);
+            status = g->DrawArc(pen, *rect, start_angle, sweep_angle);
+        }
+        else if (_KIND_OF(argv[1], &tRectangleF)) {
+            RectF *rect = Data_Ptr<RectF *>(argv[1]);
+            status = g->DrawArc(pen, *rect, start_angle, sweep_angle);
+        }
+        else {
+            rb_raise(rb_eTypeError, "The second argument should be Rectangle or RectangleF");
+        }
+    }
+    else if (argc == 7) {
+        if (Integer_p(argv[1], argv[2], argv[3], argv[4])) {
+            status = g->DrawArc(pen, RB_NUM2INT(argv[1]), RB_NUM2INT(argv[2]), RB_NUM2INT(argv[3]), RB_NUM2INT(argv[4]), start_angle, sweep_angle);
+        }
+        else if (Float_p(argv[1], argv[2], argv[3], argv[4])) {
+            status = g->DrawArc(pen, NUM2SINGLE(argv[1]), NUM2SINGLE(argv[2]), NUM2SINGLE(argv[3]), NUM2SINGLE(argv[4]), start_angle, sweep_angle);
+        }
+        else {
+            rb_raise(rb_eTypeError, "The arguments representing the position and size of the rectangle should be Integer or Float.");
+        }
+    }
+    Check_Status(status);
+
+    return self;
 }
 
 void
@@ -986,6 +1098,9 @@ Init_graphics()
     ATTR_RW(cGraphics, TextContrast, text_contrast, graphics);
     ATTR_RW(cGraphics, TextRenderingHint, text_rendering_hint, graphics);
     ATTR_R(cGraphics, VisibleClipBounds, visible_clip_bounds, graphics);
+
+    rb_define_method(cGraphics, "Clear", RUBY_METHOD_FUNC(gdip_graphics_clear), 1);
+    rb_define_alias(cGraphics, "clear", "Clear");
     
     rb_define_method(cGraphics, "DrawRectangle", RUBY_METHOD_FUNC(gdip_graphics_draw_rectangle), -1);
     rb_define_alias(cGraphics, "draw_rectangle", "DrawRectangle");
@@ -1005,4 +1120,6 @@ Init_graphics()
     rb_define_alias(cGraphics, "draw_closed_curve", "DrawClosedCurve");
     rb_define_method(cGraphics, "FillClosedCurve", RUBY_METHOD_FUNC(gdip_graphics_fill_closed_curve), -1);
     rb_define_alias(cGraphics, "fill_closed_curve", "FillClosedCurve");
+    rb_define_method(cGraphics, "DrawArc", RUBY_METHOD_FUNC(gdip_graphics_draw_arc), -1);
+    rb_define_alias(cGraphics, "draw_arc", "DrawArc");
 }
