@@ -956,7 +956,7 @@ gdip_graphics_fill_closed_curve(int argc, VALUE *argv, VALUE self)
     if (argc == 4) {
         tension = NUM2SINGLE(argv[3]);
     }
-    FillMode fillmode = FillModeWinding;
+    FillMode fillmode = FillModeAlternate;
     if (argc > 2) {
         fillmode = static_cast<FillMode>(gdip_arg_to_enumint(cFillMode, argv[2]));
     }
@@ -1015,6 +1015,7 @@ gdip_graphics_fill_closed_curve(int argc, VALUE *argv, VALUE self)
  *   @param height [Integer or Float]
  *   @param start_angle [Integer or Float]
  *   @param sweep_angle [Integer or Float]
+ * @return [self]
  */
 static VALUE
 gdip_graphics_draw_arc(int argc, VALUE *argv, VALUE self)
@@ -1235,6 +1236,28 @@ gdip_graphics_draw_beziers(VALUE self, VALUE pen_v, VALUE ary)
     return self;
 }
 
+/**
+ * @example
+ *   bmp.draw {|g|
+ *     g.DrawPie(pen, rect, -30, 60)
+ *     g.DrawPie(pen, 20, 20, 160, 160, 90.0, 180.0)
+ *     g.DrawPie(pen1, 20.0, 220.0, 160.0, 160.0, 90.0, 180.0)
+ *   }
+ * @overload DrawPie(pen, rect, start_angle, sweep_angle)
+ *   @param pen [Pen]
+ *   @param rect [Rectangle or RectangleF]
+ *   @param start_angle [Integer or Float]
+ *   @param sweep_angle [Integer or Float]
+ * @overload DrawPie(pen, x, y, width, height, start_angle, sweep_angle)
+ *   @param pen [Pen]
+ *   @param x [Integer or Float]
+ *   @param y [Integer or Float]
+ *   @param width [Integer or Float]
+ *   @param height [Integer or Float]
+ *   @param start_angle [Integer or Float]
+ *   @param sweep_angle [Integer or Float]
+ * @return [self]
+ */
 static VALUE
 gdip_graphics_draw_pie(int argc, VALUE *argv, VALUE self)
 {
@@ -1295,6 +1318,210 @@ gdip_graphics_draw_pie(int argc, VALUE *argv, VALUE self)
     return self;
 }
 
+/**
+ * @example
+ *   bmp.draw {|g|
+ *     g.FillPie(pen, rect, -30, 60)
+ *     g.FillPie(pen, 20, 20, 160, 160, 90.0, 180.0)
+ *     g.FillPie(pen1, 20.0, 220.0, 160.0, 160.0, 90.0, 180.0)
+ *   }
+ * @overload FillPie(brush, rect, start_angle, sweep_angle)
+ *   @param brush [Brush]
+ *   @param rect [Rectangle or RectangleF]
+ *   @param start_angle [Integer or Float]
+ *   @param sweep_angle [Integer or Float]
+ * @overload FillPie(pen, x, y, width, height, start_angle, sweep_angle)
+ *   @param brush [Brush]
+ *   @param x [Integer or Float]
+ *   @param y [Integer or Float]
+ *   @param width [Integer or Float]
+ *   @param height [Integer or Float]
+ *   @param start_angle [Integer or Float]
+ *   @param sweep_angle [Integer or Float]
+ * @return [self]
+ */
+static VALUE
+gdip_graphics_fill_pie(int argc, VALUE *argv, VALUE self)
+{
+    if (argc != 4 && argc != 7) {
+        rb_raise(rb_eArgError, "wrong number of arguments (%d for 4 or 7)", argc);
+    }
+    if (!_KIND_OF(argv[0], &tBrush)) {
+        rb_raise(rb_eTypeError, "The first argument should be Brush.");
+    }
+
+    Graphics *g = Data_Ptr<Graphics *>(self);
+    Check_NULL(g, "The graphics object does not exist.");
+    Brush *brush = Data_Ptr<Brush *>(argv[0]);
+    Check_NULL(brush, "The brush object does not exist.");
+
+    float start_angle;
+    float sweep_angle;
+    if (argc == 4 && !gdip_arg_to_single(argv[2], &start_angle, false)) {
+        rb_raise(rb_eTypeError, "The argument of the start angle should be Integer or Float.");
+    }
+    if (argc == 4 && !gdip_arg_to_single(argv[3], &sweep_angle, false)) {
+        rb_raise(rb_eTypeError, "The argument of the sweep angle should be Integer or Float.");
+    }
+    if (argc == 7 && !gdip_arg_to_single(argv[5], &start_angle, false)) {
+        rb_raise(rb_eTypeError, "The argument of the start angle should be Integer or Float.");
+    }
+    if (argc == 7 && !gdip_arg_to_single(argv[6], &sweep_angle, false)) {
+        rb_raise(rb_eTypeError, "The argument of the sweep angle should be Integer or Float.");
+    }
+
+    Status status = Ok;
+    if (argc == 4) {
+        if (_KIND_OF(argv[1], &tRectangle)) {
+            Rect *rect = Data_Ptr<Rect *>(argv[1]);
+            status = g->FillPie(brush, *rect, start_angle, sweep_angle);
+        }
+        else if (_KIND_OF(argv[1], &tRectangleF)) {
+            RectF *rect = Data_Ptr<RectF *>(argv[1]);
+            status = g->FillPie(brush, *rect, start_angle, sweep_angle);
+        }
+        else {
+            rb_raise(rb_eTypeError, "The second argument should be Rectangle or RectangleF");
+        }
+    }
+    else if (argc == 7) {
+        if (Integer_p(argv[1], argv[2], argv[3], argv[4])) {
+            status = g->FillPie(brush, RB_NUM2INT(argv[1]), RB_NUM2INT(argv[2]), RB_NUM2INT(argv[3]), RB_NUM2INT(argv[4]), start_angle, sweep_angle);
+        }
+        else if (Float_p(argv[1], argv[2], argv[3], argv[4])) {
+            status = g->FillPie(brush, NUM2SINGLE(argv[1]), NUM2SINGLE(argv[2]), NUM2SINGLE(argv[3]), NUM2SINGLE(argv[4]), start_angle, sweep_angle);
+        }
+        else {
+            rb_raise(rb_eTypeError, "The arguments representing the position and size of the rectangle should be Integer or Float.");
+        }
+    }
+    Check_Status(status);
+
+    return self;
+}
+
+/**
+ * @overload DrawPolygon(pen, points)
+ *   @param pen [Pen]
+ *   @param points [Array<Point or PointF>]
+ *   @return [self]
+ * @example
+ *   bmp.draw {|g|
+ *     points = []
+ *     30.times {
+ *       points << Point.new(rand(400), rand(400))
+ *     }
+ *     g.DrawPolygon(pen, points)
+ *   }
+ */
+static VALUE
+gdip_graphics_draw_polygon(VALUE self, VALUE pen_v, VALUE ary)
+{
+    if (!_KIND_OF(pen_v, &tPen)) {
+        rb_raise(rb_eTypeError, "The first argument should be Pen.");
+    }
+    if (!_RB_ARRAY_P(ary) && RARRAY_LEN(ary) == 0) {
+        rb_raise(rb_eTypeError, "The second argument should be Array of Point or PointF.");
+    }
+
+    Graphics *g = Data_Ptr<Graphics *>(self);
+    Check_NULL(g, "The graphics object does not exist.");
+    Pen *pen = Data_Ptr<Pen *>(pen_v);
+    Check_NULL(pen, "The pen object does not exist.");
+
+    VALUE first = rb_ary_entry(ary, 0);
+    if (_KIND_OF(first, &tPoint)) {
+        int count;
+        Point *points = alloc_array_of<Point, &tPoint>(ary, count);
+        Status status = g->DrawPolygon(pen, points, count);
+        ruby_xfree(points);
+        Check_Status(status);
+    }
+    else if (_KIND_OF(first, &tPointF)) {
+        int count;
+        PointF *points = alloc_array_of<PointF, &tPointF>(ary, count);
+        Status status = g->DrawPolygon(pen, points, count);
+        ruby_xfree(points);
+        Check_Status(status);
+    }
+    else {
+        rb_raise(rb_eTypeError, "The second argument should be Array of Point or PointF.");
+    }
+    
+    return self;
+}
+
+/**
+ * @overload FillPolygon(brush, points, fillmode = FillMode.Alternate)
+ *   @param brush [Brush]
+ *   @param points [Array<Point or PointF>]
+ *   @param fillmode [FillMode]
+ *   @return [self]
+ * @example
+ *   bmp.draw {|g|
+ *     points = []
+ *     30.times {
+ *       points << Point.new(rand(400), rand(400))
+ *     }
+ *     g.FillPolygon(brush, points)
+ *   }
+ */
+static VALUE
+gdip_graphics_fill_polygon(int argc, VALUE *argv, VALUE self)
+{
+    VALUE v_brush;
+    VALUE v_points;
+    VALUE v_fillmode = Qnil;
+    rb_scan_args(argc, argv, "21", &v_brush, &v_points, &v_fillmode);
+    if (!_KIND_OF(v_brush, &tBrush)) {
+        rb_raise(rb_eTypeError, "The first argument should be Brush.");
+    }
+    if (!_RB_ARRAY_P(v_points) || RARRAY_LEN(v_points) == 0) {
+        rb_raise(rb_eTypeError, "The second argument should be Array of Point or PointF.");
+    }
+    FillMode fillmode = FillModeAlternate;
+    if (!RB_NIL_P(v_fillmode)) {
+        fillmode = static_cast<FillMode>(gdip_arg_to_enumint(cFillMode, v_fillmode));
+    }
+
+    Graphics *g = Data_Ptr<Graphics *>(self);
+    Check_NULL(g, "The graphics object does not exist.");
+    Brush *brush = Data_Ptr<Brush *>(v_brush);
+    Check_NULL(brush, "The brush object does not exist.");
+    VALUE first = rb_ary_entry(v_points, 0);
+
+    Status status = Ok;
+    if (_KIND_OF(first, &tPoint)) {
+        int count;
+        Point *points = alloc_array_of<Point, &tPoint>(v_points, count);
+        if (!RB_NIL_P(v_fillmode)) {
+            status = g->FillPolygon(brush, points, count, fillmode);
+        }
+        else {
+            status = g->FillPolygon(brush, points, count);
+        }
+        ruby_xfree(points);
+    }
+    else if (_KIND_OF(first, &tPointF)) {
+        int count;
+        PointF *points = alloc_array_of<PointF, &tPointF>(v_points, count);
+        if (!RB_NIL_P(v_fillmode)) {
+            status = g->FillPolygon(brush, points, count, fillmode);
+        }
+        else {
+            status = g->FillPolygon(brush, points, count);
+        }
+        ruby_xfree(points);
+    }
+    else {
+        rb_raise(rb_eTypeError, "The second argument should be Array of Point or PointF.");
+    }
+    Check_Status(status);
+
+    return self;
+}
+
+
 void
 Init_graphics()
 {
@@ -1347,4 +1574,10 @@ Init_graphics()
     rb_define_alias(cGraphics, "draw_beziers", "DrawBeziers");
     rb_define_method(cGraphics, "DrawPie", RUBY_METHOD_FUNC(gdip_graphics_draw_pie), -1);
     rb_define_alias(cGraphics, "draw_pie", "DrawPie");
+    rb_define_method(cGraphics, "FillPie", RUBY_METHOD_FUNC(gdip_graphics_fill_pie), -1);
+    rb_define_alias(cGraphics, "fill_pie", "FillPie");
+    rb_define_method(cGraphics, "DrawPolygon", RUBY_METHOD_FUNC(gdip_graphics_draw_polygon), 2);
+    rb_define_alias(cGraphics, "draw_polygon", "DrawPolygon");
+    rb_define_method(cGraphics, "FillPolygon", RUBY_METHOD_FUNC(gdip_graphics_fill_polygon), -1);
+    rb_define_alias(cGraphics, "fill_polygon", "FillPolygon");
 }
