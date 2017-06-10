@@ -43,6 +43,15 @@ clamp(T val, T min, T max)
 }
 
 static inline bool
+Integer_p(int argc, VALUE *argv)
+{
+    for (int i = 0; i < argc; ++i) {
+        if (!RB_INTEGER_TYPE_P(argv[i])) return false;
+    }
+    return true;
+}
+
+static inline bool
 Integer_p(VALUE v1)
 {
     return (RB_INTEGER_TYPE_P(v1));
@@ -67,6 +76,15 @@ Integer_p(VALUE v1, VALUE v2, VALUE v3, VALUE v4)
 }
 
 static inline bool
+Float_p(int argc, VALUE *argv)
+{
+    for (int i = 0; i < argc; ++i) {
+        if (!_RB_FLOAT_P(argv[i])) return false;
+    }
+    return true;
+}
+
+static inline bool
 Float_p(VALUE v1)
 {
     return (_RB_FLOAT_P(v1));
@@ -88,4 +106,13 @@ static inline bool
 Float_p(VALUE v1, VALUE v2, VALUE v3, VALUE v4)
 {
     return (Float_p(v1, v2, v3) && Float_p(v4));
+}
+
+static inline bool
+Typeddata_p(int argc, VALUE *argv, const rb_data_type_t *type)
+{
+    for (int i = 0; i < argc; ++i) {
+        if (!_KIND_OF(argv[i], type)) return false;
+    }
+    return true;
 }

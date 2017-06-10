@@ -579,15 +579,15 @@ gdip_graphics_draw_line(int argc, VALUE *argv, VALUE self)
 }
 
 /**
+ * @overload DrawLines(pen, points)
+ *   @param pen [Pen]
+ *   @param points [Array<Point or PointF>]
+ *   @return [self]
  * @example
  *   points = [Point.new(0, 10), Point.new(30, 30), Point.new(100, 30)]
  *   bmp.draw {|g|
  *     g.DrawLines(pen, points)
  *   }
- * @overload DrawLines(pen, points)
- *   @param pen [Pen]
- *   @param points [Array<Point or PointF>]
- * @return [self]
  */
 static VALUE
 gdip_graphics_draw_lines(VALUE self, VALUE pen_v, VALUE ary)
@@ -595,7 +595,7 @@ gdip_graphics_draw_lines(VALUE self, VALUE pen_v, VALUE ary)
     if (!_KIND_OF(pen_v, &tPen)) {
         rb_raise(rb_eTypeError, "The first argument should be Pen.");
     }
-    if (!_RB_ARRAY_P(ary) && RARRAY_LEN(ary) <= 0) {
+    if (!_RB_ARRAY_P(ary) && RARRAY_LEN(ary) == 0) {
         rb_raise(rb_eTypeError, "The second argument should be Array of Point or PointF.");
     }
 
@@ -657,7 +657,7 @@ gdip_graphics_draw_curve(int argc, VALUE *argv, VALUE self)
     if (!_KIND_OF(argv[0], &tPen)) {
         rb_raise(rb_eTypeError, "The first argument should be Pen.");
     }
-    if (!_RB_ARRAY_P(argv[1]) || RARRAY_LEN(argv[1]) <= 0) {
+    if (!_RB_ARRAY_P(argv[1]) || RARRAY_LEN(argv[1]) == 0) {
         rb_raise(rb_eTypeError, "The second argument should be Array of Point or PointF.");
     }
     if (argc == 3 && !Float_p(argv[2])) {
@@ -940,7 +940,7 @@ gdip_graphics_fill_closed_curve(int argc, VALUE *argv, VALUE self)
     if (_KIND_OF(argv[1], &tBrush)) {
         rb_raise(rb_eTypeError, "The second argument should be Brush.");
     }
-    if (_RB_ARRAY_P(argv[1]) && RARRAY_LEN(argv[1]) <= 0) {
+    if (_RB_ARRAY_P(argv[1]) && RARRAY_LEN(argv[1]) == 0) {
         rb_raise(rb_eTypeError, "The second argument should be Array of Point or PointF.");
     }
     if (argc == 4 && !Float_p(argv[3])) {
@@ -1034,16 +1034,16 @@ gdip_graphics_draw_arc(int argc, VALUE *argv, VALUE self)
     float start_angle;
     float sweep_angle;
     if (argc == 4 && !gdip_arg_to_single(argv[2], &start_angle, false)) {
-        rb_raise(rb_eTypeError, "The argument of a start angle should be Integer or Float.");
+        rb_raise(rb_eTypeError, "The argument of the start angle should be Integer or Float.");
     }
     if (argc == 4 && !gdip_arg_to_single(argv[3], &sweep_angle, false)) {
-        rb_raise(rb_eTypeError, "The argument of a sweep angle should be Integer or Float.");
+        rb_raise(rb_eTypeError, "The argument of the sweep angle should be Integer or Float.");
     }
     if (argc == 7 && !gdip_arg_to_single(argv[5], &start_angle, false)) {
-        rb_raise(rb_eTypeError, "The argument of a start angle should be Integer or Float.");
+        rb_raise(rb_eTypeError, "The argument of the start angle should be Integer or Float.");
     }
     if (argc == 7 && !gdip_arg_to_single(argv[6], &sweep_angle, false)) {
-        rb_raise(rb_eTypeError, "The argument of a sweep angle should be Integer or Float.");
+        rb_raise(rb_eTypeError, "The argument of the sweep angle should be Integer or Float.");
     }
 
     Status status = Ok;
@@ -1066,6 +1066,225 @@ gdip_graphics_draw_arc(int argc, VALUE *argv, VALUE self)
         }
         else if (Float_p(argv[1], argv[2], argv[3], argv[4])) {
             status = g->DrawArc(pen, NUM2SINGLE(argv[1]), NUM2SINGLE(argv[2]), NUM2SINGLE(argv[3]), NUM2SINGLE(argv[4]), start_angle, sweep_angle);
+        }
+        else {
+            rb_raise(rb_eTypeError, "The arguments representing the position and size of the rectangle should be Integer or Float.");
+        }
+    }
+    Check_Status(status);
+
+    return self;
+}
+
+
+/**
+ * @example
+ *   bmp.draw {|g|
+ *     points = []
+ *     points << Point.new(30, 30)
+ *     points << Point.new(130, 30)
+ *     points << Point.new(80, 130)
+ *     points << Point.new(180, 130)
+ *     g.DrawBezier(pen, *points)
+ *   }
+ * @overload DrawBezier(pen, point1, point2, point3, point4)
+ *   @param pen [Pen]
+ *   @param point1 [Point or PointF]
+ *   @param point2 [Point or PointF]
+ *   @param point3 [Point or PointF]
+ *   @param point4 [Point or PointF]
+ * @overload DrawBezier(pen, x1, y1, x2, y2, x3, y3, x4, y4)
+ *   @param pen [Pen]
+ *   @param x1 [Integer or Float]
+ *   @param y1 [Integer or Float]
+ *   @param x2 [Integer or Float]
+ *   @param y2 [Integer or Float]
+ *   @param x3 [Integer or Float]
+ *   @param y3 [Integer or Float]
+ *   @param x4 [Integer or Float]
+ *   @param y4 [Integer or Float]
+ * @return [self]
+ */
+static VALUE
+gdip_graphics_draw_bezier(int argc, VALUE *argv, VALUE self)
+{
+    if (argc != 5 && argc != 9) {
+        rb_raise(rb_eArgError, "wrong number of arguments (%d for 5 or 9)", argc);
+    }
+
+    if (!_KIND_OF(argv[0], &tPen)) {
+        rb_raise(rb_eTypeError, "The first argument should be Pen.");
+    }
+
+    Graphics *g = Data_Ptr<Graphics *>(self);
+    Check_NULL(g, "The graphics object does not exist.");
+    Pen *pen = Data_Ptr<Pen *>(argv[0]);
+    Check_NULL(pen, "The pen object does not exist.");
+
+    Status status = Ok;
+    if (argc == 5) {
+        if (Typeddata_p(4, &argv[1], &tPoint)) {
+            Point *po1 = Data_Ptr<Point *>(argv[1]);
+            Point *po2 = Data_Ptr<Point *>(argv[2]);
+            Point *po3 = Data_Ptr<Point *>(argv[3]);
+            Point *po4 = Data_Ptr<Point *>(argv[4]);
+            status = g->DrawBezier(pen, *po1, *po2, *po3, *po4);
+        }
+        else if (Typeddata_p(4, &argv[1], &tPointF)) {
+            PointF *po1 = Data_Ptr<PointF *>(argv[1]);
+            PointF *po2 = Data_Ptr<PointF *>(argv[2]);
+            PointF *po3 = Data_Ptr<PointF *>(argv[3]);
+            PointF *po4 = Data_Ptr<PointF *>(argv[4]);
+            status = g->DrawBezier(pen, *po1, *po2, *po3, *po4);
+        }
+        else {
+            rb_raise(rb_eTypeError, "The argument representing points should be Point or PointF.");
+        }
+    }
+    else if (argc == 9) {
+        if (Integer_p(8, &argv[1])) {
+            status = g->DrawBezier(pen, 
+                RB_NUM2INT(argv[1]), RB_NUM2INT(argv[2]), RB_NUM2INT(argv[3]), RB_NUM2INT(argv[4]), 
+                RB_NUM2INT(argv[5]), RB_NUM2INT(argv[6]), RB_NUM2INT(argv[7]), RB_NUM2INT(argv[8]));
+        }
+        else if (Float_p(8, &argv[1])) {
+            status = g->DrawBezier(pen, 
+                NUM2SINGLE(argv[1]), NUM2SINGLE(argv[2]), NUM2SINGLE(argv[3]), NUM2SINGLE(argv[4]), 
+                NUM2SINGLE(argv[5]), NUM2SINGLE(argv[6]), NUM2SINGLE(argv[7]), NUM2SINGLE(argv[8]));
+        }
+        else {
+            rb_raise(rb_eTypeError, "The argument representing the coordinates of points should be Integer or Float.");
+        }
+    }
+    Check_Status(status);
+
+    return self;
+}
+
+/**
+ * @overload DrawBeziers(pen, points)
+ *   @param pen [Pen]
+ *   @param points [Array<Point or PointF>] The number of points should be 1 + 3n (n >= 1: 4, 7, 10, 13, ...).
+ *   @return [self]
+ * @example
+ *   bmp.draw {|g|
+ *     points = []
+ *     points << Point.new(1, 2)
+ *     points << Point.new(0, 2)
+ *     points << Point.new(0, 1)
+ *     points << Point.new(1, 1)
+ *     points << Point.new(1, 0)
+ *     points << Point.new(2, 0)
+ *     points << Point.new(2, 1)
+ *     points << Point.new(3, 1)
+ *     points << Point.new(3, 2)
+ *     points << Point.new(2, 2)
+ *     points << Point.new(2, 3)
+ *     points << Point.new(1, 3)
+ *     points << Point.new(1, 2)
+ *     points.each {|po| po.x = 50 + 100 * po.x; po.y = 50 + 100 * po.y }
+ *     g.DrawBeziers(pen, points)
+ *   }
+ */
+static VALUE
+gdip_graphics_draw_beziers(VALUE self, VALUE pen_v, VALUE ary)
+{
+    if (!_KIND_OF(pen_v, &tPen)) {
+        rb_raise(rb_eTypeError, "The first argument should be Pen.");
+    }
+    if (!_RB_ARRAY_P(ary) || RARRAY_LEN(ary) == 0) {
+        rb_raise(rb_eTypeError, "The second argument should be Array of Point or PointF.");
+    }
+
+    Graphics *g = Data_Ptr<Graphics *>(self);
+    Check_NULL(g, "The graphics object does not exist.");
+    Pen *pen = Data_Ptr<Pen *>(pen_v);
+    Check_NULL(pen, "The pen object does not exist.");
+    VALUE first = rb_ary_entry(ary, 0);
+
+    if (_KIND_OF(first, &tPoint)) {
+        int count;
+        Point *points = alloc_array_of<Point, &tPoint>(ary, count);
+        if ((count - 1) % 3 == 0) {
+            Status status = g->DrawBeziers(pen, points, count);
+            ruby_xfree(points);
+            Check_Status(status);
+        }
+        else {
+            ruby_xfree(points);
+            rb_raise(rb_eArgError, "wrong number of elements of the array (%d for 4, 7, 10, 13, ...)", count);
+        }
+    }
+    else if (_KIND_OF(first, &tPointF)) {
+        int count;
+        PointF *points = alloc_array_of<PointF, &tPointF>(ary, count);
+        if ((count - 1) % 3 == 0) {
+            Status status = g->DrawBeziers(pen, points, count);
+            ruby_xfree(points);
+            Check_Status(status);
+        }
+        else {
+            ruby_xfree(points);
+            rb_raise(rb_eArgError, "wrong number of elements of the array (%d for 4, 7, 10, 13, ...)", count);
+        }
+    }
+    else {
+        rb_raise(rb_eTypeError, "The second argument should be Array of Point or PointF.");
+    }
+
+    return self;
+}
+
+static VALUE
+gdip_graphics_draw_pie(int argc, VALUE *argv, VALUE self)
+{
+    if (argc != 4 && argc != 7) {
+        rb_raise(rb_eArgError, "wrong number of arguments (%d for 4 or 7)", argc);
+    }
+    if (!_KIND_OF(argv[0], &tPen)) {
+        rb_raise(rb_eTypeError, "The first argument should be Pen.");
+    }
+
+    Graphics *g = Data_Ptr<Graphics *>(self);
+    Check_NULL(g, "The graphics object does not exist.");
+    Pen *pen = Data_Ptr<Pen *>(argv[0]);
+    Check_NULL(pen, "The pen object does not exist.");
+
+    float start_angle;
+    float sweep_angle;
+    if (argc == 4 && !gdip_arg_to_single(argv[2], &start_angle, false)) {
+        rb_raise(rb_eTypeError, "The argument of the start angle should be Integer or Float.");
+    }
+    if (argc == 4 && !gdip_arg_to_single(argv[3], &sweep_angle, false)) {
+        rb_raise(rb_eTypeError, "The argument of the sweep angle should be Integer or Float.");
+    }
+    if (argc == 7 && !gdip_arg_to_single(argv[5], &start_angle, false)) {
+        rb_raise(rb_eTypeError, "The argument of the start angle should be Integer or Float.");
+    }
+    if (argc == 7 && !gdip_arg_to_single(argv[6], &sweep_angle, false)) {
+        rb_raise(rb_eTypeError, "The argument of the sweep angle should be Integer or Float.");
+    }
+
+    Status status = Ok;
+    if (argc == 4) {
+        if (_KIND_OF(argv[1], &tRectangle)) {
+            Rect *rect = Data_Ptr<Rect *>(argv[1]);
+            status = g->DrawPie(pen, *rect, start_angle, sweep_angle);
+        }
+        else if (_KIND_OF(argv[1], &tRectangleF)) {
+            RectF *rect = Data_Ptr<RectF *>(argv[1]);
+            status = g->DrawPie(pen, *rect, start_angle, sweep_angle);
+        }
+        else {
+            rb_raise(rb_eTypeError, "The second argument should be Rectangle or RectangleF");
+        }
+    }
+    else if (argc == 7) {
+        if (Integer_p(argv[1], argv[2], argv[3], argv[4])) {
+            status = g->DrawPie(pen, RB_NUM2INT(argv[1]), RB_NUM2INT(argv[2]), RB_NUM2INT(argv[3]), RB_NUM2INT(argv[4]), start_angle, sweep_angle);
+        }
+        else if (Float_p(argv[1], argv[2], argv[3], argv[4])) {
+            status = g->DrawPie(pen, NUM2SINGLE(argv[1]), NUM2SINGLE(argv[2]), NUM2SINGLE(argv[3]), NUM2SINGLE(argv[4]), start_angle, sweep_angle);
         }
         else {
             rb_raise(rb_eTypeError, "The arguments representing the position and size of the rectangle should be Integer or Float.");
@@ -1122,4 +1341,10 @@ Init_graphics()
     rb_define_alias(cGraphics, "fill_closed_curve", "FillClosedCurve");
     rb_define_method(cGraphics, "DrawArc", RUBY_METHOD_FUNC(gdip_graphics_draw_arc), -1);
     rb_define_alias(cGraphics, "draw_arc", "DrawArc");
+    rb_define_method(cGraphics, "DrawBezier", RUBY_METHOD_FUNC(gdip_graphics_draw_bezier), -1);
+    rb_define_alias(cGraphics, "draw_bezier", "DrawBezier");
+    rb_define_method(cGraphics, "DrawBeziers", RUBY_METHOD_FUNC(gdip_graphics_draw_beziers), 2);
+    rb_define_alias(cGraphics, "draw_beziers", "DrawBeziers");
+    rb_define_method(cGraphics, "DrawPie", RUBY_METHOD_FUNC(gdip_graphics_draw_pie), -1);
+    rb_define_alias(cGraphics, "draw_pie", "DrawPie");
 }
