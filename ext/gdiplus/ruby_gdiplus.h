@@ -69,6 +69,10 @@ extern VALUE cFillMode;
 extern VALUE cGraphicsUnit;
 extern VALUE cInterpolationMode;
 
+extern VALUE cFontFamily;
+extern VALUE cFontCollection;
+extern VALUE cFont;
+
 extern const rb_data_type_t tGuid;
 extern const rb_data_type_t tImageCodecInfo;
 extern const rb_data_type_t tImage;
@@ -86,6 +90,9 @@ extern const rb_data_type_t tSize;
 extern const rb_data_type_t tSizeF;
 extern const rb_data_type_t tRectangle;
 extern const rb_data_type_t tRectangleF;
+extern const rb_data_type_t tFontFamily;
+extern const rb_data_type_t tFontCollection;
+extern const rb_data_type_t tFont;
 
 void Init_codec();
 void Init_image();
@@ -95,6 +102,7 @@ void Init_color();
 void Init_pen_brush();
 void Init_graphics();
 void Init_rectangle();
+void Init_font();
 
 /* gdip_enum.cpp */
 extern ID ID_UNKNOWN;

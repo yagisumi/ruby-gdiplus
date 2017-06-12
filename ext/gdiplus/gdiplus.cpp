@@ -54,6 +54,9 @@ VALUE cSize;
 VALUE cSizeF;
 VALUE cRectangle;
 VALUE cRectangleF;
+VALUE cFontFamily;
+VALUE cFontCollection;
+VALUE cFont;
 
 int gdip_refcount = 0;
 bool gdip_end_flag = false;
@@ -210,4 +213,5 @@ Init_gdiplus(void)
     Init_pen_brush();
     Init_graphics();
     Init_rectangle();
+    Init_font();
 }
