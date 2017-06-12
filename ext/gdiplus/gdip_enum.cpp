@@ -73,21 +73,44 @@ gdip_arg_to_enumint(VALUE klass, VALUE arg, bool to_int)
     if (RB_SYMBOL_P(arg)) {
         arg = rb_const_get(klass, RB_SYM2ID(arg));
     }
+    
     if (_KIND_OF(arg, &tEnumInt) && rb_obj_is_kind_of(arg, klass)) {
         r = Data_Ptr_As<int>(arg);
+    }
+    else if (Integer_p(arg)) {
+        r = RB_NUM2INT(arg);
     }
     else if (to_int) {
         VALUE num = rb_to_int(arg);
         r = RB_NUM2INT(num);
     }
     else {
-        rb_raise(rb_eTypeError, "An argument must be %s or Symbol", __class__(klass));
+        rb_raise(rb_eTypeError, "The argument should be %s ,Symbol or Integer", __class__(klass));
     }
     return r;
 }
 
+
+/**
+ * @return [String]
+ */
+static VALUE
+gdip_enumint_inspect(VALUE self)
+{
+    int num = Data_Ptr_As<int>(self);
+    IMap<int, ID> *table = gdip_enum_get_table<int>(CLASS_OF(self));
+    if (table != NULL) {
+        ID id;
+        table->get(num, id, ID_UNKNOWN);
+        return util_utf8_sprintf("#<%s.%s: 0x%08x>", __class__(self), rb_id2name(id), num);
+    }
+    else {
+        return util_utf8_sprintf("#<%s: 0x%08x>", __class__(self), num);
+    }
+}
+
 /*
- * Returns a constant value.
+ * Returns a enum value.
  * @return [Integer]
  */
 static VALUE
@@ -96,6 +119,9 @@ gdip_enumint_to_i(VALUE self)
     return RB_INT2NUM(Data_Ptr_As<int>(self));
 }
 
+/**
+ * @return [Integer]
+ */
 static VALUE
 gdip_enumint_or(VALUE self, VALUE other)
 {
@@ -105,6 +131,9 @@ gdip_enumint_or(VALUE self, VALUE other)
     return RB_INT2NUM(n_self | n_other);
 }
 
+/**
+ * @return [Integer]
+ */
 static VALUE
 gdip_enumint_and(VALUE self, VALUE other)
 {
@@ -124,6 +153,10 @@ gdip_enumint_coerce(VALUE self, VALUE other)
     return rb_assoc_new(other, self);
 }
 
+/**
+ * Compares to other.
+ * @return [Boolean]
+ */
 static VALUE
 gdip_enumint_equal(VALUE self, VALUE other)
 {
@@ -139,6 +172,190 @@ gdip_enumint_equal(VALUE self, VALUE other)
         return x == y ? Qtrue : Qfalse;
     }
     else return Qfalse;
+}
+
+unsigned int
+gdip_arg_to_enumflags(VALUE klass, VALUE arg, bool to_int)
+{
+    unsigned int r = 0;
+    if (RB_SYMBOL_P(arg)) {
+        arg = rb_const_get(klass, RB_SYM2ID(arg));
+    }
+
+    if (_KIND_OF(arg, &tEnumInt) && rb_obj_is_kind_of(arg, klass)) {
+        r = Data_Ptr_As<unsigned int>(arg);
+    }
+    else if (Integer_p(arg)) {
+        r = RB_NUM2UINT(arg);
+    }
+    else if (to_int) {
+        VALUE num = rb_to_int(arg);
+        r = RB_NUM2UINT(num);
+    }
+    else {
+        rb_raise(rb_eTypeError, "The argument should be %s ,Symbol or Integer", __class__(klass));
+    }
+    return r;
+}
+
+/**
+ * @overload initialize()
+ * @overload initialize(arg, ...)
+ *   Performs a bitwise OR on arguments.
+ *   @param arg [Integer or Symbol] Symbol is replaced by constant value.
+ */
+static VALUE
+gdip_enumflags_init(int argc, VALUE *argv, VALUE self)
+{
+    unsigned int n_self = 0;
+    for (int i = 0; i < argc; ++i) {
+        if (Integer_p(argv[0])) {
+            n_self = n_self | RB_NUM2UINT(argv[i]);
+        }
+        else if (RB_SYMBOL_P(argv[0])) {
+            VALUE v = rb_const_get(CLASS_OF(self), RB_SYM2ID(argv[i]));
+            n_self = n_self | Data_Ptr_As<unsigned int>(v);
+        }
+        else {
+            rb_raise(rb_eTypeError, "The arguments should be Integer or Symbol.");
+        }
+    }
+    Data_Ptr_Set_As<unsigned int>(self, n_self);
+
+    return self;
+}
+
+/**
+ * @return [String]
+ */
+static VALUE
+gdip_enumflags_inspect(VALUE self)
+{
+    unsigned int num = Data_Ptr_As<unsigned int>(self);
+    IMap<unsigned int, ID> *table = gdip_enum_get_table<unsigned int>(CLASS_OF(self));
+    VALUE r = Qnil;
+    if (table != NULL) {
+        unsigned int flags = num;
+        if (flags == 0) {
+            ID id;
+            if (table->get(num, id)) {
+                r = util_utf8_sprintf("#<%s 0x%08x: %s>", __class__(self), num, rb_id2name(id));
+            }
+        } else {
+            VALUE symbols = rb_str_new(NULL, 0);
+            for (int i = table->length() - 1; i >= 0; --i) {
+                std::pair<unsigned int, ID> kv = table->get_key_value(i);
+                if (kv.first && (flags & kv.first) == kv.first) {
+                    if (RSTRING_LEN(symbols) > 0) {
+                        rb_str_cat_cstr(symbols, " | ");
+                    }
+                    rb_str_cat_cstr(symbols, rb_id2name(kv.second));
+                    flags = flags & ~kv.first;
+                }
+            }
+            
+            if (flags) {
+                if (RSTRING_LEN(symbols) > 0) {
+                    rb_str_cat_cstr(symbols, " | __UNKNOWN__");
+                }
+                else {
+                    rb_str_cat_cstr(symbols, "__UNKNOWN__");
+                }
+            }
+
+            if (RSTRING_LEN(symbols) > 0) {
+                r = util_utf8_sprintf("#<%s 0x%08x: %s >", __class__(self), num, RSTRING_PTR(symbols));
+            }
+            RB_GC_GUARD(symbols);
+        }
+    }
+
+    if (RB_NIL_P(r)) {
+        r = util_utf8_sprintf("#<%s 0x%08x>", __class__(self), num);
+    }
+    return r;
+}
+
+/**
+ * @return [Integer]
+ */
+static VALUE
+gdip_enumflags_to_i(VALUE self)
+{
+    return RB_UINT2NUM(Data_Ptr_As<unsigned int>(self));
+}
+
+static VALUE
+gdip_enumflags_or(VALUE self, VALUE other)
+{
+    VALUE klass = CLASS_OF(self);
+    if (RB_SYMBOL_P(other)) {
+        other = rb_const_get(klass, RB_SYM2ID(other));
+    }
+    unsigned int n_self = Data_Ptr_As<unsigned int>(self);
+    unsigned int n_other = 0;
+    if (_KIND_OF(other, &tEnumInt) && rb_obj_is_kind_of(other, klass)) {
+        n_other = Data_Ptr_As<unsigned int>(other);
+    }
+    else if (_RB_INTEGER_P(other)) {
+        n_other = RB_NUM2UINT(other);
+    }
+    else {
+        rb_raise(rb_eTypeError, "The argument should be %s.", __class__(self));
+    }
+    return gdip_enumint_create(klass, n_self | n_other);
+}
+
+static VALUE
+gdip_enumflags_and(VALUE self, VALUE other)
+{
+    VALUE klass = CLASS_OF(self);
+    if (RB_SYMBOL_P(other)) {
+        other = rb_const_get(klass, RB_SYM2ID(other));
+    }
+    unsigned int n_self = Data_Ptr_As<unsigned int>(self);
+    unsigned int n_other = 0;
+    if (_KIND_OF(other, &tEnumInt) && rb_obj_is_kind_of(other, klass)) {
+        n_other = Data_Ptr_As<unsigned int>(other);
+    }
+    else if (_RB_INTEGER_P(other)) {
+        n_other = RB_NUM2UINT(other);
+    }
+    else {
+        rb_raise(rb_eTypeError, "The argument should be %s.", __class__(self));
+    }
+    return gdip_enumint_create(klass, n_self & n_other);
+}
+
+/**
+ * Compares to other.
+ * @return [Boolean]
+ */
+static VALUE
+gdip_enumflags_equal(VALUE self, VALUE other)
+{
+    if (self == other) return Qtrue;
+    if (_KIND_OF(other, &tEnumInt)) {
+        unsigned int x = Data_Ptr_As<unsigned int>(self);
+        unsigned int y = Data_Ptr_As<unsigned int>(other);
+        return x == y ? Qtrue : Qfalse;
+    }
+    else if (_RB_INTEGER_P(other)) {
+        unsigned int x = Data_Ptr_As<unsigned int>(self);
+        unsigned int y = RB_NUM2UINT(other);
+        return x == y ? Qtrue : Qfalse;
+    }
+    else return Qfalse;
+}
+
+static VALUE
+gdip_enumflags_add_flag(VALUE self)
+{
+    VALUE klass = CLASS_OF(self);
+    VALUE adding = rb_const_get(klass, rb_frame_this_func());
+    unsigned int n_self = Data_Ptr_As<unsigned int>(self);
+    unsigned int n_adding = Data_Ptr_As<unsigned int>(adding);
+    return gdip_enumint_create(klass, n_self | n_adding);
 }
 
 template <typename T>
@@ -207,23 +424,13 @@ gdip_enum_define(VALUE klass, IMap<TKey, ID> *table, const char *name, TKey data
     table->append(data, id);
 }
 
-static VALUE
-gdip_enumint_inspect(VALUE self)
-{
-    int num = Data_Ptr_As<int>(self);
-    IMap<int, ID> *table = gdip_enum_get_table<int>(CLASS_OF(self));
-    if (table != NULL) {
-        ID id;
-        table->get(num, id, ID_UNKNOWN);
-        return util_utf8_sprintf("#<%s.%s: 0x%08x>", __class__(self), rb_id2name(id), num);
-    }
-    else {
-        return util_utf8_sprintf("#<%s: 0x%08x>", __class__(self), num);
-    }
-    
-}
 
 #define define_enumint(klass, table, name, num) gdip_enum_define<int>(klass, table, name, num, gdip_enumint_create(klass, num))
+#define define_enumflags(klass, table, name, num) \
+    do {\
+        gdip_enum_define<unsigned int>(klass, table, name, num, gdip_enumint_create(klass, num));\
+        rb_define_method(klass, name, RUBY_METHOD_FUNC(gdip_enumflags_add_flag), 0);\
+    } while (0)
 
 static void
 Init_PixelFormat()
@@ -448,20 +655,35 @@ Init_PenType()
     define_enumint(cPenType, table, "Unknown", -1);
 }
 
+/**
+ * Document-class: Gdiplus::FontStyle
+ * @example
+ *   FontStyle.Bold | FontStyle.Italic
+ *   #=> #<Gdiplus::FontStyle 0x00000003: Italic | Bold >
+ *   FontStyle.new(0b11)
+ *   #=> #<Gdiplus::FontStyle 0x00000003: Italic | Bold >
+ *   FontStyle.new(:Bold, :Italic)
+ *   #=> #<Gdiplus::FontStyle 0x00000003: Italic | Bold >
+ *   FontStyle.new | :Bold | :Italic
+ *   #=> #<Gdiplus::FontStyle 0x00000003: Italic | Bold >
+ *   FontStyle.Bold.Italic
+ *   #=> #<Gdiplus::FontStyle 0x00000003: Italic | Bold >
+ */
 static void
 Init_FontStyle()
 {
-    cFontStyle = rb_define_class_under(mGdiplus, "FontStyle", cEnumInt);
-    rb_undef_alloc_func(cFontStyle);
-    SortedArrayMap<int, ID> *table = new SortedArrayMap<int, ID>(6);
+    //cFontStyle = rb_define_class_under(mGdiplus, "FontStyle", cEnumInt);
+    //rb_undef_alloc_func(cFontStyle);
+    cFontStyle = rb_define_class_under(mGdiplus, "FontStyle", cEnumFlags);
+    SortedArrayMap<unsigned int, ID> *table = new SortedArrayMap<unsigned int, ID>(5);
     klass_table_map.set(cFontStyle, table);
 
-    define_enumint(cFontStyle, table, "Regular", 0);
-    define_enumint(cFontStyle, table, "Bold", 1);
-    define_enumint(cFontStyle, table, "Italic", 2);
-    define_enumint(cFontStyle, table, "BoldItalic", 3);
-    define_enumint(cFontStyle, table, "Underline", 4);
-    define_enumint(cFontStyle, table, "Strikeout", 8);
+    define_enumflags(cFontStyle, table, "Regular", 0);
+    define_enumflags(cFontStyle, table, "Bold", 1);
+    define_enumflags(cFontStyle, table, "Italic", 2);
+    define_enumflags(cFontStyle, table, "Underline", 4);
+    define_enumflags(cFontStyle, table, "Strikeout", 8);
+    //define_enumflags(cFontStyle, table, "BoldItalic", 3);
 }
 
 static void
@@ -778,6 +1000,7 @@ Init_enum() {
     ID_UNKNOWN = rb_intern("__UNKNOWN__");
 
     cEnumInt = rb_define_class_under(mInternals, "EnumInt", rb_cObject);
+    rb_undef_alloc_func(cEnumInt);
     rb_define_method(cEnumInt, "inspect", RUBY_METHOD_FUNC(gdip_enumint_inspect), 0);
     rb_define_method(cEnumInt, "to_i", RUBY_METHOD_FUNC(gdip_enumint_to_i), 0);
     rb_define_method(cEnumInt, "to_int", RUBY_METHOD_FUNC(gdip_enumint_to_i), 0);
@@ -785,6 +1008,16 @@ Init_enum() {
     rb_define_method(cEnumInt, "&", RUBY_METHOD_FUNC(gdip_enumint_and), 1);
     rb_define_method(cEnumInt, "coerce", RUBY_METHOD_FUNC(gdip_enumint_coerce), 1);
     rb_define_method(cEnumInt, "==", RUBY_METHOD_FUNC(gdip_enumint_equal), 1);
+
+    cEnumFlags = rb_define_class_under(mInternals, "EnumFlags", cEnumInt);
+    rb_define_alloc_func(cEnumFlags, &typeddata_alloc_null<&tEnumInt>);
+    rb_define_method(cEnumFlags, "initialize", RUBY_METHOD_FUNC(gdip_enumflags_init), -1);
+    rb_define_method(cEnumFlags, "inspect", RUBY_METHOD_FUNC(gdip_enumflags_inspect), 0);
+    rb_define_method(cEnumFlags, "to_i", RUBY_METHOD_FUNC(gdip_enumflags_to_i), 0);
+    rb_define_method(cEnumFlags, "to_int", RUBY_METHOD_FUNC(gdip_enumflags_to_i), 0);
+    rb_define_method(cEnumFlags, "|", RUBY_METHOD_FUNC(gdip_enumflags_or), 1);
+    rb_define_method(cEnumFlags, "&", RUBY_METHOD_FUNC(gdip_enumflags_and), 1);
+    rb_define_method(cEnumFlags, "==", RUBY_METHOD_FUNC(gdip_enumflags_equal), 1);
 
     Init_PixelFormat();
     Init_EncoderParameterValueType();

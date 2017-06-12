@@ -294,12 +294,18 @@ class GdiplusEnumIntTest < Test::Unit::TestCase
     assert_match(/Bold/, FontStyle.Bold.inspect)
     assert_equal(2, FontStyle.Italic.to_i)
     assert_match(/Italic/, FontStyle.Italic.inspect)
-    assert_equal(3, FontStyle.BoldItalic.to_i)
-    assert_match(/BoldItalic/, FontStyle.BoldItalic.inspect)
+    #assert_equal(3, FontStyle.BoldItalic.to_i)
+    #assert_match(/BoldItalic/, FontStyle.BoldItalic.inspect)
     assert_equal(4, FontStyle.Underline.to_i)
     assert_match(/Underline/, FontStyle.Underline.inspect)
     assert_equal(8, FontStyle.Strikeout.to_i)
     assert_match(/Strikeout/, FontStyle.Strikeout.inspect)
+    
+    # EnumFlags
+    assert_equal(FontStyle.new(3), FontStyle.Bold | FontStyle.Italic)
+    assert_equal(FontStyle.new(3), FontStyle.new(:Bold, :Italic))
+    assert_equal(FontStyle.new(3), FontStyle.new | :Bold | :Italic)
+    assert_equal(FontStyle.new(3), FontStyle.Bold.Italic)
   end
 
   def test_GenericFontFamily

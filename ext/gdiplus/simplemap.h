@@ -8,7 +8,7 @@
 
 #include "ruby_gdiplus.h"
 #include <string.h>
-
+#include <utility>
 
 
 class MapBase {
@@ -22,7 +22,8 @@ public:
     virtual bool append(TKey key, TVal val) = 0;
     virtual bool set(TKey key, TVal val) = 0;
     virtual bool get(TKey key, TVal& val) = 0;
-    virtual bool each(bool(*func)(TKey, TVal)) = 0;
+    virtual std::pair<TKey, TVal> get_key_value(int idx) = 0;
+    virtual int length() = 0;
     bool get(TKey key, TVal& val, TVal default_val) {
         if (this->get(key, val)) {
             return true;
@@ -88,13 +89,11 @@ public:
         }
         return false;
     }
-    virtual bool each(bool(*func)(TKey, TVal)) {
-        for (int i = 0; i < Len; ++i) {
-            if (func(KeyTable[i], ValTable[i]) == false) {
-                return false;
-            }
-        }
-        return true;
+    virtual int length() {
+        return Len;
+    }
+    virtual std::pair<TKey, TVal> get_key_value(int idx) {
+        return std::make_pair(KeyTable[idx], ValTable[idx]);
     }
 };
 
@@ -139,16 +138,6 @@ public:
         else {
             return false;
         }
-    }
-    virtual bool each(bool(*func)(int, TVal)) {
-        for (int i = 0; i < this->Capa; ++i) {
-            if (this->KeyTable[i] != InitKey) {
-                if (func(this->KeyTable[i], this->ValTable[i]) == false) {
-                    return false;
-                }
-            }
-        }
-        return true;
     }
 };
 

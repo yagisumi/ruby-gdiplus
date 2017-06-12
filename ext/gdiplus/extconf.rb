@@ -14,6 +14,7 @@ if gdiplus_debug
 end
 
 if $mingw
+  #$CXXFLAGS += " -std=c++11 "
   if gdiplus_debug # DEBUG
     
     if RUBY_VERSION_NUM >= 20400 # for 2.4

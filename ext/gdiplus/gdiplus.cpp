@@ -39,6 +39,7 @@ VALUE cInterpolationMode;
 VALUE cEncoder;
 VALUE cEncoderValue;
 VALUE cEnumInt;
+VALUE cEnumFlags;
 VALUE cImageFormat;
 VALUE cEncoderParameter;
 VALUE cEncoderParameters;

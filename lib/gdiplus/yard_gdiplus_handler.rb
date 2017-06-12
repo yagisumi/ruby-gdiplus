@@ -2,7 +2,7 @@
 
 # @private
 class GdiplusEnumHandler < YARD::Handlers::C::Base
-  MATCH_ENUM_1 = /define_enumint\((\w+), \w+, "(\w+)", (\w+)\)/
+  MATCH_ENUM_1 = /(?:define_enumint|define_enumflags)\((\w+), \w+, "(\w+)", (-?\w+)\)/
   MATCH_ENUM_2 = /gdip_enum_define<[^>]+>\((\w+), \w+, "(\w+)"/
   
   handles MATCH_ENUM_1
@@ -93,6 +93,7 @@ end
 $superclass_path_map = {
   "cGpObject" => "Gdiplus::Internals::GpObject",
   "cEnumInt" => "Gdiplus::Internals::EnumInt",
+  "cEnumFlags" => "Gdiplus::Internals::EnumFlags",
   "cImage" => "Gdiplus::Image",
   "cGuid" => "Gdiplus::Guid",
   "cBrush" => "Gdiplus::Brush",

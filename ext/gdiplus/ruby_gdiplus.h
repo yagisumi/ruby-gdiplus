@@ -34,6 +34,7 @@ extern VALUE cEncoderParameterValueType;
 extern VALUE cEncoder;
 extern VALUE cEncoderValue;
 extern VALUE cEnumInt;
+extern VALUE cEnumFlags;
 extern VALUE cImageFormat;
 extern VALUE cEncoderParameter;
 extern VALUE cEncoderParameters;
@@ -145,6 +146,7 @@ template <typename T> VALUE gdip_enum_get(VALUE klass, T data);
 VALUE gdip_enumint_create(VALUE klass, int num);
 int gdip_arg_to_enumint(VALUE klass, VALUE arg, bool to_int=false);
 VALUE gdip_enum_guid_create(VALUE klass, GUID *guid);
+unsigned int gdip_arg_to_enumflags(VALUE klass, VALUE arg, bool to_int=false);
 
 /* gdip_graphics.cpp */
 VALUE gdip_graphics_create(Graphics *g);
