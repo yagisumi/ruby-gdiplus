@@ -26,7 +26,7 @@ VALUE cMatrixOrder;
 VALUE cPenAlignment;
 VALUE cPenType;
 VALUE cFontStyle;
-VALUE cGenericFontFamily;
+VALUE cGenericFontFamilies;
 VALUE cPixelOffsetMode;
 VALUE cSmoothingMode;
 VALUE cTextRenderingHint;
@@ -57,6 +57,8 @@ VALUE cRectangleF;
 VALUE cFontFamily;
 VALUE cFontCollection;
 VALUE cFont;
+VALUE cInstalledFontCollection;
+VALUE cPrivateFontCollection;
 
 int gdip_refcount = 0;
 bool gdip_end_flag = false;

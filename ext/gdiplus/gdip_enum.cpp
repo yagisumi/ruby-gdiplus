@@ -66,6 +66,25 @@ gdip_enumint_create(VALUE klass, int num)
     return r;
 }
 
+bool 
+gdip_arg_parse_enumint(VALUE klass, VALUE arg, int* num)
+{
+    if (RB_SYMBOL_P(arg)) {
+        arg = rb_const_get(klass, RB_SYM2ID(arg));
+    }
+
+    if (_KIND_OF(arg, &tEnumInt) && rb_obj_is_kind_of(arg, klass)) {
+        *num = Data_Ptr_As<int>(arg);
+        return true;
+    }
+    else if (Integer_p(arg)) {
+        *num = RB_NUM2INT(arg);
+        return true;
+    }
+
+    return false;
+}
+
 int
 gdip_arg_to_enumint(VALUE klass, VALUE arg, bool to_int)
 {
@@ -73,7 +92,7 @@ gdip_arg_to_enumint(VALUE klass, VALUE arg, bool to_int)
     if (RB_SYMBOL_P(arg)) {
         arg = rb_const_get(klass, RB_SYM2ID(arg));
     }
-    
+
     if (_KIND_OF(arg, &tEnumInt) && rb_obj_is_kind_of(arg, klass)) {
         r = Data_Ptr_As<int>(arg);
     }
@@ -687,16 +706,16 @@ Init_FontStyle()
 }
 
 static void
-Init_GenericFontFamily()
+Init_GenericFontFamilies()
 {
-    cGenericFontFamily = rb_define_class_under(mGdiplus, "GenericFontFamily", cEnumInt);
-    rb_undef_alloc_func(cGenericFontFamily);
+    cGenericFontFamilies = rb_define_class_under(mGdiplus, "GenericFontFamilies", cEnumInt);
+    rb_undef_alloc_func(cGenericFontFamilies);
     IndexArrayMap<ID> *table = new IndexArrayMap<ID>(3);
-    klass_table_map.set(cGenericFontFamily, table);
+    klass_table_map.set(cGenericFontFamilies, table);
 
-    define_enumint(cGenericFontFamily, table, "Serif", 0);
-    define_enumint(cGenericFontFamily, table, "SansSerif", 1);
-    define_enumint(cGenericFontFamily, table, "Monospace", 2);
+    define_enumint(cGenericFontFamilies, table, "Serif", 0);
+    define_enumint(cGenericFontFamilies, table, "SansSerif", 1);
+    define_enumint(cGenericFontFamilies, table, "Monospace", 2);
 }
 
 static void
@@ -1032,7 +1051,7 @@ Init_enum() {
     Init_PenAlignment();
     Init_PenType();
     Init_FontStyle();
-    Init_GenericFontFamily();
+    Init_GenericFontFamilies();
     Init_PixelOffsetMode();
     Init_SmoothingMode();
     Init_TextRenderingHint();

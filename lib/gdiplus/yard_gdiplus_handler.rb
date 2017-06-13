@@ -53,11 +53,11 @@ end
 
 # @private
 class GdiplusAttrHandler < YARD::Handlers::C::Base
-  MATCH_ATTR_R4 = /ATTR_R\((\w+), (\w+), (\w+), (\w+)\)/
-  MATCH_ATTR_R5 = /ATTR_R\((\w+), (\w+), (\w+), (\w+), (\w+)\)/
-  MATCH_ATTR_R_Q = /ATTR_R_Q\((\w+), (\w+), (\w+), (\w+)\)/
-  MATCH_ATTR_RW = /ATTR_RW\((\w+), (\w+), (\w+), (\w+)\)/
-  
+  MATCH_ATTR_R4 = /(CLASS_)?ATTR_R\((\w+), (\w+), (\w+), (\w+)\)/
+  MATCH_ATTR_R5 = /(CLASS_)?ATTR_R\((\w+), (\w+), (\w+), (\w+), (\w+)\)/
+  MATCH_ATTR_R_Q = /(CLASS_)?ATTR_R_Q\((\w+), (\w+), (\w+), (\w+)\)/
+  MATCH_ATTR_RW = /(CLASS_)?ATTR_RW\((\w+), (\w+), (\w+), (\w+)\)/
+ 
   handles MATCH_ATTR_R4
   handles MATCH_ATTR_R5
   handles MATCH_ATTR_R_Q
@@ -65,24 +65,50 @@ class GdiplusAttrHandler < YARD::Handlers::C::Base
   statement_class BodyStatement
 
   process do
-    statement.source.scan(MATCH_ATTR_R4) do |klass, name1, name2, prefix|
-      handle_method(:instance, klass, name1, "gdip_#{prefix}_get_#{name2}")
-      handle_attribute(klass, name1, 1, 0)
-      handle_alias(klass, name2, name1)
+    statement.source.scan(MATCH_ATTR_R4) do |class_scope, klass, name1, name2, prefix|
+      if class_scope
+        handle_method(:class, klass, name1, "gdip_#{prefix}_s_get_#{name2}")
+        handle_attribute(klass, name1, 1, 0, :class)
+        handle_alias(klass, name2, name1, :class)
+      else
+        handle_method(:instance, klass, name1, "gdip_#{prefix}_get_#{name2}")
+        handle_attribute(klass, name1, 1, 0)
+        handle_alias(klass, name2, name1)
+      end
+      
     end
-    statement.source.scan(MATCH_ATTR_R5) do |klass, name1, name2, prefix, name3|
-      handle_attribute(klass, name1, 1, 0)
-      handle_alias(klass, name2, name1)
+    statement.source.scan(MATCH_ATTR_R5) do |class_scope, klass, name1, name2, prefix, name3|
+      if class_scope
+        handle_method(:class, klass, name1, "gdip_#{prefix}_s_get_#{name3}")
+        handle_attribute(klass, name1, 1, 0, :class)
+        handle_alias(klass, name2, name1, :class)
+      else
+        handle_method(:instance, klass, name1, "gdip_#{prefix}_get_#{name3}")
+        handle_attribute(klass, name1, 1, 0)
+        handle_alias(klass, name2, name1)
+      end
     end
-    statement.source.scan(MATCH_ATTR_R_Q) do |klass, name1, name2, prefix|
-      handle_method(:instance, klass, name1, "gdip_#{prefix}_get_#{name2}")
-      handle_attribute(klass, name1, 1, 0)
-      handle_alias(klass, "#{name2}?", name1)
+    statement.source.scan(MATCH_ATTR_R_Q) do |class_scope, klass, name1, name2, prefix|
+      if class_scope
+        handle_method(:instance, klass, name1, "gdip_#{prefix}_s_get_#{name2}")
+        handle_attribute(klass, name1, 1, 0, :class)
+        handle_alias(klass, "#{name2}?", name1, :class)
+      else
+        handle_method(:instance, klass, name1, "gdip_#{prefix}_get_#{name2}")
+        handle_attribute(klass, name1, 1, 0)
+        handle_alias(klass, "#{name2}?", name1)
+      end
     end
-    statement.source.scan(MATCH_ATTR_RW) do |klass, name1, name2, prefix|
-      handle_method(:instance, klass, name1, "gdip_#{prefix}_get_#{name2}")
-      handle_attribute(klass, name1, 1, 1)
-      handle_alias(klass, name2, name1)
+    statement.source.scan(MATCH_ATTR_RW) do |class_scope, klass, name1, name2, prefix|
+      if class_scope
+        handle_method(:class, klass, name1, "gdip_#{prefix}_s_get_#{name2}")
+        handle_attribute(klass, name1, 1, 1, :class)
+        handle_alias(klass, name2, name1, :class)
+      else
+        handle_method(:instance, klass, name1, "gdip_#{prefix}_get_#{name2}")
+        handle_attribute(klass, name1, 1, 1, :class)
+        handle_alias(klass, name2, name1, :class)
+      end
     end
     
   end
@@ -138,6 +164,7 @@ module YARD
         def handle_method(scope, var_name, name, func_name, _source_file = nil)
           visibility = :public
           case scope
+          when Symbol ###; scope = scope
           when "singleton_method"; scope = :class
           when "module_function"; scope = :module
           when "private_method"; scope = :instance; visibility = :private
@@ -163,6 +190,18 @@ module YARD
             if name.end_with?("?") && !(obj.tag(:return) || (obj.tag(:overload) && obj.tag(:overload).tag(:return)))
               obj.add_tag(Tags::Tag.new(:return, '', 'Boolean'))
             end
+          end
+        end
+        
+        ### modified to accept a scope parameter
+        def handle_attribute(var_name, name, read, write, scope = :instance)
+          values = {:read => read.to_i, :write => write.to_i}
+          {:read => name, :write => "#{name}="}.each do |type, meth_name|
+            next unless values[type] > 0
+            obj = handle_method(scope, var_name, meth_name, nil)
+            register_file_info(obj, statement.file, statement.line)
+            obj.namespace.attributes[scope][name] ||= SymbolHash[:read => nil, :write => nil]
+            obj.namespace.attributes[scope][name][type] = obj
           end
         end
         

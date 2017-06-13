@@ -59,7 +59,7 @@ extern VALUE cSizeF;
 extern VALUE cRectangle;
 extern VALUE cRectangleF;
 extern VALUE cFontStyle;
-extern VALUE cGenericFontFamily;
+extern VALUE cGenericFontFamilies;
 extern VALUE cPixelOffsetMode;
 extern VALUE cSmoothingMode;
 extern VALUE cTextRenderingHint;
@@ -72,6 +72,8 @@ extern VALUE cInterpolationMode;
 extern VALUE cFontFamily;
 extern VALUE cFontCollection;
 extern VALUE cFont;
+extern VALUE cInstalledFontCollection;
+extern VALUE cPrivateFontCollection;
 
 extern const rb_data_type_t tGuid;
 extern const rb_data_type_t tImageCodecInfo;
@@ -93,6 +95,8 @@ extern const rb_data_type_t tRectangleF;
 extern const rb_data_type_t tFontFamily;
 extern const rb_data_type_t tFontCollection;
 extern const rb_data_type_t tFont;
+extern const rb_data_type_t tInstalledFontCollection;
+extern const rb_data_type_t tPrivateFontCollection;
 
 void Init_codec();
 void Init_image();
@@ -129,6 +133,11 @@ extern GUID _ImageFormatUndefined;
 
 
 /* gdiplus.cpp */
+enum ArgOption {
+    ArgOptionNone = 0,
+    ArgOptionAcceptInt = 1,
+    ArgOptionToInt = 2,
+};
 extern const char *GpStatusStrs[22];
 extern int gdip_refcount;
 extern bool gdip_end_flag;
@@ -152,6 +161,7 @@ EncoderParameters *gdip_encprms_build_struct(VALUE v);
 template <typename T> ID gdip_enum_get_id(VALUE klass, T data);
 template <typename T> VALUE gdip_enum_get(VALUE klass, T data);
 VALUE gdip_enumint_create(VALUE klass, int num);
+bool gdip_arg_parse_enumint(VALUE klass, VALUE arg, int* num);
 int gdip_arg_to_enumint(VALUE klass, VALUE arg, bool to_int=false);
 VALUE gdip_enum_guid_create(VALUE klass, GUID *guid);
 unsigned int gdip_arg_to_enumflags(VALUE klass, VALUE arg, bool to_int=false);
@@ -217,6 +227,35 @@ bool util_extname(VALUE str, char (&ext)[6]);
 #define GET_MACRO(a) GET_MACRO2 a
 #define GET_MACRO2(_1,_2,_3,_4,_5,NAME,...) NAME
 #define ATTR_R(...) GET_MACRO((__VA_ARGS__, ATTR_R5, ATTR_R4))(__VA_ARGS__)
+
+#define CLASS_ATTR_R4(klass, Name, name_, prefix) \
+    do { \
+        rb_define_singleton_method(klass, #Name, RUBY_METHOD_FUNC(gdip_ ## prefix ## _s_get_ ## name_), 0); \
+        rb_define_singleton_method(klass, #name_, RUBY_METHOD_FUNC(gdip_ ## prefix ## _s_get_ ## name_), 0); \
+    } \
+    while (0)
+#define CLASS_ATTR_R5(klass, Name, name_, prefix, fname) \
+    do { \
+        rb_define_singleton_method(klass, #Name, RUBY_METHOD_FUNC(gdip_ ## prefix ## _s_get_ ## fname), 0); \
+        rb_define_singleton_method(klass, #name_, RUBY_METHOD_FUNC(gdip_ ## prefix ## _s_get_ ## fname), 0); \
+    } \
+    while (0)
+#define CLASS_ATTR_R_Q(klass, Name, name_, prefix) \
+    do { \
+        rb_define_singleton_method(klass, #Name, RUBY_METHOD_FUNC(gdip_ ## prefix ## _s_get_ ## name_), 0); \
+        rb_define_singleton_method(klass, #name_"?", RUBY_METHOD_FUNC(gdip_ ## prefix ## _s_get_ ## name_), 0); \
+    } \
+    while (0)
+#define CLASS_ATTR_RW(klass, Name, name_, prefix) \
+    do { \
+        rb_define_singleton_method(klass, #Name, RUBY_METHOD_FUNC(gdip_ ## prefix ## _s_get_ ## name_), 0); \
+        rb_define_singleton_method(klass, #name_, RUBY_METHOD_FUNC(gdip_ ## prefix ## _s_get_ ## name_), 0); \
+        rb_define_singleton_method(klass, #Name"=", RUBY_METHOD_FUNC(gdip_ ## prefix ## _s_set_ ## name_), 1); \
+        rb_define_singleton_method(klass, #name_"=", RUBY_METHOD_FUNC(gdip_ ## prefix ## _s_set_ ## name_), 1); \
+    } \
+    while (0)
+
+#define CLASS_ATTR_R(...) GET_MACRO((__VA_ARGS__, CLASS_ATTR_R5, CLASS_ATTR_R4))(__VA_ARGS__)
 
 /* Debug */
 // #define GDIPLUS_DEBUG 1 // moved in extconf.rb

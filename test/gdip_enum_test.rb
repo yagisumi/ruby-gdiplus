@@ -308,13 +308,13 @@ class GdiplusEnumIntTest < Test::Unit::TestCase
     assert_equal(FontStyle.new(3), FontStyle.Bold.Italic)
   end
 
-  def test_GenericFontFamily
-    assert_equal(0, GenericFontFamily.Serif.to_i)
-    assert_match(/Serif/, GenericFontFamily.Serif.inspect)
-    assert_equal(1, GenericFontFamily.SansSerif.to_i)
-    assert_match(/SansSerif/, GenericFontFamily.SansSerif.inspect)
-    assert_equal(2, GenericFontFamily.Monospace.to_i)
-    assert_match(/Monospace/, GenericFontFamily.Monospace.inspect)
+  def test_GenericFontFamilies
+    assert_equal(0, GenericFontFamilies.Serif.to_i)
+    assert_match(/Serif/, GenericFontFamilies.Serif.inspect)
+    assert_equal(1, GenericFontFamilies.SansSerif.to_i)
+    assert_match(/SansSerif/, GenericFontFamilies.SansSerif.inspect)
+    assert_equal(2, GenericFontFamilies.Monospace.to_i)
+    assert_match(/Monospace/, GenericFontFamilies.Monospace.inspect)
   end
 
   def test_PixelOffsetMode
