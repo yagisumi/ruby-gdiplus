@@ -222,12 +222,12 @@ gdip_fontcol_get_families(VALUE self)
     FontCollection *fontcol = Data_Ptr<FontCollection *>(self);
     Check_NULL(fontcol, "The FontCollection object does not exist.");
     int count = fontcol->GetFamilyCount();
-    dp("_____count: %d", count);
+    
     FontFamily *families = new FontFamily[count];
     int num_found = 0;
     fontcol->GetFamilies(count, families, &num_found);
     VALUE r = rb_ary_new_capa(num_found);
-    dp("_____count: %d, num: %d", count, num_found);
+    
     for (int i = 0; i < num_found; ++i) {
         FontFamily *fontfamily = families[i].Clone();
         if (fontfamily != NULL) {
@@ -265,31 +265,69 @@ gdip_font_init(int argc, VALUE *argv, VALUE self)
         rb_raise(rb_eArgError, "wrong number of arguments (%d for 2..4)", argc);
     }
 
-    if (_KIND_OF(argv[0], &tFont)) {
+    Font *font = Data_Ptr<Font *>(self);
+    if (font != NULL) {
+        _VERBOSE("This font object is already initialized.");
+        return self;
+    }
 
+    if (_KIND_OF(argv[0], &tFont)) {
+        if (argc != 2) {
+            rb_raise(rb_eArgError, "The number of arguments should be 2 if The first arugment is Font.");
+        }
+        Font *arg_font = Data_Ptr<Font *>(argv[0]);
+        Check_NULL(arg_font, "The Font object of an argument does not exist.");
+        FontFamily *family = new FontFamily();
+        
+        Status status = arg_font->GetFamily(family);
+        dp("status: %d", status);
+        if (status != Ok) {
+            if (family != NULL) {
+                delete family;
+            }
+            Check_Status(status);
+        }
+        VALUE v_family = gdip_fontfamily_create(family);
+
+        int style = FontStyleRegular;
+        if (!gdip_arg_to_enumint(cFontStyle, argv[1], &style)) {
+            rb_raise(rb_eArgError, "The second argument should be FontStyle.");
+        }
+
+        _DATA_PTR(self) = gdip_obj_create(new Font(family, arg_font->GetSize(), style, arg_font->GetUnit()));
+        RB_GC_GUARD(v_family);
     }
     else if (_RB_STRING_P(argv[0]) || _KIND_OF(argv[0], &tFontFamily)) {
+        float size = 12.0f;
+        gdip_arg_to_single(argv[1], &size, "The second argument should be Float or Integer.");
         Unit unit = UnitPixel;
         int style = FontStyleRegular;
         if (argc == 3) {
-            if (gdip_arg_to_enumint(cGraphicsUnit, argv[2], (int*)&unit)) {
-
-            }
-            else if (false) {
-
-            }
-            else {
-
+            if (!gdip_arg_to_enumint(cGraphicsUnit, argv[2], (int*)&unit) &&
+                !gdip_arg_to_enumint(cFontStyle, argv[2], &style)) {
+                rb_raise(rb_eTypeError, "The third argument should be GraphicsUnit or FontStyle.");
             }
         }
         else if (argc == 4) {
-
+            gdip_arg_to_enumint(cFontStyle, argv[2], &style, ArgOptionAcceptInt, "The third argument should be FontStyle.");
+            gdip_arg_to_enumint(cGraphicsUnit, argv[3], (int*)&unit, ArgOptionAcceptInt, "The fourth argument should be GraphicsUnit.");
         }
-
+        if (_RB_STRING_P(argv[0])) {
+            VALUE wstr = util_utf16_str_new(argv[0]);
+            _DATA_PTR(self) = gdip_obj_create(new Font(RString_Ptr<WCHAR *>(wstr), size, style, unit));
+            RB_GC_GUARD(wstr);
+        }
+        else {
+            FontFamily *family = Data_Ptr<FontFamily *>(argv[0]);
+            Check_NULL(family, "The FontFamily object does not exist.");
+            _DATA_PTR(self) = gdip_obj_create(new Font(family, size, style, unit));
+        }
     }
     else {
-
+        rb_raise(rb_eTypeError, "The first argument should be Font, FontFamily or String.");
     }
+
+    return self;
 }
 
 void
@@ -322,5 +360,6 @@ Init_font()
 
     cFont = rb_define_class_under(mGdiplus, "Font", cGpObject);
     rb_define_alloc_func(cFont, &typeddata_alloc_null<&tFont>);
+    rb_define_method(cFont, "initialize", RUBY_METHOD_FUNC(gdip_font_init), -1);
 
 }
