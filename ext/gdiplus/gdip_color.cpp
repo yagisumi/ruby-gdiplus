@@ -8,9 +8,9 @@
 const rb_data_type_t tColor = _MAKE_DATA_TYPE(
     "Color", 0, RUBY_NEVER_FREE, NULL, NULL, &cColor);
 
-// bool gdip_arg_to_color(VALUE v, Color *color, bool to_int=false, bool do_raise=true)
+
 bool
-gdip_arg_to_color(VALUE v, Color *color, bool to_int, bool do_raise)
+gdip_arg_to_color(VALUE v, Color *color, int option, const char *raise_msg)
 {
     if (RB_SYMBOL_P(v)) {
         v = rb_const_get(cColor, RB_SYM2ID(v));
@@ -20,17 +20,17 @@ gdip_arg_to_color(VALUE v, Color *color, bool to_int, bool do_raise)
         color->SetValue(Data_Ptr_As<ARGB>(v));
         return true;
     }
-    else if (_RB_INTEGER_P(v)) {
+    else if ((option & ArgOptionAcceptInt) && _RB_INTEGER_P(v)) {
         color->SetValue(RB_NUM2UINT(v));
         return true;
     }
-    else if (to_int) {
+    else if (option & ArgOptionToInt) {
         VALUE num = rb_to_int(v);
         color->SetValue(RB_NUM2UINT(num));
         return true;
     }
-    else if (do_raise) {
-        rb_raise(rb_eTypeError, "The argument should be Color or Integer");
+    else if (raise_msg != NULL) {
+        rb_raise(rb_eTypeError, raise_msg);
     }
     return false;
 }
@@ -90,7 +90,7 @@ gdip_color_init(int argc, VALUE *argv, VALUE self)
         }
         else {
             Color color;
-            gdip_arg_to_color(argv[0], &color, true, true);
+            gdip_arg_to_color(argv[0], &color);
             Data_Ptr_Set_As<ARGB>(self, color.GetValue());
         }
     }

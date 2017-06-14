@@ -137,14 +137,15 @@ enum ArgOption {
     ArgOptionNone = 0,
     ArgOptionAcceptInt = 1,
     ArgOptionToInt = 2,
+    ArgOptionColorDefault = ArgOptionAcceptInt | ArgOptionToInt
 };
 extern const char *GpStatusStrs[22];
 extern int gdip_refcount;
 extern bool gdip_end_flag;
 void gdiplus_shutdown();
 
-bool gdip_arg_to_double(VALUE v, double *dbl, bool do_raise=true);
-bool gdip_arg_to_single(VALUE v, float *flt, bool do_raise=true);
+bool gdip_arg_to_double(VALUE v, double *dbl, const char *raise_msg=NULL);
+bool gdip_arg_to_single(VALUE v, float *flt, const char *raise_msg=NULL);
 
 static inline void GdiplusAddRef() { ++gdip_refcount; }
 static inline void GdiplusRelease() {
@@ -161,10 +162,8 @@ EncoderParameters *gdip_encprms_build_struct(VALUE v);
 template <typename T> ID gdip_enum_get_id(VALUE klass, T data);
 template <typename T> VALUE gdip_enum_get(VALUE klass, T data);
 VALUE gdip_enumint_create(VALUE klass, int num);
-bool gdip_arg_parse_enumint(VALUE klass, VALUE arg, int* num);
-int gdip_arg_to_enumint(VALUE klass, VALUE arg, bool to_int=false);
+int gdip_arg_to_enumint(VALUE klass, VALUE arg, int *num, int option=0, const char *raise_msg=NULL);
 VALUE gdip_enum_guid_create(VALUE klass, GUID *guid);
-unsigned int gdip_arg_to_enumflags(VALUE klass, VALUE arg, bool to_int=false);
 
 /* gdip_graphics.cpp */
 VALUE gdip_graphics_create(Graphics *g);
@@ -176,7 +175,7 @@ gdip_color_create(Color& color)
 {
     return gdip_color_create(color.GetValue());
 }
-bool gdip_arg_to_color(VALUE v, Color *color, bool to_int=false, bool do_raise=true);
+bool gdip_arg_to_color(VALUE v, Color *color, int option=ArgOptionColorDefault, const char *raise_msg=NULL);
 
 /* gdip_rectangle.cpp */
 VALUE gdip_point_create(int x, int y);

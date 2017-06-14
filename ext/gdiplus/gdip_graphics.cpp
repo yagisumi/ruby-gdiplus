@@ -51,7 +51,8 @@ gdip_graphics_set_compositing_mode(VALUE self, VALUE v)
 {
     Graphics *g = Data_Ptr<Graphics *>(self);
     Check_NULL(g, "The graphics object does not exist.");
-    int enumint = gdip_arg_to_enumint(cCompositingMode, v);
+    int enumint = 0;
+    gdip_arg_to_enumint(cCompositingMode, v, &enumint, ArgOptionAcceptInt, "The argument should be CompositingMode.");
     Status status = g->SetCompositingMode(static_cast<CompositingMode>(enumint));
     Check_Status(status);
     return self;
@@ -75,7 +76,8 @@ gdip_graphics_set_compositing_quality(VALUE self, VALUE v)
 {
     Graphics *g = Data_Ptr<Graphics *>(self);
     Check_NULL(g, "The graphics object does not exist.");
-    int enumint = gdip_arg_to_enumint(cCompositingQuality, v);
+    int enumint = 0;
+    gdip_arg_to_enumint(cCompositingQuality, v, &enumint, ArgOptionAcceptInt, "The argument should be CompositingQuality.");
     Status status = g->SetCompositingQuality(static_cast<CompositingQuality>(enumint));
     Check_Status(status);
     return self;
@@ -125,7 +127,8 @@ gdip_graphics_set_interpolation_mode(VALUE self, VALUE v)
 {
     Graphics *g = Data_Ptr<Graphics *>(self);
     Check_NULL(g, "The graphics object does not exist.");
-    int enumint = gdip_arg_to_enumint(cInterpolationMode, v);
+    int enumint = 0;
+    gdip_arg_to_enumint(cInterpolationMode, v, &enumint, ArgOptionAcceptInt, "The argument should be InterpolationMode.");
     Status status = g->SetInterpolationMode(static_cast<InterpolationMode>(enumint));
     Check_Status(status);
     return self;
@@ -176,7 +179,7 @@ gdip_graphics_set_page_scale(VALUE self, VALUE v)
     Graphics *g = Data_Ptr<Graphics *>(self);
     Check_NULL(g, "The graphics object does not exist.");
     float scale;
-    gdip_arg_to_single(v, &scale);
+    gdip_arg_to_single(v, &scale, "The argument should be Float or Integer.");
     Status status = g->SetPageScale(scale);
     Check_Status(status);
     return self;
@@ -200,7 +203,8 @@ gdip_graphics_set_page_unit(VALUE self, VALUE v)
 {
     Graphics *g = Data_Ptr<Graphics *>(self);
     Check_NULL(g, "The graphics object does not exist.");
-    int enumint = gdip_arg_to_enumint(cGraphicsUnit, v);
+    int enumint = 0;
+    gdip_arg_to_enumint(cGraphicsUnit, v, &enumint, ArgOptionAcceptInt, "The argument should be GraphicsUnit.");
     Status status = g->SetPageUnit(static_cast<Unit>(enumint));
     Check_Status(status);
     return self;
@@ -224,7 +228,8 @@ gdip_graphics_set_pixel_offset_mode(VALUE self, VALUE v)
 {
     Graphics *g = Data_Ptr<Graphics *>(self);
     Check_NULL(g, "The graphics object does not exist.");
-    int enumint = gdip_arg_to_enumint(cPixelOffsetMode, v);
+    int enumint = 0;
+    gdip_arg_to_enumint(cPixelOffsetMode, v, &enumint, ArgOptionAcceptInt, "The argument should be PixelOffsetMode.");
     Status status = g->SetPixelOffsetMode(static_cast<PixelOffsetMode>(enumint));
     Check_Status(status);
     return self;
@@ -280,8 +285,9 @@ gdip_graphics_set_smoothing_mode(VALUE self, VALUE mode)
 {
     Graphics *g = Data_Ptr<Graphics *>(self);
     Check_NULL(g, "The graphics object does not exist.");
-    int enum_mode = gdip_arg_to_enumint(cSmoothingMode, mode);
-    g->SetSmoothingMode(static_cast<SmoothingMode>(enum_mode));
+    int enumint = 0;
+    gdip_arg_to_enumint(cSmoothingMode, mode, &enumint, ArgOptionAcceptInt, "The argument should be SmoothingMode.");
+    g->SetSmoothingMode(static_cast<SmoothingMode>(enumint));
     return self;
 }
 
@@ -341,7 +347,8 @@ gdip_graphics_set_text_rendering_hint(VALUE self, VALUE v)
 {
     Graphics *g = Data_Ptr<Graphics *>(self);
     Check_NULL(g, "The graphics object does not exist.");
-    int enumint = gdip_arg_to_enumint(cTextRenderingHint, v);
+    int enumint = 0;
+    gdip_arg_to_enumint(cTextRenderingHint, v, &enumint, ArgOptionAcceptInt, "The argument should be TextRenderingHint.");
     if (enumint == TextRenderingHintClearTypeGridFit && g->GetCompositingMode() == CompositingModeSourceCopy) {
         _WARNING("Do not set ClearTypeGridFit when CompositingMode is SourceCopy.");
     }
@@ -379,7 +386,7 @@ static VALUE
 gdip_graphics_clear(VALUE self, VALUE color_v)
 {
     Color color;
-    gdip_arg_to_color(color_v, &color, true, true);
+    gdip_arg_to_color(color_v, &color);
     Graphics *g = Data_Ptr<Graphics *>(self);
     Check_NULL(g, "The graphics object does not exist.");
     g->Clear(color);
@@ -958,7 +965,7 @@ gdip_graphics_fill_closed_curve(int argc, VALUE *argv, VALUE self)
     }
     FillMode fillmode = FillModeAlternate;
     if (argc > 2) {
-        fillmode = static_cast<FillMode>(gdip_arg_to_enumint(cFillMode, argv[2]));
+        gdip_arg_to_enumint(cFillMode, argv[2], (int*)&fillmode, 0, "The third argument should be FillMode.");
     }
     
     VALUE first = rb_ary_entry(argv[1], 0);
@@ -1034,16 +1041,16 @@ gdip_graphics_draw_arc(int argc, VALUE *argv, VALUE self)
 
     float start_angle;
     float sweep_angle;
-    if (argc == 4 && !gdip_arg_to_single(argv[2], &start_angle, false)) {
+    if (argc == 4 && !gdip_arg_to_single(argv[2], &start_angle)) {
         rb_raise(rb_eTypeError, "The argument of the start angle should be Integer or Float.");
     }
-    if (argc == 4 && !gdip_arg_to_single(argv[3], &sweep_angle, false)) {
+    if (argc == 4 && !gdip_arg_to_single(argv[3], &sweep_angle)) {
         rb_raise(rb_eTypeError, "The argument of the sweep angle should be Integer or Float.");
     }
-    if (argc == 7 && !gdip_arg_to_single(argv[5], &start_angle, false)) {
+    if (argc == 7 && !gdip_arg_to_single(argv[5], &start_angle)) {
         rb_raise(rb_eTypeError, "The argument of the start angle should be Integer or Float.");
     }
-    if (argc == 7 && !gdip_arg_to_single(argv[6], &sweep_angle, false)) {
+    if (argc == 7 && !gdip_arg_to_single(argv[6], &sweep_angle)) {
         rb_raise(rb_eTypeError, "The argument of the sweep angle should be Integer or Float.");
     }
 
@@ -1275,16 +1282,16 @@ gdip_graphics_draw_pie(int argc, VALUE *argv, VALUE self)
 
     float start_angle;
     float sweep_angle;
-    if (argc == 4 && !gdip_arg_to_single(argv[2], &start_angle, false)) {
+    if (argc == 4 && !gdip_arg_to_single(argv[2], &start_angle)) {
         rb_raise(rb_eTypeError, "The argument of the start angle should be Integer or Float.");
     }
-    if (argc == 4 && !gdip_arg_to_single(argv[3], &sweep_angle, false)) {
+    if (argc == 4 && !gdip_arg_to_single(argv[3], &sweep_angle)) {
         rb_raise(rb_eTypeError, "The argument of the sweep angle should be Integer or Float.");
     }
-    if (argc == 7 && !gdip_arg_to_single(argv[5], &start_angle, false)) {
+    if (argc == 7 && !gdip_arg_to_single(argv[5], &start_angle)) {
         rb_raise(rb_eTypeError, "The argument of the start angle should be Integer or Float.");
     }
-    if (argc == 7 && !gdip_arg_to_single(argv[6], &sweep_angle, false)) {
+    if (argc == 7 && !gdip_arg_to_single(argv[6], &sweep_angle)) {
         rb_raise(rb_eTypeError, "The argument of the sweep angle should be Integer or Float.");
     }
 
@@ -1357,16 +1364,16 @@ gdip_graphics_fill_pie(int argc, VALUE *argv, VALUE self)
 
     float start_angle;
     float sweep_angle;
-    if (argc == 4 && !gdip_arg_to_single(argv[2], &start_angle, false)) {
+    if (argc == 4 && !gdip_arg_to_single(argv[2], &start_angle)) {
         rb_raise(rb_eTypeError, "The argument of the start angle should be Integer or Float.");
     }
-    if (argc == 4 && !gdip_arg_to_single(argv[3], &sweep_angle, false)) {
+    if (argc == 4 && !gdip_arg_to_single(argv[3], &sweep_angle)) {
         rb_raise(rb_eTypeError, "The argument of the sweep angle should be Integer or Float.");
     }
-    if (argc == 7 && !gdip_arg_to_single(argv[5], &start_angle, false)) {
+    if (argc == 7 && !gdip_arg_to_single(argv[5], &start_angle)) {
         rb_raise(rb_eTypeError, "The argument of the start angle should be Integer or Float.");
     }
-    if (argc == 7 && !gdip_arg_to_single(argv[6], &sweep_angle, false)) {
+    if (argc == 7 && !gdip_arg_to_single(argv[6], &sweep_angle)) {
         rb_raise(rb_eTypeError, "The argument of the sweep angle should be Integer or Float.");
     }
 
@@ -1481,7 +1488,7 @@ gdip_graphics_fill_polygon(int argc, VALUE *argv, VALUE self)
     }
     FillMode fillmode = FillModeAlternate;
     if (!RB_NIL_P(v_fillmode)) {
-        fillmode = static_cast<FillMode>(gdip_arg_to_enumint(cFillMode, v_fillmode));
+        gdip_arg_to_enumint(cFillMode, v_fillmode, (int*)&fillmode, ArgOptionAcceptInt, "The argument should be FillMode.");
     }
 
     Graphics *g = Data_Ptr<Graphics *>(self);

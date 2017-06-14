@@ -148,7 +148,7 @@ gdiplus_end(VALUE self)
 }
 
 bool
-gdip_arg_to_double(VALUE v, double *dbl, bool do_raise)
+gdip_arg_to_double(VALUE v, double *dbl, const char *raise_msg)
 {
     if (_RB_FLOAT_P(v)) {
         *dbl = NUM2DBL(v);
@@ -158,14 +158,14 @@ gdip_arg_to_double(VALUE v, double *dbl, bool do_raise)
         *dbl = 1.0 * RB_NUM2INT(v);
         return true;
     }
-    else if (do_raise) {
-        rb_raise(rb_eTypeError, "The argument should be Float or Integer.");
+    else if (raise_msg != NULL) {
+        rb_raise(rb_eTypeError, raise_msg);
     }
     return false;
 }
 
 bool
-gdip_arg_to_single(VALUE v, float *flt, bool do_raise)
+gdip_arg_to_single(VALUE v, float *flt, const char *raise_msg)
 {
     if (_RB_FLOAT_P(v)) {
         *flt = NUM2SINGLE(v);
@@ -175,8 +175,8 @@ gdip_arg_to_single(VALUE v, float *flt, bool do_raise)
         *flt = 1.0f * RB_NUM2INT(v);
         return true;
     }
-    else if (do_raise) {
-        rb_raise(rb_eTypeError, "The argument should be Float or Integer.");
+    else if (raise_msg != NULL) {
+        rb_raise(rb_eTypeError, raise_msg);
     }
     return false;
 }

@@ -82,7 +82,7 @@ gdip_fontfamily_init(int argc, VALUE *argv, VALUE self)
             _DATA_PTR(self) = gdip_obj_create(new FontFamily(RString_Ptr<WCHAR *>(wstr)));
             RB_GC_GUARD(wstr);
         }
-        else if (gdip_arg_parse_enumint(cGenericFontFamilies, argv[0], &gff)) {
+        else if (gdip_arg_to_enumint(cGenericFontFamilies, argv[0], &gff)) {
             VALUE v_generic;
             switch (gff) {
                 case 0: //GenericFontFamilySerif:
@@ -141,7 +141,7 @@ gdip_fontfamily_get_em_height(int argc, VALUE *argv, VALUE self)
 
     int style = FontStyleRegular;
     if (!RB_NIL_P(v_style)) {
-        style = gdip_arg_to_enumint(cFontStyle, v_style);
+        gdip_arg_to_enumint(cFontStyle, v_style, &style, ArgOptionAcceptInt, "The argument should be FontStyle.");
     }
     UINT16 h = fontfamily->GetEmHeight(style);
     return RB_UINT2NUM(h);
@@ -158,7 +158,7 @@ gdip_fontfamily_get_cell_ascent(int argc, VALUE *argv, VALUE self)
 
     int style = FontStyleRegular;
     if (!RB_NIL_P(v_style)) {
-        style = gdip_arg_to_enumint(cFontStyle, v_style);
+        gdip_arg_to_enumint(cFontStyle, v_style, &style, ArgOptionAcceptInt, "The argument should be FontStyle.");
     }
     UINT16 h = fontfamily->GetCellAscent(style);
     return RB_UINT2NUM(h);
@@ -175,7 +175,7 @@ gdip_fontfamily_get_cell_descent(int argc, VALUE *argv, VALUE self)
 
     int style = FontStyleRegular;
     if (!RB_NIL_P(v_style)) {
-        style = gdip_arg_to_enumint(cFontStyle, v_style);
+        gdip_arg_to_enumint(cFontStyle, v_style, &style, ArgOptionAcceptInt, "The argument should be FontStyle.");
     }
     UINT16 h = fontfamily->GetCellDescent(style);
     return RB_UINT2NUM(h);
@@ -192,7 +192,7 @@ gdip_fontfamily_get_line_spacing(int argc, VALUE *argv, VALUE self)
 
     int style = FontStyleRegular;
     if (!RB_NIL_P(v_style)) {
-        style = gdip_arg_to_enumint(cFontStyle, v_style);
+        gdip_arg_to_enumint(cFontStyle, v_style, &style, ArgOptionAcceptInt, "The argument should be FontStyle.");
     }
     UINT16 h = fontfamily->GetLineSpacing(style);
     return RB_UINT2NUM(h);
@@ -272,14 +272,14 @@ gdip_font_init(int argc, VALUE *argv, VALUE self)
         Unit unit = UnitPixel;
         int style = FontStyleRegular;
         if (argc == 3) {
-            if (gdip_arg_parse_enumint(cGraphicsUnit, argv[2], &unit)) {
+            if (gdip_arg_to_enumint(cGraphicsUnit, argv[2], (int*)&unit)) {
 
             }
-            else if () {
+            else if (false) {
 
             }
             else {
-                
+
             }
         }
         else if (argc == 4) {

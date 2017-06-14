@@ -45,7 +45,7 @@ gdip_pen_init(int argc, VALUE *argv, VALUE self)
     }
 
     Color color;
-    if (gdip_arg_to_color(color_or_brush, &color, false, false)) {
+    if (gdip_arg_to_color(color_or_brush, &color, ArgOptionAcceptInt)) {
         _DATA_PTR(self) = gdip_obj_create<Pen *>(new Pen(color, width));
     }
     else if (_KIND_OF(color_or_brush, &tBrush)) {
@@ -84,7 +84,7 @@ gdip_pen_set_width(VALUE self, VALUE width)
     Check_NULL(pen, "This object does not exist");
 
     float w = 0.0f;
-    gdip_arg_to_single(width, &w);
+    gdip_arg_to_single(width, &w, "The argument should be Float or Integer.");
     pen->SetWidth(w);
     Check_LastStatus(pen);
     return self;
@@ -116,7 +116,7 @@ gdip_pen_set_dash_offset(VALUE self, VALUE offset)
     Check_NULL(pen, "This object does not exist");
 
     float oft = 0.0f;
-    gdip_arg_to_single(offset, &oft);
+    gdip_arg_to_single(offset, &oft, "The argument should be Float or Integer.");
     pen->SetDashOffset(oft);
     Check_LastStatus(pen);
     return self;
@@ -148,7 +148,7 @@ gdip_pen_set_miter_limit(VALUE self, VALUE limit)
     Check_NULL(pen, "This object does not exist");
 
     float lmt = 0.0f;
-    gdip_arg_to_single(limit, &lmt);
+    gdip_arg_to_single(limit, &lmt, "The argument should be Float or Integer.");
     pen->SetMiterLimit(lmt);
     Check_LastStatus(pen);
     return self;
@@ -389,7 +389,8 @@ gdip_pen_set_alignment(VALUE self, VALUE align)
 {
     Pen *pen = Data_Ptr<Pen *>(self);
     Check_NULL(pen, "This object does not exist");
-    int enum_align = gdip_arg_to_enumint(cPenAlignment, align);
+    int enum_align = 0;
+    gdip_arg_to_enumint(cPenAlignment, align, &enum_align, ArgOptionAcceptInt, "The argument should be PenAlignment.");
     PenAlignment pa = static_cast<PenAlignment>(enum_align);
     if (pa == PenAlignmentInset && pen->GetCompoundArrayCount() > 0) {
         _WARNING("Do not use PenAlignment.Inset with CompoundArray");
@@ -423,7 +424,8 @@ gdip_pen_set_dash_cap(VALUE self, VALUE cap)
     Pen *pen = Data_Ptr<Pen *>(self);
     Check_NULL(pen, "This object does not exist");
 
-    int enum_cap = gdip_arg_to_enumint(cDashCap, cap);
+    int enum_cap = 0;
+    gdip_arg_to_enumint(cDashCap, cap, &enum_cap, ArgOptionAcceptInt, "The argument should be DashCap.");
     pen->SetDashCap(static_cast<DashCap>(enum_cap));
     Check_LastStatus(pen);
     return self;
@@ -452,7 +454,8 @@ gdip_pen_set_dash_style(VALUE self, VALUE style)
     Pen *pen = Data_Ptr<Pen *>(self);
     Check_NULL(pen, "This object does not exist");
 
-    int enum_style = gdip_arg_to_enumint(cDashStyle, style);
+    int enum_style = 0;
+    gdip_arg_to_enumint(cDashStyle, style, &enum_style, ArgOptionAcceptInt, "The argument should be Float or Integer.");
     pen->SetDashStyle(static_cast<DashStyle>(enum_style));
     Check_LastStatus(pen);
     return self;
@@ -480,7 +483,8 @@ gdip_pen_set_end_cap(VALUE self, VALUE cap)
     Pen *pen = Data_Ptr<Pen *>(self);
     Check_NULL(pen, "This object does not exist");
 
-    int enum_cap = gdip_arg_to_enumint(cLineCap, cap);
+    int enum_cap = 0;
+    gdip_arg_to_enumint(cLineCap, cap, &enum_cap, ArgOptionAcceptInt, "The argument should be LineCap.");
     pen->SetEndCap(static_cast<LineCap>(enum_cap));
     Check_LastStatus(pen);
     return self;
@@ -509,7 +513,8 @@ gdip_pen_set_line_join(VALUE self, VALUE join)
     Pen *pen = Data_Ptr<Pen *>(self);
     Check_NULL(pen, "This object does not exist");
 
-    int enum_join = gdip_arg_to_enumint(cLineJoin, join);
+    int enum_join = 0;
+    gdip_arg_to_enumint(cLineJoin, join, &enum_join, ArgOptionAcceptInt, "The argument should be LineJoin.");
     pen->SetLineJoin(static_cast<LineJoin>(enum_join));
     Check_LastStatus(pen);
     return self;
@@ -538,7 +543,8 @@ gdip_pen_set_start_cap(VALUE self, VALUE cap)
     Pen *pen = Data_Ptr<Pen *>(self);
     Check_NULL(pen, "This object does not exist");
 
-    int enum_cap = gdip_arg_to_enumint(cLineCap, cap);
+    int enum_cap = 0;
+    gdip_arg_to_enumint(cLineCap, cap, &enum_cap, ArgOptionAcceptInt, "The argument should be LineCap.");
     pen->SetStartCap(static_cast<LineCap>(enum_cap));
     Check_LastStatus(pen);
     return self;

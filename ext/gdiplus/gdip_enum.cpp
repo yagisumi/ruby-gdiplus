@@ -66,47 +66,30 @@ gdip_enumint_create(VALUE klass, int num)
     return r;
 }
 
-bool 
-gdip_arg_parse_enumint(VALUE klass, VALUE arg, int* num)
+int
+gdip_arg_to_enumint(VALUE klass, VALUE arg, int *num, int option, const char *raise_msg)
 {
     if (RB_SYMBOL_P(arg)) {
         arg = rb_const_get(klass, RB_SYM2ID(arg));
     }
 
-    if (_KIND_OF(arg, &tEnumInt) && rb_obj_is_kind_of(arg, klass)) {
+    if (rb_obj_is_kind_of(arg, klass)) {
         *num = Data_Ptr_As<int>(arg);
         return true;
     }
-    else if (Integer_p(arg)) {
+    else if ((option & ArgOptionAcceptInt) && Integer_p(arg)) {
         *num = RB_NUM2INT(arg);
         return true;
     }
-
+    else if (option & ArgOptionToInt) {
+        VALUE v_num = rb_to_int(arg);
+        *num = RB_NUM2INT(v_num);
+        return true;
+    }
+    else if (raise_msg != NULL) {
+        rb_raise(rb_eTypeError, raise_msg);
+    }
     return false;
-}
-
-int
-gdip_arg_to_enumint(VALUE klass, VALUE arg, bool to_int)
-{
-    int r = 0;
-    if (RB_SYMBOL_P(arg)) {
-        arg = rb_const_get(klass, RB_SYM2ID(arg));
-    }
-
-    if (_KIND_OF(arg, &tEnumInt) && rb_obj_is_kind_of(arg, klass)) {
-        r = Data_Ptr_As<int>(arg);
-    }
-    else if (Integer_p(arg)) {
-        r = RB_NUM2INT(arg);
-    }
-    else if (to_int) {
-        VALUE num = rb_to_int(arg);
-        r = RB_NUM2INT(num);
-    }
-    else {
-        rb_raise(rb_eTypeError, "The argument should be %s ,Symbol or Integer", __class__(klass));
-    }
-    return r;
 }
 
 
@@ -191,30 +174,6 @@ gdip_enumint_equal(VALUE self, VALUE other)
         return x == y ? Qtrue : Qfalse;
     }
     else return Qfalse;
-}
-
-unsigned int
-gdip_arg_to_enumflags(VALUE klass, VALUE arg, bool to_int)
-{
-    unsigned int r = 0;
-    if (RB_SYMBOL_P(arg)) {
-        arg = rb_const_get(klass, RB_SYM2ID(arg));
-    }
-
-    if (_KIND_OF(arg, &tEnumInt) && rb_obj_is_kind_of(arg, klass)) {
-        r = Data_Ptr_As<unsigned int>(arg);
-    }
-    else if (Integer_p(arg)) {
-        r = RB_NUM2UINT(arg);
-    }
-    else if (to_int) {
-        VALUE num = rb_to_int(arg);
-        r = RB_NUM2UINT(num);
-    }
-    else {
-        rb_raise(rb_eTypeError, "The argument should be %s ,Symbol or Integer", __class__(klass));
-    }
-    return r;
 }
 
 /**
