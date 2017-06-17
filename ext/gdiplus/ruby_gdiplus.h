@@ -74,6 +74,7 @@ extern VALUE cFontCollection;
 extern VALUE cFont;
 extern VALUE cInstalledFontCollection;
 extern VALUE cPrivateFontCollection;
+extern VALUE cLangId;
 
 extern const rb_data_type_t tGuid;
 extern const rb_data_type_t tImageCodecInfo;
@@ -97,6 +98,7 @@ extern const rb_data_type_t tFontCollection;
 extern const rb_data_type_t tFont;
 extern const rb_data_type_t tInstalledFontCollection;
 extern const rb_data_type_t tPrivateFontCollection;
+extern const rb_data_type_t tLangId;
 
 void Init_codec();
 void Init_image();
@@ -107,6 +109,7 @@ void Init_pen_brush();
 void Init_graphics();
 void Init_rectangle();
 void Init_font();
+void Init_langid();
 
 /* gdip_enum.cpp */
 extern ID ID_UNKNOWN;
@@ -483,10 +486,10 @@ Check_LastStatus(T obj)
 }
 
 static inline void
-Check_Status(GpStatus status) {
+Check_Status(Status status) {
     if (status == Ok) { return; }
     if (status < 22) {
-        rb_raise(eGdiplus, "GpStatus.%s, Some error occurred.", GpStatusStrs[status]);
+        rb_raise(eGdiplus, "Status.%s, Some error occurred.", GpStatusStrs[status]);
     }
     else {
         rb_raise(eGdiplus, "Unknown error occurred. (GpStatus: %d)", status);

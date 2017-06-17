@@ -59,6 +59,7 @@ VALUE cFontCollection;
 VALUE cFont;
 VALUE cInstalledFontCollection;
 VALUE cPrivateFontCollection;
+VALUE cLangId;
 
 int gdip_refcount = 0;
 bool gdip_end_flag = false;
@@ -216,4 +217,5 @@ Init_gdiplus(void)
     Init_graphics();
     Init_rectangle();
     Init_font();
+    Init_langid();
 }

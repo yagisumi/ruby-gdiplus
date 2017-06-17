@@ -5,6 +5,8 @@ class GdiplusFontTest < Test::Unit::TestCase
   include Gdiplus
   
   def test_FontFamily
+    return if InstalledFontCollection.broken?
+    
     assert_instance_of(FontFamily, FontFamily.GenericSansSerif)
     assert_instance_of(FontFamily, FontFamily.GenericSerif)
     assert_instance_of(FontFamily, FontFamily.GenericMonospace)
@@ -24,7 +26,7 @@ class GdiplusFontTest < Test::Unit::TestCase
     assert_instance_of(FontFamily, FontFamily.new(FontFamily.GenericSansSerif.name, InstalledFontCollection.new))
     assert_raise(GdiplusError) { FontFamily.new("jkjagsljslkdjfljaslgrfjds") }
     
-    fontfamily = FontFamily.GenericMonospace
+    fontfamily = FontFamily.new("Times New Roman")
     assert_kind_of(Integer, fontfamily.GetEmHeight())
     assert_kind_of(Integer, fontfamily.GetCellAscent())
     assert_kind_of(Integer, fontfamily.GetCellDescent())

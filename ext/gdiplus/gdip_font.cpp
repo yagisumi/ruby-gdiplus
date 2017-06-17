@@ -21,6 +21,8 @@ const rb_data_type_t tPrivateFontCollection = _MAKE_DATA_TYPE(
 const rb_data_type_t tFont = _MAKE_DATA_TYPE(
     "Font", 0, GDIP_OBJ_FREE(Font *), NULL, NULL, &cFont);
 
+
+
 static VALUE
 gdip_fontfamily_create(FontFamily *fontfamily)
 {
@@ -28,6 +30,7 @@ gdip_fontfamily_create(FontFamily *fontfamily)
     _DATA_PTR(r) = gdip_obj_create(fontfamily);
     return r;
 }
+
 
 static VALUE vGenericSansSerif = Qnil;
 static VALUE vGenericSerif = Qnil;
@@ -143,7 +146,7 @@ gdip_fontfamily_get_em_height(int argc, VALUE *argv, VALUE self)
     if (!RB_NIL_P(v_style)) {
         gdip_arg_to_enumint(cFontStyle, v_style, &style, ArgOptionAcceptInt, "The argument should be FontStyle.");
     }
-    UINT16 h = fontfamily->GetEmHeight(style);
+    Gdiplus::UINT16 h = fontfamily->GetEmHeight(style);
     return RB_UINT2NUM(h);
 }
 
@@ -160,7 +163,7 @@ gdip_fontfamily_get_cell_ascent(int argc, VALUE *argv, VALUE self)
     if (!RB_NIL_P(v_style)) {
         gdip_arg_to_enumint(cFontStyle, v_style, &style, ArgOptionAcceptInt, "The argument should be FontStyle.");
     }
-    UINT16 h = fontfamily->GetCellAscent(style);
+    Gdiplus::UINT16 h = fontfamily->GetCellAscent(style);
     return RB_UINT2NUM(h);
 }
 
@@ -177,7 +180,7 @@ gdip_fontfamily_get_cell_descent(int argc, VALUE *argv, VALUE self)
     if (!RB_NIL_P(v_style)) {
         gdip_arg_to_enumint(cFontStyle, v_style, &style, ArgOptionAcceptInt, "The argument should be FontStyle.");
     }
-    UINT16 h = fontfamily->GetCellDescent(style);
+    Gdiplus::UINT16 h = fontfamily->GetCellDescent(style);
     return RB_UINT2NUM(h);
 }
 
@@ -194,7 +197,7 @@ gdip_fontfamily_get_line_spacing(int argc, VALUE *argv, VALUE self)
     if (!RB_NIL_P(v_style)) {
         gdip_arg_to_enumint(cFontStyle, v_style, &style, ArgOptionAcceptInt, "The argument should be FontStyle.");
     }
-    UINT16 h = fontfamily->GetLineSpacing(style);
+    Gdiplus::UINT16 h = fontfamily->GetLineSpacing(style);
     return RB_UINT2NUM(h);
 }
 
@@ -214,6 +217,19 @@ gdip_privfontcol_alloc(VALUE klass)
     dp("PrivateFontCollection alloc");
     VALUE r = _Data_Wrap_Struct(klass, &tPrivateFontCollection, ptr);
     return r;
+}
+
+static VALUE
+gdip_privfontcol_add_font_file(VALUE self, VALUE filename)
+{
+    PrivateFontCollection *privfontcol = Data_Ptr<PrivateFontCollection *>(self);
+    Check_NULL(privfontcol, "This PrivateFontCollection does not exist.");
+
+    VALUE wstr = util_utf16_str_new(filename);
+    Status status = privfontcol->AddFontFile(RString_Ptr<WCHAR *>(wstr));
+    RB_GC_GUARD(wstr);
+    Check_Status(status);
+    return self;
 }
 
 static VALUE
@@ -280,7 +296,6 @@ gdip_font_init(int argc, VALUE *argv, VALUE self)
         FontFamily *family = new FontFamily();
         
         Status status = arg_font->GetFamily(family);
-        dp("status: %d", status);
         if (status != Ok) {
             if (family != NULL) {
                 delete family;
@@ -330,6 +345,172 @@ gdip_font_init(int argc, VALUE *argv, VALUE self)
     return self;
 }
 
+static VALUE
+gdip_font_get_bold(VALUE self)
+{
+    Font *font = Data_Ptr<Font *>(self);
+    Check_NULL(font, "This Font object does not exist.");
+    int style = font->GetStyle();
+    return style & FontStyleBold ? Qtrue : Qfalse;
+}
+
+static VALUE
+gdip_font_get_italic(VALUE self)
+{
+    Font *font = Data_Ptr<Font *>(self);
+    Check_NULL(font, "This Font object does not exist.");
+    int style = font->GetStyle();
+    return style & FontStyleItalic ? Qtrue : Qfalse;
+}
+
+static VALUE
+gdip_font_get_strikeout(VALUE self)
+{
+    Font *font = Data_Ptr<Font *>(self);
+    Check_NULL(font, "This Font object does not exist.");
+    int style = font->GetStyle();
+    return style & FontStyleStrikeout ? Qtrue : Qfalse;
+}
+
+static VALUE
+gdip_font_get_underline(VALUE self)
+{
+    Font *font = Data_Ptr<Font *>(self);
+    Check_NULL(font, "This Font object does not exist.");
+    int style = font->GetStyle();
+    return style & FontStyleUnderline ? Qtrue : Qfalse;
+}
+
+static VALUE
+gdip_font_get_style(VALUE self)
+{
+    Font *font = Data_Ptr<Font *>(self);
+    Check_NULL(font, "This Font object does not exist.");
+    return gdip_enumint_create(cFontStyle, font->GetStyle());
+}
+
+static VALUE
+gdip_font_get_unit(VALUE self)
+{
+    Font *font = Data_Ptr<Font *>(self);
+    Check_NULL(font, "This Font object does not exist.");
+    return gdip_enumint_create(cGraphicsUnit, font->GetUnit());
+}
+
+static VALUE
+gdip_font_get_size(VALUE self)
+{
+    Font *font = Data_Ptr<Font *>(self);
+    Check_NULL(font, "This Font object does not exist.");
+    return SINGLE2NUM(font->GetSize());
+}
+
+static VALUE
+gdip_font_get_font_family(VALUE self)
+{
+    Font *font = Data_Ptr<Font *>(self);
+    Check_NULL(font, "This Font object does not exist.");
+    FontFamily *family = new FontFamily();
+    Status status = font->GetFamily(family);
+    if (status != Ok) {
+        delete family;
+        Check_Status(status);
+    }
+    return gdip_fontfamily_create(family);
+}
+
+static VALUE
+gdip_font_get_name(VALUE self)
+{
+    Font *font = Data_Ptr<Font *>(self);
+    Check_NULL(font, "This Font object does not exist.");
+    FontFamily *family = new FontFamily();
+    Status status = font->GetFamily(family);
+    if (status != Ok) {
+        delete family;
+        Check_Status(status);
+    }
+
+    WCHAR wstr[LF_FACESIZE];
+    status = family->GetFamilyName(wstr);
+    delete family;
+    Check_Status(status);
+    return util_utf8_str_new_from_wstr(wstr);
+}
+
+static float
+gdip_font_get_height_i(Font *font)
+{
+    HDC hdc = GetDC(NULL);
+    if (hdc == NULL) {
+        rb_raise(rb_eRuntimeError, "Failed to GetDC.");
+    }
+    Graphics *g = Graphics::FromHDC(hdc);
+    float h = font->GetHeight(g);
+    delete g;
+    ReleaseDC(NULL, hdc);
+    return h;
+}
+
+static VALUE
+gdip_font_get_height(VALUE self)
+{
+    Font *font = Data_Ptr<Font *>(self);
+    Check_NULL(font, "This Font object does not exist.");
+    return RB_INT2NUM(static_cast<int>(ceilf(gdip_font_get_height_i(font))));
+}
+
+static VALUE
+gdip_font_m_get_height(int argc, VALUE *argv, VALUE self)
+{
+    if (argc != 0 && argc != 1) {
+        rb_raise(rb_eArgError, "wrong number of arguments (%d for 0..1)", argc);
+    }
+
+    Font *font = Data_Ptr<Font *>(self);
+    Check_NULL(font, "This Font object does not exist.");
+
+    if (argc == 0) {
+        return SINGLE2NUM(gdip_font_get_height_i(font));
+    }
+    else if (argc == 1) {
+        float dpi;
+        if (_KIND_OF(argv[0], &tGraphics)) {
+            Graphics *g = Data_Ptr<Graphics *>(argv[0]);
+            Check_NULL(g, "The Graphics object does not exist.");
+
+            return SINGLE2NUM(font->GetHeight(g));
+        }
+        else if (gdip_arg_to_single(argv[0], &dpi)) {
+            return SINGLE2NUM(font->GetHeight(dpi));
+        }
+        else {
+            rb_raise(rb_eTypeError, "The argument should be Graphics or Float.");
+        }
+    }
+    return Qnil;
+}
+
+static bool
+test_font()
+{
+    const FontFamily *family = FontFamily::GenericSansSerif();
+    if (family == NULL) {
+        return false;
+    }
+    else {
+        delete family;
+        return true;
+    }
+}
+
+static VALUE
+gdip_instfontcol_s_broken(VALUE self)
+{
+    return test_font() ? Qfalse : Qtrue;
+}
+
+typedef void *(WINAPI *LPFNAddDllDirectory)(const WCHAR*);
 void
 Init_font()
 {
@@ -354,12 +535,34 @@ Init_font()
     ATTR_R(cFontCollection, Families, families, fontcol);
 
     cInstalledFontCollection = rb_define_class_under(mGdiplus, "InstalledFontCollection", cFontCollection);
+    rb_define_singleton_method(cInstalledFontCollection, "broken?", RUBY_METHOD_FUNC(gdip_instfontcol_s_broken), 0);
     rb_define_alloc_func(cInstalledFontCollection, gdip_instfontcol_alloc);
     cPrivateFontCollection = rb_define_class_under(mGdiplus, "PrivateFontCollection", cFontCollection);
     rb_define_alloc_func(cPrivateFontCollection, gdip_privfontcol_alloc);
+    rb_define_method(cPrivateFontCollection, "AddFontFile", RUBY_METHOD_FUNC(gdip_privfontcol_add_font_file), 1);
 
     cFont = rb_define_class_under(mGdiplus, "Font", cGpObject);
     rb_define_alloc_func(cFont, &typeddata_alloc_null<&tFont>);
     rb_define_method(cFont, "initialize", RUBY_METHOD_FUNC(gdip_font_init), -1);
+    ATTR_R_Q(cFont, Bold, bold, font);
+    ATTR_R_Q(cFont, Italic, italic, font);
+    ATTR_R_Q(cFont, Strikeout, strikeout, font);
+    ATTR_R_Q(cFont, Underline, underline, font);
+    ATTR_R(cFont, Style, style, font);
+    ATTR_R(cFont, Unit, unit, font);
+    ATTR_R(cFont, Size, size, font);
+    ATTR_R(cFont, FontFamily, font_family, font);
+    ATTR_R(cFont, Name, name, font);
+    ATTR_R(cFont, Height, height, font);
 
+    rb_define_method(cFont, "GetHeight", RUBY_METHOD_FUNC(gdip_font_m_get_height), -1);
+    rb_define_alias(cFont, "get_height", "GetHeight");
+
+    if (test_font() == false) {
+        _WARNING(
+            "\nIt seems that Font of gdiplus extension does not work properly on the combination of this ruby and windows.\n"
+            "It will fail to load installed fonts.\n"
+            "Use PrivateFontCollection#AddFontFile to get FontFamily.\n"
+            "And someone please fix this problem.");
+    }
 }
