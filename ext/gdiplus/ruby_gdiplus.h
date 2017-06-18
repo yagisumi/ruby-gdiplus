@@ -190,6 +190,9 @@ VALUE gdip_rect_create(Rect *rect=NULL);
 VALUE gdip_rectf_create(float x, float y, float width, float height);
 VALUE gdip_rectf_create(RectF *rect=NULL);
 
+/* gdip_langid.cpp */
+bool gdip_arg_to_langid(VALUE arg, LANGID *langid, int option=ArgOptionAcceptInt, const char *raise_msg=NULL);
+
 /* gdip_utils.cpp */
 VALUE util_encode_to_utf8(VALUE str);
 VALUE util_associate_utf8(VALUE str);

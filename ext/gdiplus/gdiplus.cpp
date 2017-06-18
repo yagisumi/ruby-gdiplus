@@ -218,4 +218,5 @@ Init_gdiplus(void)
     Init_rectangle();
     Init_font();
     Init_langid();
+
 }

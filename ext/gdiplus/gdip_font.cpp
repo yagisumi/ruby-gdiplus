@@ -494,13 +494,14 @@ gdip_font_m_get_height(int argc, VALUE *argv, VALUE self)
 static bool
 test_font()
 {
-    const FontFamily *family = FontFamily::GenericSansSerif();
-    if (family == NULL) {
+    InstalledFontCollection *fontcol = new InstalledFontCollection();
+    if (fontcol == NULL) {
         return false;
     }
     else {
-        delete family;
-        return true;
+        int count = fontcol->GetFamilyCount();
+        delete fontcol;
+        return count == 0 ? false : true;
     }
 }
 
@@ -510,7 +511,7 @@ gdip_instfontcol_s_broken(VALUE self)
     return test_font() ? Qfalse : Qtrue;
 }
 
-typedef void *(WINAPI *LPFNAddDllDirectory)(const WCHAR*);
+
 void
 Init_font()
 {
