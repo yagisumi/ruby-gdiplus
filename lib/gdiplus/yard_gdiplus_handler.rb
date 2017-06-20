@@ -106,8 +106,8 @@ class GdiplusAttrHandler < YARD::Handlers::C::Base
         handle_alias(klass, name2, name1, :class)
       else
         handle_method(:instance, klass, name1, "gdip_#{prefix}_get_#{name2}")
-        handle_attribute(klass, name1, 1, 1, :class)
-        handle_alias(klass, name2, name1, :class)
+        handle_attribute(klass, name1, 1, 1)
+        handle_alias(klass, name2, name1)
       end
     end
     

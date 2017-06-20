@@ -35,6 +35,13 @@ VALUE cCompositingQuality;
 VALUE cFillMode;
 VALUE cGraphicsUnit;
 VALUE cInterpolationMode;
+VALUE cDriverStringOptions;
+VALUE cFlushIntention;
+VALUE cHotkeyPrefix;
+VALUE cStringAlignment;
+VALUE cStringDigitSubstitute;
+VALUE cStringFormatFlags;
+VALUE cStringTrimming;
 
 VALUE cEncoder;
 VALUE cEncoderValue;
@@ -60,6 +67,7 @@ VALUE cFont;
 VALUE cInstalledFontCollection;
 VALUE cPrivateFontCollection;
 VALUE cLangId;
+VALUE cStringFormat;
 
 int gdip_refcount = 0;
 bool gdip_end_flag = false;
@@ -218,5 +226,5 @@ Init_gdiplus(void)
     Init_rectangle();
     Init_font();
     Init_langid();
-
+    Init_stringformat();
 }

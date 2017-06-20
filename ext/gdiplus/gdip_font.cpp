@@ -133,6 +133,21 @@ gdip_fontfamily_get_name(VALUE self)
     return util_utf8_str_new_from_wstr(wname);
 }
 
+
+static VALUE
+gdip_fontfamily_m_get_name(VALUE self, VALUE lang)
+{
+    FontFamily *fontfamily = Data_Ptr<FontFamily *>(self);
+    Check_NULL(fontfamily, "The FontFamily object does not exist.");
+    LANGID langid;
+    gdip_arg_to_langid(lang, &langid, ArgOptionAcceptInt, "The argument should be LangId or Integer.");
+    WCHAR wname[LF_FACESIZE];
+    Status status = fontfamily->GetFamilyName(wname, langid);
+    Check_Status(status);
+    return util_utf8_str_new_from_wstr(wname);
+}
+
+
 static VALUE
 gdip_fontfamily_get_em_height(int argc, VALUE *argv, VALUE self)
 {
@@ -522,6 +537,8 @@ Init_font()
     CLASS_ATTR_R(cFontFamily, GenericSerif, generic_serif, fontfamily);
     CLASS_ATTR_R(cFontFamily, GenericMonospace, generic_monospace, fontfamily);
     ATTR_R(cFontFamily, Name, name, fontfamily);
+    rb_define_method(cFontFamily, "GetName", RUBY_METHOD_FUNC(gdip_fontfamily_m_get_name), 1);
+    rb_define_alias(cFontFamily, "get_name", "GetName");
     rb_define_method(cFontFamily, "GetEmHeight", RUBY_METHOD_FUNC(gdip_fontfamily_get_em_height), -1);
     rb_define_alias(cFontFamily, "get_em_height", "GetEmHeight");
     rb_define_method(cFontFamily, "GetCellAscent", RUBY_METHOD_FUNC(gdip_fontfamily_get_cell_ascent), -1);

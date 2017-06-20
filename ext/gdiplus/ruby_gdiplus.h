@@ -68,6 +68,13 @@ extern VALUE cCompositingQuality;
 extern VALUE cFillMode;
 extern VALUE cGraphicsUnit;
 extern VALUE cInterpolationMode;
+extern VALUE cDriverStringOptions;
+extern VALUE cFlushIntention;
+extern VALUE cHotkeyPrefix;
+extern VALUE cStringAlignment;
+extern VALUE cStringDigitSubstitute;
+extern VALUE cStringFormatFlags;
+extern VALUE cStringTrimming;
 
 extern VALUE cFontFamily;
 extern VALUE cFontCollection;
@@ -75,6 +82,7 @@ extern VALUE cFont;
 extern VALUE cInstalledFontCollection;
 extern VALUE cPrivateFontCollection;
 extern VALUE cLangId;
+extern VALUE cStringFormat;
 
 extern const rb_data_type_t tGuid;
 extern const rb_data_type_t tImageCodecInfo;
@@ -99,6 +107,7 @@ extern const rb_data_type_t tFont;
 extern const rb_data_type_t tInstalledFontCollection;
 extern const rb_data_type_t tPrivateFontCollection;
 extern const rb_data_type_t tLangId;
+extern const rb_data_type_t tStringFormat;
 
 void Init_codec();
 void Init_image();
@@ -110,6 +119,7 @@ void Init_graphics();
 void Init_rectangle();
 void Init_font();
 void Init_langid();
+void Init_stringformat();
 
 /* gdip_enum.cpp */
 extern ID ID_UNKNOWN;
@@ -191,6 +201,7 @@ VALUE gdip_rectf_create(float x, float y, float width, float height);
 VALUE gdip_rectf_create(RectF *rect=NULL);
 
 /* gdip_langid.cpp */
+VALUE gdip_langid_create(LANGID langage);
 bool gdip_arg_to_langid(VALUE arg, LANGID *langid, int option=ArgOptionAcceptInt, const char *raise_msg=NULL);
 
 /* gdip_utils.cpp */

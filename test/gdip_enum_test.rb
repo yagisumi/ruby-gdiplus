@@ -432,6 +432,89 @@ class GdiplusEnumIntTest < Test::Unit::TestCase
     assert_equal(7, InterpolationMode.HighQualityBicubic.to_i)
     assert_match(/HighQualityBicubic/, InterpolationMode.HighQualityBicubic.inspect)
   end
+  
+  def test_DriverStringOptions
+    assert_equal(0x00000001, DriverStringOptions.CmapLookup.to_i)
+    assert_match(/CmapLookup/, DriverStringOptions.CmapLookup.inspect)
+    assert_equal(0x00000002, DriverStringOptions.Vertical.to_i)
+    assert_match(/Vertical/, DriverStringOptions.Vertical.inspect)
+    assert_equal(0x00000004, DriverStringOptions.RealizedAdvance.to_i)
+    assert_match(/RealizedAdvance/, DriverStringOptions.RealizedAdvance.inspect)
+    assert_equal(0x00000008, DriverStringOptions.LimitSubpixel.to_i)
+    assert_match(/LimitSubpixel/, DriverStringOptions.LimitSubpixel.inspect)
+  end
+
+  def test_FlushIntention
+    assert_equal(0, FlushIntention.Flush.to_i)
+    assert_match(/Flush/, FlushIntention.Flush.inspect)
+    assert_equal(1, FlushIntention.Sync.to_i)
+    assert_match(/Sync/, FlushIntention.Sync.inspect)
+  end
+
+  def test_HotkeyPrefix
+    assert_equal(0, HotkeyPrefix.None.to_i)
+    assert_match(/None/, HotkeyPrefix.None.inspect)
+    assert_equal(1, HotkeyPrefix.Show.to_i)
+    assert_match(/Show/, HotkeyPrefix.Show.inspect)
+    assert_equal(2, HotkeyPrefix.Hide.to_i)
+    assert_match(/Hide/, HotkeyPrefix.Hide.inspect)
+  end
+
+  def test_StringAlignment
+    assert_equal(0, StringAlignment.Near.to_i)
+    assert_match(/Near/, StringAlignment.Near.inspect)
+    assert_equal(1, StringAlignment.Center.to_i)
+    assert_match(/Center/, StringAlignment.Center.inspect)
+    assert_equal(2, StringAlignment.Far.to_i)
+    assert_match(/Far/, StringAlignment.Far.inspect)
+  end
+
+  def test_StringDigitSubstitute
+    assert_equal(0, StringDigitSubstitute.User.to_i)
+    assert_match(/User/, StringDigitSubstitute.User.inspect)
+    assert_equal(1, StringDigitSubstitute.None.to_i)
+    assert_match(/None/, StringDigitSubstitute.None.inspect)
+    assert_equal(2, StringDigitSubstitute.National.to_i)
+    assert_match(/National/, StringDigitSubstitute.National.inspect)
+    assert_equal(3, StringDigitSubstitute.Traditional.to_i)
+    assert_match(/Traditional/, StringDigitSubstitute.Traditional.inspect)
+  end
+
+  def test_StringFormatFlags
+    assert_equal(0x00000001, StringFormatFlags.DirectionRightToLeft.to_i)
+    assert_match(/DirectionRightToLeft/, StringFormatFlags.DirectionRightToLeft.inspect)
+    assert_equal(0x00000002, StringFormatFlags.DirectionVertical.to_i)
+    assert_match(/DirectionVertical/, StringFormatFlags.DirectionVertical.inspect)
+    assert_equal(0x00000004, StringFormatFlags.NoFitBlackBox.to_i)
+    assert_match(/NoFitBlackBox/, StringFormatFlags.NoFitBlackBox.inspect)
+    assert_equal(0x00000020, StringFormatFlags.DisplayFormatControl.to_i)
+    assert_match(/DisplayFormatControl/, StringFormatFlags.DisplayFormatControl.inspect)
+    assert_equal(0x00000400, StringFormatFlags.NoFontFallback.to_i)
+    assert_match(/NoFontFallback/, StringFormatFlags.NoFontFallback.inspect)
+    assert_equal(0x00000800, StringFormatFlags.MeasureTrailingSpaces.to_i)
+    assert_match(/MeasureTrailingSpaces/, StringFormatFlags.MeasureTrailingSpaces.inspect)
+    assert_equal(0x00001000, StringFormatFlags.NoWrap.to_i)
+    assert_match(/NoWrap/, StringFormatFlags.NoWrap.inspect)
+    assert_equal(0x00002000, StringFormatFlags.LineLimit.to_i)
+    assert_match(/LineLimit/, StringFormatFlags.LineLimit.inspect)
+    assert_equal(0x00004000, StringFormatFlags.NoClip.to_i)
+    assert_match(/NoClip/, StringFormatFlags.NoClip.inspect)
+  end
+
+  def test_StringTrimming
+    assert_equal(0, StringTrimming.None.to_i)
+    assert_match(/None/, StringTrimming.None.inspect)
+    assert_equal(1, StringTrimming.Character.to_i)
+    assert_match(/Character/, StringTrimming.Character.inspect)
+    assert_equal(2, StringTrimming.Word.to_i)
+    assert_match(/Word/, StringTrimming.Word.inspect)
+    assert_equal(3, StringTrimming.EllipsisCharacter.to_i)
+    assert_match(/EllipsisCharacter/, StringTrimming.EllipsisCharacter.inspect)
+    assert_equal(4, StringTrimming.EllipsisWord.to_i)
+    assert_match(/EllipsisWord/, StringTrimming.EllipsisWord.inspect)
+    assert_equal(5, StringTrimming.EllipsisPath.to_i)
+    assert_match(/EllipsisPath/, StringTrimming.EllipsisPath.inspect)
+  end
 
 end
 

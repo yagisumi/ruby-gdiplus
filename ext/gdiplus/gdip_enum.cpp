@@ -39,7 +39,7 @@ public:
     }
 };
 
-static KlassTableMap klass_table_map(30);
+static KlassTableMap klass_table_map(60);
 
 template <typename TKey>
 static IMap<TKey, ID>*
@@ -803,6 +803,106 @@ Init_InterpolationMode()
     define_enumint(cInterpolationMode, table, "HighQualityBicubic", 7);
 }
 
+static void
+Init_DriverStringOptions()
+{
+    cDriverStringOptions = rb_define_class_under(mGdiplus, "DriverStringOptions", cEnumFlags);
+    SortedArrayMap<unsigned int, ID> *table = new SortedArrayMap<unsigned int, ID>(4);
+    klass_table_map.set(cDriverStringOptions, table);
+
+    define_enumflags(cDriverStringOptions, table, "CmapLookup", 0x00000001);
+    define_enumflags(cDriverStringOptions, table, "Vertical", 0x00000002);
+    define_enumflags(cDriverStringOptions, table, "RealizedAdvance", 0x00000004);
+    define_enumflags(cDriverStringOptions, table, "LimitSubpixel", 0x00000008);
+}
+
+static void
+Init_FlushIntention()
+{
+    cFlushIntention = rb_define_class_under(mGdiplus, "FlushIntention", cEnumInt);
+    rb_undef_alloc_func(cFlushIntention);
+    IndexArrayMap<ID> *table = new IndexArrayMap<ID>(2);
+    klass_table_map.set(cFlushIntention, table);
+
+    define_enumint(cFlushIntention, table, "Flush", 0);
+    define_enumint(cFlushIntention, table, "Sync", 1);
+}
+
+static void
+Init_HotkeyPrefix()
+{
+    cHotkeyPrefix = rb_define_class_under(mGdiplus, "HotkeyPrefix", cEnumInt);
+    rb_undef_alloc_func(cHotkeyPrefix);
+    IndexArrayMap<ID> *table = new IndexArrayMap<ID>(3);
+    klass_table_map.set(cHotkeyPrefix, table);
+
+    define_enumint(cHotkeyPrefix, table, "None", 0);
+    define_enumint(cHotkeyPrefix, table, "Show", 1);
+    define_enumint(cHotkeyPrefix, table, "Hide", 2);
+}
+
+static void
+Init_StringAlignment()
+{
+    cStringAlignment = rb_define_class_under(mGdiplus, "StringAlignment", cEnumInt);
+    rb_undef_alloc_func(cStringAlignment);
+    IndexArrayMap<ID> *table = new IndexArrayMap<ID>(3);
+    klass_table_map.set(cStringAlignment, table);
+
+    define_enumint(cStringAlignment, table, "Near", 0);
+    define_enumint(cStringAlignment, table, "Center", 1);
+    define_enumint(cStringAlignment, table, "Far", 2);
+}
+
+static void
+Init_StringDigitSubstitute()
+{
+    cStringDigitSubstitute = rb_define_class_under(mGdiplus, "StringDigitSubstitute", cEnumInt);
+    rb_undef_alloc_func(cStringDigitSubstitute);
+    IndexArrayMap<ID> *table = new IndexArrayMap<ID>(4);
+    klass_table_map.set(cStringDigitSubstitute, table);
+
+    define_enumint(cStringDigitSubstitute, table, "User", 0);
+    define_enumint(cStringDigitSubstitute, table, "None", 1);
+    define_enumint(cStringDigitSubstitute, table, "National", 2);
+    define_enumint(cStringDigitSubstitute, table, "Traditional", 3);
+}
+
+static void
+Init_StringFormatFlags()
+{
+    cStringFormatFlags = rb_define_class_under(mGdiplus, "StringFormatFlags", cEnumFlags);
+    SortedArrayMap<unsigned int, ID> *table = new SortedArrayMap<unsigned int, ID>(9);
+    klass_table_map.set(cStringFormatFlags, table);
+
+    define_enumflags(cStringFormatFlags, table, "DirectionRightToLeft", 0x00000001);
+    define_enumflags(cStringFormatFlags, table, "DirectionVertical", 0x00000002);
+    define_enumflags(cStringFormatFlags, table, "NoFitBlackBox", 0x00000004);
+    define_enumflags(cStringFormatFlags, table, "DisplayFormatControl", 0x00000020);
+    define_enumflags(cStringFormatFlags, table, "NoFontFallback", 0x00000400);
+    define_enumflags(cStringFormatFlags, table, "MeasureTrailingSpaces", 0x00000800);
+    define_enumflags(cStringFormatFlags, table, "NoWrap", 0x00001000);
+    define_enumflags(cStringFormatFlags, table, "LineLimit", 0x00002000);
+    define_enumflags(cStringFormatFlags, table, "NoClip", 0x00004000);
+}
+
+static void
+Init_StringTrimming()
+{
+    cStringTrimming = rb_define_class_under(mGdiplus, "StringTrimming", cEnumInt);
+    rb_undef_alloc_func(cStringTrimming);
+    IndexArrayMap<ID> *table = new IndexArrayMap<ID>(6);
+    klass_table_map.set(cStringTrimming, table);
+
+    define_enumint(cStringTrimming, table, "None", 0);
+    define_enumint(cStringTrimming, table, "Character", 1);
+    define_enumint(cStringTrimming, table, "Word", 2);
+    define_enumint(cStringTrimming, table, "EllipsisCharacter", 3);
+    define_enumint(cStringTrimming, table, "EllipsisWord", 4);
+    define_enumint(cStringTrimming, table, "EllipsisPath", 5);
+}
+
+
 /* Encoder */
 
 /**
@@ -1019,7 +1119,14 @@ Init_enum() {
     Init_FillMode();
     Init_GraphicsUnit();
     Init_InterpolationMode();
-    
+    Init_DriverStringOptions();
+    Init_FlushIntention();
+    Init_HotkeyPrefix();
+    Init_StringAlignment();
+    Init_StringDigitSubstitute();
+    Init_StringFormatFlags();
+    Init_StringTrimming();
+    /* GUID */
     Init_Encoder();
     Init_imageformat();
 }

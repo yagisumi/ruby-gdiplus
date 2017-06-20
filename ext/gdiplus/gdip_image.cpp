@@ -260,8 +260,8 @@ gdip_image_get_raw_format(VALUE self)
 }
 
 /**
- *
- * Block comment
+ * @return [self]
+ * @yieldparam g [Graphics]
  * 
  */
 static VALUE

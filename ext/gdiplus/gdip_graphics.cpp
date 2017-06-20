@@ -8,6 +8,7 @@
 const rb_data_type_t tGraphics = _MAKE_DATA_TYPE(
     "Graphics", 0, GDIP_OBJ_FREE(Graphics *), NULL, NULL, &cGraphics);
 
+
 VALUE
 gdip_graphics_create(Graphics *g)
 {
@@ -1528,6 +1529,34 @@ gdip_graphics_fill_polygon(int argc, VALUE *argv, VALUE self)
     return self;
 }
 
+/**
+ * @return [self]
+ * @overload DrawString(str, font, brush, x, y, format=nil)
+ *   @param str [String]
+ *   @param font [Font]
+ *   @param brush [Brush]
+ *   @param x [Float]
+ *   @param y [Float]
+ *   @param format [StringFormat]
+ * @overload DrawString(str, font, brush, point, format=nil)
+ *   @param str [String]
+ *   @param font [Font]
+ *   @param brush [Brush]
+ *   @param point [PointF]
+ *   @param format [StringFormat]
+ * @overload DrawString(str, font, brush, rect, format=nil)
+ *   @param str [String]
+ *   @param font [Font]
+ *   @param brush [Brush]
+ *   @param point [RectangleF]
+ *   @param format [StringFormat]
+ */
+static VALUE
+gdip_graphics_draw_string(int argc, VALUE *argv, VALUE self)
+{
+
+    return self;
+}
 
 void
 Init_graphics()
