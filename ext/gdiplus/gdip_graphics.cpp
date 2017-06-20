@@ -1529,31 +1529,124 @@ gdip_graphics_fill_polygon(int argc, VALUE *argv, VALUE self)
     return self;
 }
 
+static Status
+gdip_graphics_draw_string_at_point(Graphics *g, VALUE wstr, Font *font, Brush *brush, PointF& point, VALUE v_format)
+{
+    Status status = Ok;
+    if (_KIND_OF(v_format, &tStringFormat)) {
+        StringFormat *format = Data_Ptr<StringFormat *>(v_format);
+        Check_NULL(format, "The StringFormat object does not exist.");
+        status = g->DrawString(RString_Ptr<WCHAR *>(wstr), -1, font, point, format, brush);
+    }
+    else if (RB_NIL_P(v_format)) {
+        status = g->DrawString(RString_Ptr<WCHAR *>(wstr), -1, font, point, brush);
+    }
+    else {
+        rb_raise(rb_eTypeError, "The last argument should be StringFormat.");
+    }
+    return status;
+}
+
+static Status
+gdip_graphics_draw_string_at_rect(Graphics *g, VALUE wstr, Font *font, Brush *brush, RectF& rect, VALUE v_format)
+{
+    Status status = Ok;
+    if (_KIND_OF(v_format, &tStringFormat)) {
+        StringFormat *format = Data_Ptr<StringFormat *>(v_format);
+        Check_NULL(format, "The StringFormat object does not exist.");
+        status = g->DrawString(RString_Ptr<WCHAR *>(wstr), -1, font, rect, format, brush);
+    }
+    else if (RB_NIL_P(v_format)) {
+        status = g->DrawString(RString_Ptr<WCHAR *>(wstr), -1, font, rect, NULL, brush);
+    }
+    else {
+        rb_raise(rb_eTypeError, "The last argument should be StringFormat.");
+    }
+    return status;
+}
+
 /**
  * @return [self]
  * @overload DrawString(str, font, brush, x, y, format=nil)
  *   @param str [String]
  *   @param font [Font]
  *   @param brush [Brush]
- *   @param x [Float]
- *   @param y [Float]
+ *   @param x [Integer or Float]
+ *   @param y [Integer or Float]
  *   @param format [StringFormat]
  * @overload DrawString(str, font, brush, point, format=nil)
  *   @param str [String]
  *   @param font [Font]
  *   @param brush [Brush]
- *   @param point [PointF]
+ *   @param point [Point or PointF]
  *   @param format [StringFormat]
  * @overload DrawString(str, font, brush, rect, format=nil)
  *   @param str [String]
  *   @param font [Font]
  *   @param brush [Brush]
- *   @param point [RectangleF]
+ *   @param point [Rectangle or RectangleF]
  *   @param format [StringFormat]
  */
 static VALUE
 gdip_graphics_draw_string(int argc, VALUE *argv, VALUE self)
 {
+    if (argc < 4 || 6 < argc) {
+        rb_raise(rb_eArgError, "wrong number of arguments (%d for 4..6)", argc);
+    }
+
+    if (!_RB_STRING_P(argv[0])) {
+        rb_raise(rb_eTypeError, "The first argument should be String.");
+    }
+    if (!_KIND_OF(argv[1], &tFont)) {
+        rb_raise(rb_eTypeError, "The second argument should be Font.");
+    }
+    if (!_KIND_OF(argv[2], &tBrush)) {
+        rb_raise(rb_eTypeError, "The third argument should be Brush.");
+    }
+
+    Graphics *g = Data_Ptr<Graphics *>(self);
+    Check_NULL(g, "The graphics object does not exist.");
+    VALUE wstr = util_utf16_str_new(argv[0]);
+    Font *font = Data_Ptr<Font *>(argv[1]);
+    Brush *brush = Data_Ptr<Brush *>(argv[2]);
+    Check_NULL(font, "The Font object does not exist.");
+    Check_NULL(font, "The Brush object does not exist.");
+
+    Status status = Ok;
+    if (argc >= 5 && Integer_p(argv[3]) && Integer_p(argv[4])) {
+        PointF point(static_cast<float>(RB_NUM2INT(argv[3])), static_cast<float>(RB_NUM2INT(argv[4])));
+        status = gdip_graphics_draw_string_at_point(g, wstr, font, brush, point, argc == 6 ? argv[5] : Qnil);
+    }
+    else if (argc >= 5 && Float_p(argv[3]) && Float_p(argv[4])) {
+        PointF point(NUM2SINGLE(argv[3]), NUM2SINGLE(argv[4]));
+        status = gdip_graphics_draw_string_at_point(g, wstr, font, brush, point, argc == 6 ? argv[5] : Qnil);
+    }
+    else if (_KIND_OF(argv[3], &tPointF)) {
+        PointF *point = Data_Ptr<PointF *>(argv[3]);
+        status = gdip_graphics_draw_string_at_point(g, wstr, font, brush, *point, argc == 5 ? argv[4] : Qnil);
+    }
+    else if (_KIND_OF(argv[3], &tPoint)) {
+        Point *point_arg = Data_Ptr<Point *>(argv[3]);
+        PointF point(static_cast<float>(point_arg->X), static_cast<float>(point_arg->Y));
+        status = gdip_graphics_draw_string_at_point(g, wstr, font, brush, point, argc == 5 ? argv[4] : Qnil);
+    }
+    else if (_KIND_OF(argv[3], &tRectangleF)) {
+        RectF *rect = Data_Ptr<RectF *>(argv[3]);
+        status = gdip_graphics_draw_string_at_rect(g, wstr, font, brush, *rect, argc == 5 ? argv[4] : Qnil);
+    }
+    else if (_KIND_OF(argv[3], &tRectangle)) {
+        Rect *rect_arg = Data_Ptr<Rect *>(argv[3]);
+        RectF rect;
+        rect.X = static_cast<float>(rect_arg->X);
+        rect.Y = static_cast<float>(rect_arg->Y);
+        rect.Width = static_cast<float>(rect_arg->Width);
+        rect.Height = static_cast<float>(rect_arg->Height);
+        status = gdip_graphics_draw_string_at_rect(g, wstr, font, brush, rect, argc == 5 ? argv[4] : Qnil);
+    }
+    else {
+        rb_raise(rb_eTypeError, "Argument types do not match.");
+    }
+    Check_Status(status);
 
     return self;
 }
@@ -1616,4 +1709,7 @@ Init_graphics()
     rb_define_alias(cGraphics, "draw_polygon", "DrawPolygon");
     rb_define_method(cGraphics, "FillPolygon", RUBY_METHOD_FUNC(gdip_graphics_fill_polygon), -1);
     rb_define_alias(cGraphics, "fill_polygon", "FillPolygon");
+    rb_define_method(cGraphics, "DrawString", RUBY_METHOD_FUNC(gdip_graphics_draw_string), -1);
+    rb_define_alias(cGraphics, "draw_string", "DrawString");
+    
 }

@@ -9,6 +9,15 @@
 const rb_data_type_t tStringFormat = _MAKE_DATA_TYPE(
     "StringFormat", 0, GDIP_OBJ_FREE(StringFormat *), NULL, NULL, &cStringFormat);
 
+
+/**
+ * @overload initialize()
+ * @overload initialize(format)
+ *   @param format [StringFormat]
+ * @overload initialize(options, language=0)
+ *   @param options [StringFormatFlags]
+ *   @param language [LangId] Specifies the language of the text.
+ */
 static VALUE
 gdip_strfmt_init(int argc, VALUE *argv, VALUE self)
 {
@@ -38,7 +47,7 @@ gdip_strfmt_init(int argc, VALUE *argv, VALUE self)
     }
     else if (argc == 2) {
         if (!gdip_arg_to_enumint(cStringFormatFlags, argv[0], &flags) || !gdip_arg_to_langid(argv[1], &language)) {
-            rb_raise(rb_eTypeError, "wrong types of arguments");
+            rb_raise(rb_eTypeError, "Argument types do not match.");
         }
     }
     _DATA_PTR(self) = gdip_obj_create(new StringFormat(flags, language));
@@ -167,7 +176,7 @@ Init_stringformat()
     cStringFormat = rb_define_class_under(mGdiplus, "StringFormat", cGpObject);
     rb_define_alloc_func(cStringFormat, &typeddata_alloc_null<&tStringFormat>);
     rb_define_method(cStringFormat, "initialize", RUBY_METHOD_FUNC(gdip_strfmt_init), -1);
-    
+
     ATTR_RW(cStringFormat, Alignment, alignment, strfmt);
     ATTR_R(cStringFormat, DigitSubstitutionLanguage, digit_substitution_language, strfmt);
     ATTR_R(cStringFormat, DigitSubstitutionMethod, digit_substitution_method, strfmt);
