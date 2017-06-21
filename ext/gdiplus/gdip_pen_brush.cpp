@@ -393,7 +393,7 @@ gdip_pen_set_alignment(VALUE self, VALUE align)
     Pen *pen = Data_Ptr<Pen *>(self);
     Check_NULL(pen, "This object does not exist");
     int enum_align = 0;
-    gdip_arg_to_enumint(cPenAlignment, align, &enum_align, ArgOptionAcceptInt, "The argument should be PenAlignment.");
+    gdip_arg_to_enumint(cPenAlignment, align, &enum_align, "The argument should be PenAlignment.", ArgOptionAcceptInt);
     PenAlignment pa = static_cast<PenAlignment>(enum_align);
     if (pa == PenAlignmentInset && pen->GetCompoundArrayCount() > 0) {
         _WARNING("Do not use PenAlignment.Inset with CompoundArray");
@@ -429,7 +429,7 @@ gdip_pen_set_dash_cap(VALUE self, VALUE cap)
     Check_NULL(pen, "This object does not exist");
 
     int enum_cap = 0;
-    gdip_arg_to_enumint(cDashCap, cap, &enum_cap, ArgOptionAcceptInt, "The argument should be DashCap.");
+    gdip_arg_to_enumint(cDashCap, cap, &enum_cap, "The argument should be DashCap.", ArgOptionAcceptInt);
     pen->SetDashCap(static_cast<DashCap>(enum_cap));
     Check_LastStatus(pen);
     return self;
@@ -460,7 +460,7 @@ gdip_pen_set_dash_style(VALUE self, VALUE style)
     Check_NULL(pen, "This object does not exist");
 
     int enum_style = 0;
-    gdip_arg_to_enumint(cDashStyle, style, &enum_style, ArgOptionAcceptInt, "The argument should be Float or Integer.");
+    gdip_arg_to_enumint(cDashStyle, style, &enum_style, "The argument should be Float or Integer.", ArgOptionAcceptInt);
     pen->SetDashStyle(static_cast<DashStyle>(enum_style));
     Check_LastStatus(pen);
     return self;
@@ -490,7 +490,7 @@ gdip_pen_set_end_cap(VALUE self, VALUE cap)
     Check_NULL(pen, "This object does not exist");
 
     int enum_cap = 0;
-    gdip_arg_to_enumint(cLineCap, cap, &enum_cap, ArgOptionAcceptInt, "The argument should be LineCap.");
+    gdip_arg_to_enumint(cLineCap, cap, &enum_cap, "The argument should be LineCap.", ArgOptionAcceptInt);
     pen->SetEndCap(static_cast<LineCap>(enum_cap));
     Check_LastStatus(pen);
     return self;
@@ -521,7 +521,7 @@ gdip_pen_set_line_join(VALUE self, VALUE join)
     Check_NULL(pen, "This object does not exist");
 
     int enum_join = 0;
-    gdip_arg_to_enumint(cLineJoin, join, &enum_join, ArgOptionAcceptInt, "The argument should be LineJoin.");
+    gdip_arg_to_enumint(cLineJoin, join, &enum_join, "The argument should be LineJoin.", ArgOptionAcceptInt);
     pen->SetLineJoin(static_cast<LineJoin>(enum_join));
     Check_LastStatus(pen);
     return self;
@@ -552,7 +552,7 @@ gdip_pen_set_start_cap(VALUE self, VALUE cap)
     Check_NULL(pen, "This object does not exist");
 
     int enum_cap = 0;
-    gdip_arg_to_enumint(cLineCap, cap, &enum_cap, ArgOptionAcceptInt, "The argument should be LineCap.");
+    gdip_arg_to_enumint(cLineCap, cap, &enum_cap, "The argument should be LineCap.", ArgOptionAcceptInt);
     pen->SetStartCap(static_cast<LineCap>(enum_cap));
     Check_LastStatus(pen);
     return self;

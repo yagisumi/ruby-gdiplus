@@ -42,7 +42,7 @@ gdip_strfmt_init(int argc, VALUE *argv, VALUE self)
             return self;
         }
         else {
-            gdip_arg_to_enumint(cStringFormatFlags, argv[0], &flags, ArgOptionAcceptInt, "The first argument should be StringFormatFlags or StringFormat.");
+            gdip_arg_to_enumint(cStringFormatFlags, argv[0], &flags, "The first argument should be StringFormatFlags or StringFormat.", ArgOptionAcceptInt);
         }
     }
     else if (argc == 2) {
@@ -96,7 +96,7 @@ gdip_strfmt_set_alignment(VALUE self, VALUE arg)
     StringFormat *format = Data_Ptr<StringFormat *>(self);
     Check_NULL(format, "The StringFormat object does not exist.");
     int enumint = 0;
-    gdip_arg_to_enumint(cStringAlignment, arg, &enumint, ArgOptionAcceptInt, "The argument should be StringAlignment.");
+    gdip_arg_to_enumint(cStringAlignment, arg, &enumint, "The argument should be StringAlignment.", ArgOptionAcceptInt);
     Status status = format->SetAlignment(static_cast<StringAlignment>(enumint));
     Check_Status(status);
     return self;
@@ -133,7 +133,7 @@ gdip_strfmt_set_format_flags(VALUE self, VALUE arg)
     StringFormat *format = Data_Ptr<StringFormat *>(self);
     Check_NULL(format, "The StringFormat object does not exist.");
     int enumint = 0;
-    gdip_arg_to_enumint(cStringFormatFlags, arg, &enumint, ArgOptionAcceptInt, "The argument should be StringFormatFlags.");
+    gdip_arg_to_enumint(cStringFormatFlags, arg, &enumint, "The argument should be StringFormatFlags.", ArgOptionAcceptInt);
     Status status = format->SetFormatFlags(static_cast<StringFormatFlags>(enumint));
     Check_Status(status);
     return self;
@@ -154,7 +154,7 @@ gdip_strfmt_set_hotkey_prefix(VALUE self, VALUE arg)
     StringFormat *format = Data_Ptr<StringFormat *>(self);
     Check_NULL(format, "The StringFormat object does not exist.");
     int enumint = 0;
-    gdip_arg_to_enumint(cHotkeyPrefix, arg, &enumint, ArgOptionAcceptInt, "The argument should be HotkeyPrefix.");
+    gdip_arg_to_enumint(cHotkeyPrefix, arg, &enumint, "The argument should be HotkeyPrefix.", ArgOptionAcceptInt);
     Status status = format->SetHotkeyPrefix(static_cast<HotkeyPrefix>(enumint));
     Check_Status(status);
     return self;
@@ -175,7 +175,7 @@ gdip_strfmt_set_line_alignment(VALUE self, VALUE arg)
     StringFormat *format = Data_Ptr<StringFormat *>(self);
     Check_NULL(format, "The StringFormat object does not exist.");
     int enumint = 0;
-    gdip_arg_to_enumint(cStringAlignment, arg, &enumint, ArgOptionAcceptInt, "The argument should be StringAlignment.");
+    gdip_arg_to_enumint(cStringAlignment, arg, &enumint, "The argument should be StringAlignment.", ArgOptionAcceptInt);
     Status status = format->SetLineAlignment(static_cast<StringAlignment>(enumint));
     Check_Status(status);
     return self;
@@ -196,7 +196,7 @@ gdip_strfmt_set_trimming(VALUE self, VALUE arg)
     StringFormat *format = Data_Ptr<StringFormat *>(self);
     Check_NULL(format, "The StringFormat object does not exist.");
     int enumint = 0;
-    gdip_arg_to_enumint(cStringTrimming, arg, &enumint, ArgOptionAcceptInt, "The argument should be StringTrimming.");
+    gdip_arg_to_enumint(cStringTrimming, arg, &enumint, "The argument should be StringTrimming.", ArgOptionAcceptInt);
     Status status = format->SetTrimming(static_cast<StringTrimming>(enumint));
     Check_Status(status);
     return self;
@@ -279,7 +279,7 @@ gdip_strfmt_set_digit_substitution(VALUE self, VALUE language, VALUE substitute)
     LANGID langid = 0;
     gdip_arg_to_langid(language, &langid, "The first argument should be LangId.");
     int enumint = 0;
-    gdip_arg_to_enumint(cStringDigitSubstitute, substitute, &enumint, ArgOptionAcceptInt, "The second argument should be StringDigitSubstitute.");
+    gdip_arg_to_enumint(cStringDigitSubstitute, substitute, &enumint, "The second argument should be StringDigitSubstitute.", ArgOptionAcceptInt);
     Status status = format->SetDigitSubstitution(langid, static_cast<StringDigitSubstitute>(enumint));
     Check_Status(status);
 

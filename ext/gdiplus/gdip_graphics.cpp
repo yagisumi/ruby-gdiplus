@@ -53,7 +53,7 @@ gdip_graphics_set_compositing_mode(VALUE self, VALUE v)
     Graphics *g = Data_Ptr<Graphics *>(self);
     Check_NULL(g, "The graphics object does not exist.");
     int enumint = 0;
-    gdip_arg_to_enumint(cCompositingMode, v, &enumint, ArgOptionAcceptInt, "The argument should be CompositingMode.");
+    gdip_arg_to_enumint(cCompositingMode, v, &enumint, "The argument should be CompositingMode.", ArgOptionAcceptInt);
     Status status = g->SetCompositingMode(static_cast<CompositingMode>(enumint));
     Check_Status(status);
     return self;
@@ -78,7 +78,7 @@ gdip_graphics_set_compositing_quality(VALUE self, VALUE v)
     Graphics *g = Data_Ptr<Graphics *>(self);
     Check_NULL(g, "The graphics object does not exist.");
     int enumint = 0;
-    gdip_arg_to_enumint(cCompositingQuality, v, &enumint, ArgOptionAcceptInt, "The argument should be CompositingQuality.");
+    gdip_arg_to_enumint(cCompositingQuality, v, &enumint, "The argument should be CompositingQuality.", ArgOptionAcceptInt);
     Status status = g->SetCompositingQuality(static_cast<CompositingQuality>(enumint));
     Check_Status(status);
     return self;
@@ -129,7 +129,7 @@ gdip_graphics_set_interpolation_mode(VALUE self, VALUE v)
     Graphics *g = Data_Ptr<Graphics *>(self);
     Check_NULL(g, "The graphics object does not exist.");
     int enumint = 0;
-    gdip_arg_to_enumint(cInterpolationMode, v, &enumint, ArgOptionAcceptInt, "The argument should be InterpolationMode.");
+    gdip_arg_to_enumint(cInterpolationMode, v, &enumint, "The argument should be InterpolationMode.", ArgOptionAcceptInt);
     Status status = g->SetInterpolationMode(static_cast<InterpolationMode>(enumint));
     Check_Status(status);
     return self;
@@ -205,7 +205,7 @@ gdip_graphics_set_page_unit(VALUE self, VALUE v)
     Graphics *g = Data_Ptr<Graphics *>(self);
     Check_NULL(g, "The graphics object does not exist.");
     int enumint = 0;
-    gdip_arg_to_enumint(cGraphicsUnit, v, &enumint, ArgOptionAcceptInt, "The argument should be GraphicsUnit.");
+    gdip_arg_to_enumint(cGraphicsUnit, v, &enumint, "The argument should be GraphicsUnit.", ArgOptionAcceptInt);
     Status status = g->SetPageUnit(static_cast<Unit>(enumint));
     Check_Status(status);
     return self;
@@ -230,7 +230,7 @@ gdip_graphics_set_pixel_offset_mode(VALUE self, VALUE v)
     Graphics *g = Data_Ptr<Graphics *>(self);
     Check_NULL(g, "The graphics object does not exist.");
     int enumint = 0;
-    gdip_arg_to_enumint(cPixelOffsetMode, v, &enumint, ArgOptionAcceptInt, "The argument should be PixelOffsetMode.");
+    gdip_arg_to_enumint(cPixelOffsetMode, v, &enumint, "The argument should be PixelOffsetMode.", ArgOptionAcceptInt);
     Status status = g->SetPixelOffsetMode(static_cast<PixelOffsetMode>(enumint));
     Check_Status(status);
     return self;
@@ -287,7 +287,7 @@ gdip_graphics_set_smoothing_mode(VALUE self, VALUE mode)
     Graphics *g = Data_Ptr<Graphics *>(self);
     Check_NULL(g, "The graphics object does not exist.");
     int enumint = 0;
-    gdip_arg_to_enumint(cSmoothingMode, mode, &enumint, ArgOptionAcceptInt, "The argument should be SmoothingMode.");
+    gdip_arg_to_enumint(cSmoothingMode, mode, &enumint, "The argument should be SmoothingMode.", ArgOptionAcceptInt);
     g->SetSmoothingMode(static_cast<SmoothingMode>(enumint));
     return self;
 }
@@ -349,7 +349,7 @@ gdip_graphics_set_text_rendering_hint(VALUE self, VALUE v)
     Graphics *g = Data_Ptr<Graphics *>(self);
     Check_NULL(g, "The graphics object does not exist.");
     int enumint = 0;
-    gdip_arg_to_enumint(cTextRenderingHint, v, &enumint, ArgOptionAcceptInt, "The argument should be TextRenderingHint.");
+    gdip_arg_to_enumint(cTextRenderingHint, v, &enumint, "The argument should be TextRenderingHint.", ArgOptionAcceptInt);
     if (enumint == TextRenderingHintClearTypeGridFit && g->GetCompositingMode() == CompositingModeSourceCopy) {
         _WARNING("Do not set ClearTypeGridFit when CompositingMode is SourceCopy.");
     }
@@ -966,7 +966,7 @@ gdip_graphics_fill_closed_curve(int argc, VALUE *argv, VALUE self)
     }
     FillMode fillmode = FillModeAlternate;
     if (argc > 2) {
-        gdip_arg_to_enumint(cFillMode, argv[2], (int*)&fillmode, 0, "The third argument should be FillMode.");
+        gdip_arg_to_enumint(cFillMode, argv[2], (int*)&fillmode, "The third argument should be FillMode.");
     }
     
     VALUE first = rb_ary_entry(argv[1], 0);
@@ -1489,7 +1489,7 @@ gdip_graphics_fill_polygon(int argc, VALUE *argv, VALUE self)
     }
     FillMode fillmode = FillModeAlternate;
     if (!RB_NIL_P(v_fillmode)) {
-        gdip_arg_to_enumint(cFillMode, v_fillmode, (int*)&fillmode, ArgOptionAcceptInt, "The argument should be FillMode.");
+        gdip_arg_to_enumint(cFillMode, v_fillmode, (int*)&fillmode, "The argument should be FillMode.", ArgOptionAcceptInt);
     }
 
     Graphics *g = Data_Ptr<Graphics *>(self);

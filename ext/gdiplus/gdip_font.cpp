@@ -159,7 +159,7 @@ gdip_fontfamily_get_em_height(int argc, VALUE *argv, VALUE self)
 
     int style = FontStyleRegular;
     if (!RB_NIL_P(v_style)) {
-        gdip_arg_to_enumint(cFontStyle, v_style, &style, ArgOptionAcceptInt, "The argument should be FontStyle.");
+        gdip_arg_to_enumint(cFontStyle, v_style, &style, "The argument should be FontStyle.", ArgOptionAcceptInt);
     }
     Gdiplus::UINT16 h = fontfamily->GetEmHeight(style);
     return RB_UINT2NUM(h);
@@ -176,7 +176,7 @@ gdip_fontfamily_get_cell_ascent(int argc, VALUE *argv, VALUE self)
 
     int style = FontStyleRegular;
     if (!RB_NIL_P(v_style)) {
-        gdip_arg_to_enumint(cFontStyle, v_style, &style, ArgOptionAcceptInt, "The argument should be FontStyle.");
+        gdip_arg_to_enumint(cFontStyle, v_style, &style, "The argument should be FontStyle.", ArgOptionAcceptInt);
     }
     Gdiplus::UINT16 h = fontfamily->GetCellAscent(style);
     return RB_UINT2NUM(h);
@@ -193,7 +193,7 @@ gdip_fontfamily_get_cell_descent(int argc, VALUE *argv, VALUE self)
 
     int style = FontStyleRegular;
     if (!RB_NIL_P(v_style)) {
-        gdip_arg_to_enumint(cFontStyle, v_style, &style, ArgOptionAcceptInt, "The argument should be FontStyle.");
+        gdip_arg_to_enumint(cFontStyle, v_style, &style, "The argument should be FontStyle.", ArgOptionAcceptInt);
     }
     Gdiplus::UINT16 h = fontfamily->GetCellDescent(style);
     return RB_UINT2NUM(h);
@@ -210,7 +210,7 @@ gdip_fontfamily_get_line_spacing(int argc, VALUE *argv, VALUE self)
 
     int style = FontStyleRegular;
     if (!RB_NIL_P(v_style)) {
-        gdip_arg_to_enumint(cFontStyle, v_style, &style, ArgOptionAcceptInt, "The argument should be FontStyle.");
+        gdip_arg_to_enumint(cFontStyle, v_style, &style, "The argument should be FontStyle.", ArgOptionAcceptInt);
     }
     Gdiplus::UINT16 h = fontfamily->GetLineSpacing(style);
     return RB_UINT2NUM(h);
@@ -339,8 +339,8 @@ gdip_font_init(int argc, VALUE *argv, VALUE self)
             }
         }
         else if (argc == 4) {
-            gdip_arg_to_enumint(cFontStyle, argv[2], &style, ArgOptionAcceptInt, "The third argument should be FontStyle.");
-            gdip_arg_to_enumint(cGraphicsUnit, argv[3], (int*)&unit, ArgOptionAcceptInt, "The fourth argument should be GraphicsUnit.");
+            gdip_arg_to_enumint(cFontStyle, argv[2], &style, "The third argument should be FontStyle.", ArgOptionAcceptInt);
+            gdip_arg_to_enumint(cGraphicsUnit, argv[3], (int*)&unit, "The fourth argument should be GraphicsUnit.", ArgOptionAcceptInt);
         }
         if (_RB_STRING_P(argv[0])) {
             VALUE wstr = util_utf16_str_new(argv[0]);

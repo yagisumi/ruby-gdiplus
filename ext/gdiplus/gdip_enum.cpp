@@ -67,7 +67,7 @@ gdip_enumint_create(VALUE klass, int num)
 }
 
 int
-gdip_arg_to_enumint(VALUE klass, VALUE arg, int *num, int option, const char *raise_msg)
+gdip_arg_to_enumint(VALUE klass, VALUE arg, int *num, const char *raise_msg, int option)
 {
     if (RB_SYMBOL_P(arg) && rb_const_defined_at(klass, RB_SYM2ID(arg))) {
         arg = rb_const_get(klass, RB_SYM2ID(arg));
