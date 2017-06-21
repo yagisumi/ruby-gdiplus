@@ -159,6 +159,7 @@ void gdiplus_shutdown();
 
 bool gdip_arg_to_double(VALUE v, double *dbl, const char *raise_msg=NULL);
 bool gdip_arg_to_single(VALUE v, float *flt, const char *raise_msg=NULL);
+float *alloc_array_of_single(VALUE ary, int& count);
 
 static inline void GdiplusAddRef() { ++gdip_refcount; }
 static inline void GdiplusRelease() {
@@ -397,6 +398,7 @@ typeddata_alloc_null(VALUE klass=Qnil)
     return r;
 }
 
+
 template<typename T, const rb_data_type_t *type>
 static T *
 alloc_array_of(VALUE ary, int& count)
@@ -422,6 +424,8 @@ alloc_array_of(VALUE ary, int& count)
     }
     return tary;
 }
+
+
 
 template<typename T>
 static void

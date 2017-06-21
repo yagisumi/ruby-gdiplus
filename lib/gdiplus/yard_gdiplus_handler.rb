@@ -2,7 +2,7 @@
 
 # @private
 class GdiplusEnumHandler < YARD::Handlers::C::Base
-  MATCH_ENUM_1 = /(?:define_enumint|define_enumflags)\((\w+), \w+, "(\w+)", (-?\w+)\)/
+  MATCH_ENUM_1 = /(define_enumint|define_enumflags)\((\w+), \w+, "(\w+)", (-?\w+)\)/
   MATCH_ENUM_2 = /gdip_enum_define<[^>]+>\((\w+), \w+, "(\w+)"/
   
   handles MATCH_ENUM_1
@@ -10,9 +10,9 @@ class GdiplusEnumHandler < YARD::Handlers::C::Base
   statement_class BodyStatement
 
   process do
-    statement.source.scan(MATCH_ENUM_1) do |klass, const_name, value|
+    statement.source.scan(MATCH_ENUM_1) do |kind, klass, const_name, value|
       handle_constants("const", klass, const_name, value)
-      handle_enum_method(klass, const_name)
+      handle_enum_method(klass, const_name, kind == "define_enumflags")
     end
     statement.source.scan(MATCH_ENUM_2) do |var_name, const_name|
       klass = var_name.sub(/^c/, '')
@@ -22,7 +22,7 @@ class GdiplusEnumHandler < YARD::Handlers::C::Base
     end
   end
   
-  def handle_enum_method(var_name, name)
+  def handle_enum_method(var_name, name, is_enumflags=false)
     namespace = namespace_for_variable(var_name)
     register MethodObject.new(namespace, name, :class) do |obj|
       register_visibility(obj, :public)
@@ -31,6 +31,19 @@ class GdiplusEnumHandler < YARD::Handlers::C::Base
       obj.add_tag(YARD::Tags::Tag.new(:return, "{Gdiplus::#{klass}::#{name}}", klass))
       obj.explicit = true
     end
+    if is_enumflags
+      register MethodObject.new(namespace, name, :instance) do |obj|
+        register_visibility(obj, :public)
+        
+        klass = var_name.sub(/^c/, '')
+        obj.docstring = "Returns +self | #{name}+."
+        t = YARD::Tags::Tag.new(:return, "{Gdiplus::#{klass}}", klass)
+        t.text = ""
+        obj.add_tag(t)
+        obj.explicit = true
+      end
+    end
+    
   end
 end
 

@@ -345,7 +345,7 @@ gdip_pen_set_dash_pattern(VALUE self, VALUE ary)
             ++count;
         }
         else if (!verbose) {
-            _VERBOSE("An argument must be Array of Float");
+            _VERBOSE("The argument should be Array of Float");
             verbose = true;
         }
     }

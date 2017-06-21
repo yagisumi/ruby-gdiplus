@@ -190,6 +190,30 @@ gdip_arg_to_single(VALUE v, float *flt, const char *raise_msg)
     return false;
 }
 
+float *
+alloc_array_of_single(VALUE ary, int& count)
+{
+    count = 0;
+    for (long i = 0; i < RARRAY_LEN(ary); ++i) {
+        VALUE elem = rb_ary_entry(ary, i);
+        if (Float_p(elem)) {
+            count += 1;
+        }
+    }
+    if (count == 0) return NULL;
+
+    int idx = 0;
+    float *tary = static_cast<float *>(ruby_xcalloc(count, sizeof(float)));
+    for (long i = 0; i < RARRAY_LEN(ary); ++i) {
+        VALUE elem = rb_ary_entry(ary, i);
+        if (Float_p(elem)) {
+            tary[idx] = NUM2SINGLE(elem);
+            idx += 1;
+        }
+    }
+    return tary;
+}
+
 /**
  * @return [Integer]
  */

@@ -54,6 +54,33 @@ gdip_strfmt_init(int argc, VALUE *argv, VALUE self)
     return self;
 }
 
+static VALUE vGenericDefault = Qnil;
+static VALUE vGenericTypographic = Qnil;
+
+static VALUE
+gdip_strfmt_s_get_generic_default(VALUE self)
+{
+    if (RB_NIL_P(vGenericDefault)) {
+        vGenericDefault = typeddata_alloc_null<&tStringFormat>(cStringFormat);
+        _DATA_PTR(vGenericDefault) = gdip_obj_create(const_cast<StringFormat *>(StringFormat::GenericDefault()));
+        RB_OBJ_FREEZE(vGenericDefault);
+        rb_gc_register_address(&vGenericDefault);
+    }
+    return vGenericDefault;
+}
+
+static VALUE
+gdip_strfmt_s_get_generic_typographic(VALUE self)
+{
+    if (RB_NIL_P(vGenericTypographic)) {
+        vGenericTypographic = typeddata_alloc_null<&tStringFormat>(cStringFormat);
+        _DATA_PTR(vGenericTypographic) = gdip_obj_create(const_cast<StringFormat *>(StringFormat::GenericDefault()));
+        RB_OBJ_FREEZE(vGenericTypographic);
+        rb_gc_register_address(&vGenericTypographic);
+    }
+    return vGenericTypographic;
+}
+
 static VALUE
 gdip_strfmt_get_alignment(VALUE self)
 {
@@ -175,12 +202,99 @@ gdip_strfmt_set_trimming(VALUE self, VALUE arg)
     return self;
 }
 
+static VALUE
+gdip_strfmt_get_tab_stops(VALUE self)
+{
+    StringFormat *format = Data_Ptr<StringFormat *>(self);
+    Check_NULL(format, "The StringFormat object does not exist.");
+    float offset = 0.0f;
+    VALUE r = Qnil;
+    int count = format->GetTabStopCount();
+    if (count == 0) {
+        r = rb_ary_new();
+    }
+    else {
+        float *stops = static_cast<float *>(ruby_xmalloc(count * sizeof(float)));
+        Status status = format->GetTabStops(count, &offset, stops);
+        if (status == Ok) {
+            r = rb_ary_new_capa(count);
+            for (int i = 0; i < count; ++i) {
+                rb_ary_push(r, SINGLE2NUM(stops[i]));
+            }
+        }
+        ruby_xfree(stops);
+        Check_Status(status);
+    }
+    return r;
+}
+static VALUE
+gdip_strfmt_get_first_tab_offset(VALUE self)
+{
+    StringFormat *format = Data_Ptr<StringFormat *>(self);
+    Check_NULL(format, "The StringFormat object does not exist.");
+    float offset = 0.0f;
+    float stops;
+    Status status = format->GetTabStops(0, &offset, &stops);
+    Check_Status(status);
+    return SINGLE2NUM(offset);
+}
+
+static VALUE
+gdip_strfmt_set_tab_stops(VALUE self, VALUE first_offset, VALUE tab_stops)
+{
+    Check_Frozen(self);
+    StringFormat *format = Data_Ptr<StringFormat *>(self);
+    Check_NULL(format, "The StringFormat object does not exist.");
+
+    float first = 0.0f;
+    gdip_arg_to_single(first_offset, &first, "The first argument should be Float.");
+    if (_RB_ARRAY_P(tab_stops)) {
+        int count = 0;
+        float *ary = alloc_array_of_single(tab_stops, count);
+        Status status = Ok;
+        if (ary == NULL) {
+            float tmp = 0.0f;
+            status = format->SetTabStops(first, 0, &tmp);
+        }
+        else {
+            status = format->SetTabStops(first, count, ary);
+            ruby_xfree(ary);
+        }
+        Check_Status(status);
+    }
+    else {
+        rb_raise(rb_eTypeError, "The second argument should be Array of Float.");
+    }
+    
+    return self;
+}
+
+static VALUE
+gdip_strfmt_set_digit_substitution(VALUE self, VALUE language, VALUE substitute)
+{
+    Check_Frozen(self);
+    StringFormat *format = Data_Ptr<StringFormat *>(self);
+    Check_NULL(format, "The StringFormat object does not exist.");
+
+    LANGID langid = 0;
+    gdip_arg_to_langid(language, &langid, ArgOptionAcceptInt, "The first argument should be LangId.");
+    int enumint = 0;
+    gdip_arg_to_enumint(cStringDigitSubstitute, substitute, &enumint, ArgOptionAcceptInt, "The second argument should be StringDigitSubstitute.");
+    Status status = format->SetDigitSubstitution(langid, static_cast<StringDigitSubstitute>(enumint));
+    Check_Status(status);
+
+    return self;
+}
+
 void
 Init_stringformat()
 {
     cStringFormat = rb_define_class_under(mGdiplus, "StringFormat", cGpObject);
     rb_define_alloc_func(cStringFormat, &typeddata_alloc_null<&tStringFormat>);
     rb_define_method(cStringFormat, "initialize", RUBY_METHOD_FUNC(gdip_strfmt_init), -1);
+
+    CLASS_ATTR_R(cStringFormat, GenericDefault, generic_default, strfmt);
+    CLASS_ATTR_R(cStringFormat, GenericTypographic, generic_typographic, strfmt);
 
     ATTR_RW(cStringFormat, Alignment, alignment, strfmt);
     ATTR_R(cStringFormat, DigitSubstitutionLanguage, digit_substitution_language, strfmt);
@@ -189,6 +303,14 @@ Init_stringformat()
     ATTR_RW(cStringFormat, HotkeyPrefix, hotkey_prefix, strfmt);
     ATTR_RW(cStringFormat, LineAlignment, line_alignment, strfmt);
     ATTR_RW(cStringFormat, Trimming, trimming, strfmt);
-    
 
+    rb_define_method(cStringFormat, "GetTabStops", RUBY_METHOD_FUNC(gdip_strfmt_get_tab_stops), 0);
+    rb_define_alias(cStringFormat, "get_tab_stops", "GetTabStops");
+    rb_define_method(cStringFormat, "GetFirstTabOffset", RUBY_METHOD_FUNC(gdip_strfmt_get_first_tab_offset), 0);
+    rb_define_alias(cStringFormat, "get_first_tab_offset", "GetFirstTabOffset");
+    rb_define_method(cStringFormat, "SetTabStops", RUBY_METHOD_FUNC(gdip_strfmt_set_tab_stops), 2);
+    rb_define_alias(cStringFormat, "set_tab_stops", "SetTabStops");
+    rb_define_method(cStringFormat, "SetDigitSubstitution", RUBY_METHOD_FUNC(gdip_strfmt_set_digit_substitution), 2);
+    rb_define_alias(cStringFormat, "set_digit_substitution", "SetDigitSubstitution");
+    
 }
