@@ -203,7 +203,7 @@ VALUE gdip_rectf_create(RectF *rect=NULL);
 
 /* gdip_langid.cpp */
 VALUE gdip_langid_create(LANGID langage);
-bool gdip_arg_to_langid(VALUE arg, LANGID *langid, int option=ArgOptionAcceptInt, const char *raise_msg=NULL);
+bool gdip_arg_to_langid(VALUE arg, LANGID *langid, const char *raise_msg=NULL, int option=ArgOptionAcceptInt);
 
 /* gdip_utils.cpp */
 VALUE util_encode_to_utf8(VALUE str);

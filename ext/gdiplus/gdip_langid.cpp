@@ -433,7 +433,7 @@ table_lookup_by_name(const char *name)
 }  
 
 bool
-gdip_arg_to_langid(VALUE arg, LANGID *langid, int option, const char *raise_msg)
+gdip_arg_to_langid(VALUE arg, LANGID *langid, const char *raise_msg, int option)
 {
     if (_RB_INTEGER_P(arg)) {
         *langid = (LANGID)(RB_NUM2UINT(arg) | 0xffff);

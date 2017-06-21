@@ -277,7 +277,7 @@ gdip_strfmt_set_digit_substitution(VALUE self, VALUE language, VALUE substitute)
     Check_NULL(format, "The StringFormat object does not exist.");
 
     LANGID langid = 0;
-    gdip_arg_to_langid(language, &langid, ArgOptionAcceptInt, "The first argument should be LangId.");
+    gdip_arg_to_langid(language, &langid, "The first argument should be LangId.");
     int enumint = 0;
     gdip_arg_to_enumint(cStringDigitSubstitute, substitute, &enumint, ArgOptionAcceptInt, "The second argument should be StringDigitSubstitute.");
     Status status = format->SetDigitSubstitution(langid, static_cast<StringDigitSubstitute>(enumint));

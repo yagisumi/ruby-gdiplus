@@ -140,7 +140,7 @@ gdip_fontfamily_m_get_name(VALUE self, VALUE lang)
     FontFamily *fontfamily = Data_Ptr<FontFamily *>(self);
     Check_NULL(fontfamily, "The FontFamily object does not exist.");
     LANGID langid;
-    gdip_arg_to_langid(lang, &langid, ArgOptionAcceptInt, "The argument should be LangId or Integer.");
+    gdip_arg_to_langid(lang, &langid, "The argument should be LangId or Integer.");
     WCHAR wname[LF_FACESIZE];
     Status status = fontfamily->GetFamilyName(wname, langid);
     Check_Status(status);
