@@ -189,7 +189,7 @@ gdip_color_create(Color& color)
 {
     return gdip_color_create(color.GetValue());
 }
-bool gdip_arg_to_color(VALUE v, Color *color, int option=ArgOptionColorDefault, const char *raise_msg=NULL);
+bool gdip_arg_to_color(VALUE v, Color *color, const char *raise_msg=NULL, int option=ArgOptionColorDefault);
 
 /* gdip_rectangle.cpp */
 VALUE gdip_point_create(int x, int y);

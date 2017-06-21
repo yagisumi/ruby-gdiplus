@@ -10,7 +10,7 @@ const rb_data_type_t tColor = _MAKE_DATA_TYPE(
 
 
 bool
-gdip_arg_to_color(VALUE v, Color *color, int option, const char *raise_msg)
+gdip_arg_to_color(VALUE v, Color *color, const char *raise_msg, int option)
 {
     if (RB_SYMBOL_P(v)) {
         v = rb_const_get(cColor, RB_SYM2ID(v));

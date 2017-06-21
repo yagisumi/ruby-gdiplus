@@ -45,15 +45,11 @@ gdip_pen_init(int argc, VALUE *argv, VALUE self)
     }
 
     Color color;
-    if (gdip_arg_to_color(color_or_brush, &color, ArgOptionAcceptInt)) {
-        _DATA_PTR(self) = gdip_obj_create<Pen *>(new Pen(color, width));
-    }
-    else if (_KIND_OF(color_or_brush, &tBrush)) {
+    if (_KIND_OF(color_or_brush, &tBrush)) {
         Brush *brush = Data_Ptr<Brush *>(color_or_brush);
         _DATA_PTR(self) = gdip_obj_create<Pen *>(new Pen(brush, width));
-    }
-    else {
-        rb_raise(rb_eTypeError, "The first argument must be Color, Integer or Brush");
+    } else if (gdip_arg_to_color(color_or_brush, &color)) {
+        _DATA_PTR(self) = gdip_obj_create<Pen *>(new Pen(color, width));
     }
     return self;
 }
