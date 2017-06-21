@@ -483,6 +483,14 @@ Check_NULL(void *p, const char *msg)
     }
 }
 
+static inline void
+Check_Frozen(VALUE v)
+{
+    if (RB_OBJ_FROZEN(v)) {
+        rb_error_frozen_object(v);
+    }
+}
+
 template<typename T>
 static inline void
 Check_LastStatus(T obj)

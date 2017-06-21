@@ -388,6 +388,14 @@
 #define rb_str_cat_cstr rb_str_cat2
 #endif
 
+#if RUBY_API_VERSION_CODE < 10900
+  static inline VALUE
+  rb_str_length(VALUE str)
+  {
+    return LONG2NUM(RSTRING(str)->len);
+  }
+#endif
+
 #if !defined(HAVE_RUBY_ENCODING_H)
 #define rb_usascii_str_new rb_str_new
 #define rb_usascii_str_new_cstr rb_str_new2
@@ -490,6 +498,20 @@
       return ((struct RRational *)(x))->num;
     }
   #endif
+#endif
+
+#if RUBY_API_VERSION_CODE < 20000
+  static inline void
+  rb_error_frozen_object(VALUE frozen_obj)
+  {
+    rb_error_frozen(rb_class2name(CLASS_OF(frozen_obj)));
+  }
+#elif RUBY_API_VERSION_CODE < 20200
+  static inline void
+  rb_error_frozen_object(VALUE frozen_obj)
+  {
+    rb_raise(rb_eRuntimeError, "can't modify frozen %"PRIsVALUE, CLASS_OF(frozen_obj));
+  }
 #endif
 
 #endif /* RUBY_COMPATIBLE_H_ */

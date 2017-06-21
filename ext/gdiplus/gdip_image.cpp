@@ -267,6 +267,7 @@ gdip_image_get_raw_format(VALUE self)
 static VALUE
 gdip_image_draw(VALUE self)
 {
+    Check_Frozen(self);
     Image *image = Data_Ptr<Image *>(self);
     Check_NULL(image, "The image object does not exist.");
 

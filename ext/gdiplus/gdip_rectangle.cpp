@@ -84,6 +84,7 @@ gdip_point_get_x(VALUE self)
 static VALUE
 gdip_point_set_x(VALUE self, VALUE num)
 {
+    Check_Frozen(self);
     Point *point = Data_Ptr<Point *>(self);
     if (_RB_INTEGER_P(num)) {
         point->X = RB_NUM2INT(num);
@@ -108,6 +109,7 @@ gdip_point_get_y(VALUE self)
 static VALUE
 gdip_point_set_y(VALUE self, VALUE num)
 {
+    Check_Frozen(self);
     Point *point = Data_Ptr<Point *>(self);
     if (_RB_INTEGER_P(num)) {
         point->Y = RB_NUM2INT(num);
@@ -246,6 +248,7 @@ gdip_pointf_get_x(VALUE self)
 static VALUE
 gdip_pointf_set_x(VALUE self, VALUE num)
 {
+    Check_Frozen(self);
     PointF *point = Data_Ptr<PointF *>(self);
     if (Float_p(num)) {
         point->X = NUM2SINGLE(num);
@@ -270,6 +273,7 @@ gdip_pointf_get_y(VALUE self)
 static VALUE
 gdip_pointf_set_y(VALUE self, VALUE num)
 {
+    Check_Frozen(self);
     PointF *point = Data_Ptr<PointF *>(self);
     if (Float_p(num)) {
         point->Y = NUM2SINGLE(num);
@@ -406,6 +410,7 @@ gdip_size_get_width(VALUE self)
 static VALUE
 gdip_size_set_width(VALUE self, VALUE num)
 {
+    Check_Frozen(self);
     Size *size = Data_Ptr<Size *>(self);
     if (Integer_p(num)) {
         size->Width = RB_NUM2INT(num);
@@ -430,6 +435,7 @@ gdip_size_get_height(VALUE self)
 static VALUE
 gdip_size_set_height(VALUE self, VALUE num)
 {
+    Check_Frozen(self);
     Size *size = Data_Ptr<Size *>(self);
     if (Integer_p(num)) {
         size->Height = RB_NUM2INT(num);
@@ -572,6 +578,7 @@ gdip_sizef_get_width(VALUE self)
 static VALUE
 gdip_sizef_set_width(VALUE self, VALUE num)
 {
+    Check_Frozen(self);
     SizeF *size = Data_Ptr<SizeF *>(self);
     if (Float_p(num)) {
         size->Width = NUM2SINGLE(num);
@@ -596,6 +603,7 @@ gdip_sizef_get_height(VALUE self)
 static VALUE
 gdip_sizef_set_height(VALUE self, VALUE num)
 {
+    Check_Frozen(self);
     SizeF *size = Data_Ptr<SizeF *>(self);
     if (Float_p(num)) {
         size->Height = NUM2SINGLE(num);
@@ -767,6 +775,7 @@ gdip_rect_get_x(VALUE self)
 static VALUE
 gdip_rect_set_x(VALUE self, VALUE num)
 {
+    Check_Frozen(self);
     if (Integer_p(num)) {
         Rect *rect = Data_Ptr<Rect *>(self);
         rect->X = RB_NUM2INT(num);
@@ -791,6 +800,7 @@ gdip_rect_get_y(VALUE self)
 static VALUE
 gdip_rect_set_y(VALUE self, VALUE num)
 {
+    Check_Frozen(self);
     if (Integer_p(num)) {
         Rect *rect = Data_Ptr<Rect *>(self);
         rect->Y = RB_NUM2INT(num);
@@ -815,6 +825,7 @@ gdip_rect_get_width(VALUE self)
 static VALUE
 gdip_rect_set_width(VALUE self, VALUE num)
 {
+    Check_Frozen(self);
     if (Integer_p(num)) {
         Rect *rect = Data_Ptr<Rect *>(self);
         rect->Width = RB_NUM2INT(num);
@@ -840,6 +851,7 @@ gdip_rect_get_height(VALUE self)
 static VALUE
 gdip_rect_set_height(VALUE self, VALUE num)
 {
+    Check_Frozen(self);
     if (Integer_p(num)) {
         Rect *rect = Data_Ptr<Rect *>(self);
         rect->Height = RB_NUM2INT(num);
@@ -886,6 +898,7 @@ gdip_rect_get_location(VALUE self)
 static VALUE
 gdip_rect_set_location(VALUE self, VALUE loc)
 {
+    Check_Frozen(self);
     if (_KIND_OF(loc, &tPoint)) {
         Rect *rect = Data_Ptr<Rect *>(self);
         Point *point = Data_Ptr<Point *>(loc);
@@ -912,6 +925,7 @@ gdip_rect_get_size(VALUE self)
 static VALUE
 gdip_rect_set_size(VALUE self, VALUE size)
 {
+    Check_Frozen(self);
     if (_KIND_OF(size, &tSize)) {
         Rect *rect = Data_Ptr<Rect *>(self);
         Size *sz = Data_Ptr<Size *>(size);
@@ -994,6 +1008,7 @@ gdip_rect_contains(int argc, VALUE *argv, VALUE self)
 static VALUE
 gdip_rect_inflate_bang(int argc, VALUE *argv, VALUE self)
 {
+    Check_Frozen(self);
     if (argc != 1 && argc != 2) {
         rb_raise(rb_eArgError, "wrong number of arguments (%d for 1..2)", argc);
     }
@@ -1099,6 +1114,7 @@ gdip_rect_intersects_with(VALUE self, VALUE other)
 static VALUE
 gdip_rect_intersect_bang(VALUE self, VALUE other)
 {
+    Check_Frozen(self);
     if (_KIND_OF(other, &tRectangle)) {
         Rect *rect_self = Data_Ptr<Rect *>(self);
         Rect *rect_other = Data_Ptr<Rect *>(other);
@@ -1253,6 +1269,7 @@ gdip_rectf_get_x(VALUE self)
 static VALUE
 gdip_rectf_set_x(VALUE self, VALUE num)
 {
+    Check_Frozen(self);
     if (Float_p(num)) {
         RectF *rect = Data_Ptr<RectF *>(self);
         rect->X = NUM2SINGLE(num);
@@ -1277,6 +1294,7 @@ gdip_rectf_get_y(VALUE self)
 static VALUE
 gdip_rectf_set_y(VALUE self, VALUE num)
 {
+    Check_Frozen(self);
     if (Float_p(num)) {
         RectF *rect = Data_Ptr<RectF *>(self);
         rect->Y = NUM2SINGLE(num);
@@ -1301,6 +1319,7 @@ gdip_rectf_get_width(VALUE self)
 static VALUE
 gdip_rectf_set_width(VALUE self, VALUE num)
 {
+    Check_Frozen(self);
     if (Float_p(num)) {
         RectF *rect = Data_Ptr<RectF *>(self);
         rect->Width = NUM2SINGLE(num);
@@ -1326,6 +1345,7 @@ gdip_rectf_get_height(VALUE self)
 static VALUE
 gdip_rectf_set_height(VALUE self, VALUE num)
 {
+    Check_Frozen(self);
     if (Float_p(num)) {
         RectF *rect = Data_Ptr<RectF *>(self);
         rect->Height = NUM2SINGLE(num);
@@ -1372,6 +1392,7 @@ gdip_rectf_get_location(VALUE self)
 static VALUE
 gdip_rectf_set_location(VALUE self, VALUE loc)
 {
+    Check_Frozen(self);
     if (_KIND_OF(loc, &tPointF)) {
         RectF *rect = Data_Ptr<RectF *>(self);
         Point *point = Data_Ptr<Point *>(loc);
@@ -1398,6 +1419,7 @@ gdip_rectf_get_size(VALUE self)
 static VALUE
 gdip_rectf_set_size(VALUE self, VALUE size)
 {
+    Check_Frozen(self);
     if (_KIND_OF(size, &tSizeF)) {
         RectF *rect = Data_Ptr<RectF *>(self);
         SizeF *sz = Data_Ptr<SizeF *>(size);
@@ -1480,6 +1502,7 @@ gdip_rectf_contains(int argc, VALUE *argv, VALUE self)
 static VALUE
 gdip_rectf_inflate_bang(int argc, VALUE *argv, VALUE self)
 {
+    Check_Frozen(self);
     if (argc != 1 && argc != 2) {
         rb_raise(rb_eArgError, "wrong number of arguments (%d for 1..2)", argc);
     }
@@ -1584,6 +1607,7 @@ gdip_rectf_intersects_with(VALUE self, VALUE other)
 static VALUE
 gdip_rectf_intersect_bang(VALUE self, VALUE other)
 {
+    Check_Frozen(self);
     if (_KIND_OF(other, &tRectangleF)) {
         RectF *rect_self = Data_Ptr<RectF *>(self);
         RectF *rect_other = Data_Ptr<RectF *>(other);

@@ -65,6 +65,7 @@ gdip_strfmt_get_alignment(VALUE self)
 static VALUE
 gdip_strfmt_set_alignment(VALUE self, VALUE arg)
 {
+    Check_Frozen(self);
     StringFormat *format = Data_Ptr<StringFormat *>(self);
     Check_NULL(format, "The StringFormat object does not exist.");
     int enumint = 0;
@@ -101,6 +102,7 @@ gdip_strfmt_get_format_flags(VALUE self)
 static VALUE
 gdip_strfmt_set_format_flags(VALUE self, VALUE arg)
 {
+    Check_Frozen(self);
     StringFormat *format = Data_Ptr<StringFormat *>(self);
     Check_NULL(format, "The StringFormat object does not exist.");
     int enumint = 0;
@@ -121,6 +123,7 @@ gdip_strfmt_get_hotkey_prefix(VALUE self)
 static VALUE
 gdip_strfmt_set_hotkey_prefix(VALUE self, VALUE arg)
 {
+    Check_Frozen(self);
     StringFormat *format = Data_Ptr<StringFormat *>(self);
     Check_NULL(format, "The StringFormat object does not exist.");
     int enumint = 0;
@@ -141,6 +144,7 @@ gdip_strfmt_get_line_alignment(VALUE self)
 static VALUE
 gdip_strfmt_set_line_alignment(VALUE self, VALUE arg)
 {
+    Check_Frozen(self);
     StringFormat *format = Data_Ptr<StringFormat *>(self);
     Check_NULL(format, "The StringFormat object does not exist.");
     int enumint = 0;
@@ -161,6 +165,7 @@ gdip_strfmt_get_trimming(VALUE self)
 static VALUE
 gdip_strfmt_set_trimming(VALUE self, VALUE arg)
 {
+    Check_Frozen(self);
     StringFormat *format = Data_Ptr<StringFormat *>(self);
     Check_NULL(format, "The StringFormat object does not exist.");
     int enumint = 0;

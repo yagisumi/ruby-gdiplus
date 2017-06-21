@@ -80,6 +80,7 @@ gdip_pen_get_width(VALUE self)
 static VALUE
 gdip_pen_set_width(VALUE self, VALUE width)
 {
+    Check_Frozen(self);
     Pen *pen = Data_Ptr<Pen *>(self);
     Check_NULL(pen, "This object does not exist");
 
@@ -112,6 +113,7 @@ gdip_pen_get_dash_offset(VALUE self)
 static VALUE
 gdip_pen_set_dash_offset(VALUE self, VALUE offset)
 {
+    Check_Frozen(self);
     Pen *pen = Data_Ptr<Pen *>(self);
     Check_NULL(pen, "This object does not exist");
 
@@ -144,6 +146,7 @@ gdip_pen_get_miter_limit(VALUE self)
 static VALUE
 gdip_pen_set_miter_limit(VALUE self, VALUE limit)
 {
+    Check_Frozen(self);
     Pen *pen = Data_Ptr<Pen *>(self);
     Check_NULL(pen, "This object does not exist");
 
@@ -175,6 +178,7 @@ gdip_pen_get_color(VALUE self)
 static VALUE
 gdip_pen_set_color(VALUE self, VALUE color)
 {
+    Check_Frozen(self);
     Pen *pen = Data_Ptr<Pen *>(self);
     Check_NULL(pen, "This object does not exist");
     Color clr;
@@ -234,6 +238,7 @@ gdip_pen_get_compound_array(VALUE self)
 static VALUE
 gdip_pen_set_compound_array(VALUE self, VALUE ary)
 {
+    Check_Frozen(self);
     Pen *pen = Data_Ptr<Pen *>(self);
     Check_NULL(pen, "This object does not exist");
     if (!_RB_ARRAY_P(ary)) {
@@ -324,6 +329,7 @@ gdip_pen_get_dash_pattern(VALUE self)
 static VALUE
 gdip_pen_set_dash_pattern(VALUE self, VALUE ary)
 {
+    Check_Frozen(self);
     Pen *pen = Data_Ptr<Pen *>(self);
     Check_NULL(pen, "This object does not exist");
 
@@ -387,6 +393,7 @@ gdip_pen_get_alignment(VALUE self)
 static VALUE
 gdip_pen_set_alignment(VALUE self, VALUE align)
 {
+    Check_Frozen(self);
     Pen *pen = Data_Ptr<Pen *>(self);
     Check_NULL(pen, "This object does not exist");
     int enum_align = 0;
@@ -421,6 +428,7 @@ gdip_pen_get_dash_cap(VALUE self)
 static VALUE
 gdip_pen_set_dash_cap(VALUE self, VALUE cap)
 {
+    Check_Frozen(self);
     Pen *pen = Data_Ptr<Pen *>(self);
     Check_NULL(pen, "This object does not exist");
 
@@ -451,6 +459,7 @@ gdip_pen_get_dash_style(VALUE self)
 static VALUE
 gdip_pen_set_dash_style(VALUE self, VALUE style)
 {
+    Check_Frozen(self);
     Pen *pen = Data_Ptr<Pen *>(self);
     Check_NULL(pen, "This object does not exist");
 
@@ -480,6 +489,7 @@ gdip_pen_get_end_cap(VALUE self)
 static VALUE
 gdip_pen_set_end_cap(VALUE self, VALUE cap)
 {
+    Check_Frozen(self);
     Pen *pen = Data_Ptr<Pen *>(self);
     Check_NULL(pen, "This object does not exist");
 
@@ -510,6 +520,7 @@ gdip_pen_get_line_join(VALUE self)
 static VALUE
 gdip_pen_set_line_join(VALUE self, VALUE join)
 {
+    Check_Frozen(self);
     Pen *pen = Data_Ptr<Pen *>(self);
     Check_NULL(pen, "This object does not exist");
 
@@ -540,6 +551,7 @@ gdip_pen_get_start_cap(VALUE self)
 static VALUE
 gdip_pen_set_start_cap(VALUE self, VALUE cap)
 {
+    Check_Frozen(self);
     Pen *pen = Data_Ptr<Pen *>(self);
     Check_NULL(pen, "This object does not exist");
 
@@ -618,6 +630,7 @@ gdip_solidbrush_get_color(VALUE self)
  static VALUE
 gdip_solidbrush_set_color(VALUE self, VALUE color)
 {
+    Check_Frozen(self);
     SolidBrush *brush = Data_Ptr<SolidBrush *>(self);
     Check_NULL(brush, "This object does not exist");
     Color clr;
