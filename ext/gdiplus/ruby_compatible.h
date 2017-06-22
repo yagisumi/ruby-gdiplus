@@ -500,6 +500,44 @@
   #endif
 #endif
 
+#if RUBY_API_VERSION_CODE >= 10900 && RUBY_API_VERSION_CODE < 20100
+  #define RSTRUCT_GET(st, idx)    rb_struct_aref(st, INT2NUM(idx))
+#endif
+
+#if RUBY_API_VERSION_CODE < 10900
+  static inline VALUE
+  _rb_range_beg(VALUE range)
+  {
+    return rb_iv_get(range, "begin");
+  }
+  static inline VALUE
+  _rb_range_end(VALUE range)
+  {
+    return rb_iv_get(range, "end");
+  }
+  static inline int
+  _rb_range_excl_p(VALUE range)
+  {
+    return RB_TEST(rb_iv_get(range, "excl"));
+  }
+#else
+  static inline VALUE
+  _rb_range_beg(VALUE range)
+  {
+    return RSTRUCT_GET(range, 0);
+  }
+  static inline VALUE
+  _rb_range_end(VALUE range)
+  {
+    return RSTRUCT_GET(range, 1);
+  }
+  static inline int
+  _rb_range_excl_p(VALUE range)
+  {
+    return RB_TEST(RSTRUCT_GET(range, 2));
+  }
+#endif
+
 #if RUBY_API_VERSION_CODE < 20000
   static inline void
   rb_error_frozen_object(VALUE frozen_obj)

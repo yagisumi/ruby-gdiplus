@@ -18,6 +18,12 @@
 #define _RB_ID2NUM(v) RB_ULONG2NUM(v)
 #endif
 
+static inline int
+_RB_RANGE_P(VALUE v)
+{
+    return RB_TEST(rb_obj_is_kind_of(v, rb_cRange));
+}
+
 static inline float
 NUM2SINGLE(VALUE num)
 {

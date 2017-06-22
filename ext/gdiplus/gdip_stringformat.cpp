@@ -57,6 +57,10 @@ gdip_strfmt_init(int argc, VALUE *argv, VALUE self)
 static VALUE vGenericDefault = Qnil;
 static VALUE vGenericTypographic = Qnil;
 
+/**
+ * Gets a generic default StringFormat object.
+ * @return [StringFormat]
+ */
 static VALUE
 gdip_strfmt_s_get_generic_default(VALUE self)
 {
@@ -69,18 +73,26 @@ gdip_strfmt_s_get_generic_default(VALUE self)
     return vGenericDefault;
 }
 
+/**
+ * Gets a generic typographic StringFormat object.
+ * @return [StringFormat]
+ */
 static VALUE
 gdip_strfmt_s_get_generic_typographic(VALUE self)
 {
     if (RB_NIL_P(vGenericTypographic)) {
         vGenericTypographic = typeddata_alloc_null<&tStringFormat>(cStringFormat);
-        _DATA_PTR(vGenericTypographic) = gdip_obj_create(const_cast<StringFormat *>(StringFormat::GenericDefault()));
+        _DATA_PTR(vGenericTypographic) = gdip_obj_create(const_cast<StringFormat *>(StringFormat::GenericTypographic()));
         RB_OBJ_FREEZE(vGenericTypographic);
         rb_gc_register_address(&vGenericTypographic);
     }
     return vGenericTypographic;
 }
 
+/**
+ * Gets or sets the horizontal alignment.
+ * @return [StringAlignment]
+ */
 static VALUE
 gdip_strfmt_get_alignment(VALUE self)
 {
@@ -102,6 +114,10 @@ gdip_strfmt_set_alignment(VALUE self, VALUE arg)
     return self;
 }
 
+/**
+ * Gets the substitute language for western digits.
+ * @return [LangId]
+ */
 static VALUE
 gdip_strfmt_get_digit_substitution_language(VALUE self)
 {
@@ -110,6 +126,10 @@ gdip_strfmt_get_digit_substitution_language(VALUE self)
     return gdip_langid_create(format->GetDigitSubstitutionLanguage());
 }
 
+/**
+ * Gets the method for digit substitution.
+ * @return [StringDigitSubstitute]
+ */
 static VALUE
 gdip_strfmt_get_digit_substitution_method(VALUE self)
 {
@@ -118,6 +138,10 @@ gdip_strfmt_get_digit_substitution_method(VALUE self)
     return gdip_enumint_create(cStringDigitSubstitute, format->GetDigitSubstitutionMethod());
 }
 
+/**
+ * Gets or sets a StringFormatFlags.
+ * @return [StringFormatFlags]
+ */
 static VALUE
 gdip_strfmt_get_format_flags(VALUE self)
 {
@@ -139,6 +163,10 @@ gdip_strfmt_set_format_flags(VALUE self, VALUE arg)
     return self;
 }
 
+/**
+ * Gets or sets the HotkeyPrefix for this StringFormat.
+ * @return [HotkeyPrefix]
+ */
 static VALUE
 gdip_strfmt_get_hotkey_prefix(VALUE self)
 {
@@ -160,6 +188,10 @@ gdip_strfmt_set_hotkey_prefix(VALUE self, VALUE arg)
     return self;
 }
 
+/**
+ * Gets or sets the vertical alignment.
+ * @return [StringAlignment]
+ */
 static VALUE
 gdip_strfmt_get_line_alignment(VALUE self)
 {
@@ -181,6 +213,10 @@ gdip_strfmt_set_line_alignment(VALUE self, VALUE arg)
     return self;
 }
 
+/**
+ * Gets or sets the StringTrimming.
+ * @return [StringTrimming]
+ */
 static VALUE
 gdip_strfmt_get_trimming(VALUE self)
 {
@@ -202,6 +238,10 @@ gdip_strfmt_set_trimming(VALUE self, VALUE arg)
     return self;
 }
 
+/**
+ * Gets the tab stops.
+ * @return [Array<Float>] distances between tab stops
+ */
 static VALUE
 gdip_strfmt_get_tab_stops(VALUE self)
 {
@@ -227,6 +267,11 @@ gdip_strfmt_get_tab_stops(VALUE self)
     }
     return r;
 }
+
+/**
+ * Gets the first tab offset.
+ * @return [Float]
+ */
 static VALUE
 gdip_strfmt_get_first_tab_offset(VALUE self)
 {
@@ -239,6 +284,12 @@ gdip_strfmt_get_first_tab_offset(VALUE self)
     return SINGLE2NUM(offset);
 }
 
+/**
+ * Sets the tab stops.
+ * @param first_offset [Float]
+ * @param tab_stops [Array<Float>]
+ * @return [self]
+ */
 static VALUE
 gdip_strfmt_set_tab_stops(VALUE self, VALUE first_offset, VALUE tab_stops)
 {
@@ -269,6 +320,12 @@ gdip_strfmt_set_tab_stops(VALUE self, VALUE first_offset, VALUE tab_stops)
     return self;
 }
 
+/**
+ * Sets the language and method for substitution of digits.
+ * @param language [LangId]
+ * @param substitute [StringSubstitute]
+ * @return [self]
+ */
 static VALUE
 gdip_strfmt_set_digit_substitution(VALUE self, VALUE language, VALUE substitute)
 {
@@ -282,6 +339,65 @@ gdip_strfmt_set_digit_substitution(VALUE self, VALUE language, VALUE substitute)
     gdip_arg_to_enumint(cStringDigitSubstitute, substitute, &enumint, "The second argument should be StringDigitSubstitute.", ArgOptionAcceptInt);
     Status status = format->SetDigitSubstitution(langid, static_cast<StringDigitSubstitute>(enumint));
     Check_Status(status);
+
+    return self;
+}
+
+/**
+ * Sets ranges for Graphics#MeasureCharacterRanges method.
+ * @param ranges [Array<Range>]
+ * @return [self]
+ * @example
+ *   strfmt.SetMeasurableCharacterRanges([0..3, 6..10])
+ */
+static VALUE
+gdip_strfmt_set_measurable_character_ranges(VALUE self, VALUE ranges)
+{
+    //Check_Frozen(self);
+    StringFormat *format = Data_Ptr<StringFormat *>(self);
+    Check_NULL(format, "The StringFormat object does not exist.");
+
+    int ranges_len = RARRAY_LEN(ranges);
+    if (_RB_ARRAY_P(ranges) && ranges_len > 0) {
+        int count = 0;
+        for (int i = 0; i < ranges_len; ++i) {
+            VALUE range = rb_ary_entry(ranges, i);
+            if (_RB_RANGE_P(range)) {
+                VALUE beg = _rb_range_beg(range);
+                VALUE end = _rb_range_end(range);
+                if (Integer_p(beg, end)) {
+                    count += 1;
+                }
+            }
+        }
+        if (count != ranges_len || count == 0) {
+            _VERBOSE("The argument should be Array of Range, and the begin and end of Range should be Integer.");
+        }
+        if (count > 0) {
+            CharacterRange *cranges = static_cast<CharacterRange *>(RB_ZALLOC_N(CharacterRange, count));
+            int idx = 0;
+            for (int i = 0; i < ranges_len; ++i) {
+                VALUE range = rb_ary_entry(ranges, i);
+                if (_RB_RANGE_P(range)) {
+                    VALUE beg = _rb_range_beg(range);
+                    VALUE end = _rb_range_end(range);
+                    if (Integer_p(beg, end)) {
+                        int n_beg = RB_NUM2INT(beg);
+                        int n_end = RB_NUM2INT(end);
+                        CharacterRange cr(n_beg, n_end - n_beg + _rb_range_excl_p(range) ? 0 : 1);
+                        cranges[idx] = cr;
+                        idx += 1;
+                    }
+                }
+            }
+            Status status = format->SetMeasurableCharacterRanges(count, cranges);
+            ruby_xfree(cranges);
+            Check_Status(status);
+        }
+    }
+    else {
+        rb_raise(rb_eTypeError, "The argument should be Array of Range.");
+    }
 
     return self;
 }
@@ -312,5 +428,7 @@ Init_stringformat()
     rb_define_alias(cStringFormat, "set_tab_stops", "SetTabStops");
     rb_define_method(cStringFormat, "SetDigitSubstitution", RUBY_METHOD_FUNC(gdip_strfmt_set_digit_substitution), 2);
     rb_define_alias(cStringFormat, "set_digit_substitution", "SetDigitSubstitution");
+    rb_define_method(cStringFormat, "SetMeasurableCharacterRanges", RUBY_METHOD_FUNC(gdip_strfmt_set_measurable_character_ranges), 1);
+    rb_define_alias(cStringFormat, "set_measurable_character_ranges", "SetMeasurableCharacterRanges");
     
 }
