@@ -460,6 +460,92 @@ gdip_graphics_draw_rectangle(int argc, VALUE *argv, VALUE self)
 }
 
 /**
+ * @overload DrawRectangles(pen, rectangles)
+ *   @param pen [Pen]
+ *   @param rectangles [Array<Rectangle or RectangleF>]
+ *   @return [self]
+ */
+static VALUE
+gdip_graphics_draw_rectangles(VALUE self, VALUE pen_v, VALUE ary)
+{
+    if (!_KIND_OF(pen_v, &tPen)) {
+        rb_raise(rb_eTypeError, "The first argument should be Pen.");
+    }
+    if (!_RB_ARRAY_P(ary) && RARRAY_LEN(ary) == 0) {
+        rb_raise(rb_eTypeError, "The second argument should be Array of Rectangle or RectangleF.");
+    }
+
+    Graphics *g = Data_Ptr<Graphics *>(self);
+    Check_NULL(g, "The graphics object does not exist.");
+    Pen *pen = Data_Ptr<Pen *>(pen_v);
+    Check_NULL(pen, "The pen object does not exist.");
+
+    VALUE first = rb_ary_entry(ary, 0);
+    if (_KIND_OF(first, &tRectangle)) {
+        int count;
+        Rect *rects = alloc_array_of<Rect, &tRectangle>(ary, count);
+        Status status = g->DrawRectangles(pen, rects, count);
+        ruby_xfree(rects);
+        Check_Status(status);
+    }
+    else if (_KIND_OF(first, &tRectangleF)) {
+        int count;
+        RectF *rects = alloc_array_of<RectF, &tRectangleF>(ary, count);
+        Status status = g->DrawRectangles(pen, rects, count);
+        ruby_xfree(rects);
+        Check_Status(status);
+    }
+    else {
+        rb_raise(rb_eTypeError, "The second argument should be Array of Rectangle or RectangleF.");
+    }
+
+    return self;
+}
+
+/**
+ * @overload FillRectangles(pen, rectangles)
+ *   @param pen [Pen]
+ *   @param rectangles [Array<Rectangle or RectangleF>]
+ *   @return [self]
+ */
+static VALUE
+gdip_graphics_fill_rectangles(VALUE self, VALUE brush_v, VALUE ary)
+{
+    if (!_KIND_OF(brush_v, &tBrush)) {
+        rb_raise(rb_eTypeError, "The first argument should be Brush.");
+    }
+    if (!_RB_ARRAY_P(ary) && RARRAY_LEN(ary) == 0) {
+        rb_raise(rb_eTypeError, "The second argument should be Array of Rectangle or RectangleF.");
+    }
+
+    Graphics *g = Data_Ptr<Graphics *>(self);
+    Check_NULL(g, "The graphics object does not exist.");
+    Brush *brush = Data_Ptr<Brush *>(brush_v);
+    Check_NULL(brush, "This Brush object does not exist.");
+
+    VALUE first = rb_ary_entry(ary, 0);
+    if (_KIND_OF(first, &tRectangle)) {
+        int count;
+        Rect *rects = alloc_array_of<Rect, &tRectangle>(ary, count);
+        Status status = g->FillRectangles(brush, rects, count);
+        ruby_xfree(rects);
+        Check_Status(status);
+    }
+    else if (_KIND_OF(first, &tRectangleF)) {
+        int count;
+        RectF *rects = alloc_array_of<RectF, &tRectangleF>(ary, count);
+        Status status = g->FillRectangles(brush, rects, count);
+        ruby_xfree(rects);
+        Check_Status(status);
+    }
+    else {
+        rb_raise(rb_eTypeError, "The second argument should be Array of Rectangle or RectangleF.");
+    }
+
+    return self;
+}
+
+/**
  * @example
  *   bmp.draw {|g|
  *     g.FillRectangle(brush, rect)
@@ -1679,8 +1765,12 @@ Init_graphics()
     
     rb_define_method(cGraphics, "DrawRectangle", RUBY_METHOD_FUNC(gdip_graphics_draw_rectangle), -1);
     rb_define_alias(cGraphics, "draw_rectangle", "DrawRectangle");
+    rb_define_method(cGraphics, "DrawRectangles", RUBY_METHOD_FUNC(gdip_graphics_draw_rectangles), 2);
+    rb_define_alias(cGraphics, "draw_rectangles", "DrawRectangles");
     rb_define_method(cGraphics, "FillRectangle", RUBY_METHOD_FUNC(gdip_graphics_fill_rectangle), -1);
     rb_define_alias(cGraphics, "fill_rectangle", "FillRectangle");
+    rb_define_method(cGraphics, "FillRectangles", RUBY_METHOD_FUNC(gdip_graphics_fill_rectangles), 2);
+    rb_define_alias(cGraphics, "fill_rectangles", "FillRectangles");
     rb_define_method(cGraphics, "DrawLine", RUBY_METHOD_FUNC(gdip_graphics_draw_line), -1);
     rb_define_alias(cGraphics, "draw_line", "DrawLine");
     rb_define_method(cGraphics, "DrawLines", RUBY_METHOD_FUNC(gdip_graphics_draw_lines), 2);
