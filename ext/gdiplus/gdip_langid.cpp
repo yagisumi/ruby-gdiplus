@@ -546,8 +546,13 @@ gdip_langid_s_get_langid(VALUE self)
 
 /**
  * Document-class: Gdiplus::LangId
- * DESCRIPTIONNNNN {file:README} <br>
- * |aaa|bbb|
+ * This class represents LANGID.
+ * @example
+ *   LangId.new #=> #<Gdiplus::LangId 0x0000 NEUTRAL>
+ *   LangId.en_US # => #<Gdiplus::LangId 0x0409 en-US: English (United States)>
+ *   LangId.new("en-US") # => #<Gdiplus::LangId 0x0409 en-US: English (United States)>
+ *   LangId.new(0x0409) # => #<Gdiplus::LangId 0x0409 en-US: English (United States)>
+ *
  */
 void
 Init_langid()

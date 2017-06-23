@@ -83,6 +83,7 @@ extern VALUE cInstalledFontCollection;
 extern VALUE cPrivateFontCollection;
 extern VALUE cLangId;
 extern VALUE cStringFormat;
+extern VALUE cGraphicsPath;
 
 extern const rb_data_type_t tGuid;
 extern const rb_data_type_t tImageCodecInfo;
@@ -108,6 +109,7 @@ extern const rb_data_type_t tInstalledFontCollection;
 extern const rb_data_type_t tPrivateFontCollection;
 extern const rb_data_type_t tLangId;
 extern const rb_data_type_t tStringFormat;
+extern const rb_data_type_t tGraphicsPath;
 
 void Init_codec();
 void Init_image();
@@ -120,6 +122,7 @@ void Init_rectangle();
 void Init_font();
 void Init_langid();
 void Init_stringformat();
+void Init_graphicspath();
 
 /* gdip_enum.cpp */
 extern ID ID_UNKNOWN;

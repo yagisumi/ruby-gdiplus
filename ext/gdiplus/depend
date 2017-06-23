@@ -11,3 +11,4 @@ gdip_rectangle.o: gdip_rectangle.cpp ruby_gdiplus.h ruby_compatible.h
 gdip_font.o: gdip_font.cpp ruby_gdiplus.h ruby_compatible.h
 gdip_langid.o: gdip_langid.cpp ruby_gdiplus.h ruby_compatible.h simplemap.h
 gdip_stringformat.o: gdip_stringformat.cpp ruby_gdiplus.h ruby_compatible.h
+gdip_graphicspath.o: gdip_graphicspath.cpp ruby_gdiplus.h ruby_compatible.h
