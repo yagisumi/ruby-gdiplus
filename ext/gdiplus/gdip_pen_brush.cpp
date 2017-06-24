@@ -729,6 +729,20 @@ gdip_brushes_s_method_missing(int argc, VALUE *argv, VALUE self)
  *     g.FillRectangle(brush, 100, 100, 100, 100)
  *   }
  */
+/**
+ * Document-module: Gdiplus::Pens
+ * This module is a collection of predefined color pens. Each pen has a width of 1.0.
+ * @example
+ *   g.DrawLine(Pens.Gold, point1, point2)
+ *   g.DrawLine(Pens::Red, point3, point4)
+ */
+/**
+ * Document-module: Gdiplus::Brushes
+ * This module is a collection of predefined color brushes (SolidBrush).
+ * @example
+ *   g.FillRectangle(Brushes.Gold, rect1)
+ *   g.FillRectangle(Brushes::Red, rect2)
+ */
 void
 Init_pen_brush()
 {
