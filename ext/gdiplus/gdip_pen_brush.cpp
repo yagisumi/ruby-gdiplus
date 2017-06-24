@@ -759,11 +759,15 @@ Init_pen_brush()
     ATTR_RW(cSolidBrush, Color, color, solidbrush);
 
     VALUE cPens = rb_define_module_under(mGdiplus, "Pens");
+    // @private
     rb_define_singleton_method(cPens, "const_missing", RUBY_METHOD_FUNC(gdip_pens_s_const_missing), 1);
+    // @private
     rb_define_singleton_method(cPens, "method_missing", RUBY_METHOD_FUNC(gdip_pens_s_method_missing), -1);
 
     VALUE cBrushes = rb_define_module_under(mGdiplus, "Brushes");
+    // @private
     rb_define_singleton_method(cBrushes, "const_missing", RUBY_METHOD_FUNC(gdip_brushes_s_const_missing), 1);
+    // @private
     rb_define_singleton_method(cBrushes, "method_missing", RUBY_METHOD_FUNC(gdip_brushes_s_method_missing), -1);
 
 }
