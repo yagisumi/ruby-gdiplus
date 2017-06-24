@@ -179,7 +179,7 @@ EncoderParameters *gdip_encprms_build_struct(VALUE v);
 template <typename T> ID gdip_enum_get_id(VALUE klass, T data);
 template <typename T> VALUE gdip_enum_get(VALUE klass, T data);
 VALUE gdip_enumint_create(VALUE klass, int num);
-int gdip_arg_to_enumint(VALUE klass, VALUE arg, int *num, const char *raise_msg=NULL, int option=0);
+int gdip_arg_to_enumint(VALUE klass, VALUE arg, int *num, const char *raise_msg=NULL, int option=ArgOptionAcceptInt);
 VALUE gdip_enum_guid_create(VALUE klass, GUID *guid);
 
 /* gdip_graphics.cpp */

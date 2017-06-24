@@ -833,6 +833,35 @@ gdip_gpath_add_string(VALUE self, VALUE str, VALUE v_family, VALUE v_style, VALU
     return self;
 }
 
+/**
+ * @overload AddPath(path, connect=false)
+ *   @param path [GraphicsPath]
+ *   @param connect [Boolean]
+ *   @return [self]
+ */
+static VALUE
+gdip_gpath_add_path(int argc, VALUE *argv, VALUE self)
+{
+    Check_Frozen(self);
+    VALUE v_path;
+    VALUE v_connect;
+    rb_scan_args(argc, argv, "11", &v_path, &v_connect);
+    if (!_KIND_OF(v_path, &tGraphicsPath)) {
+        rb_raise(rb_eTypeError, "The first argument should be GraphicsPath.");
+    }
+
+    GraphicsPath *gp = Data_Ptr<GraphicsPath *>(self);
+    Check_NULL(gp, "This GraphicsPath object does not exist.");
+    GraphicsPath *path = Data_Ptr<GraphicsPath *>(argv[0]);
+    Check_NULL(path, "This GraphicsPath object does not exist.");
+
+
+    Status status = gp->AddPath(path, RB_TEST(v_connect));
+    Check_Status(status);
+
+    return self;
+}
+
 
 void
 Init_graphicspath()
@@ -873,4 +902,6 @@ Init_graphicspath()
     rb_define_alias(cGraphicsPath, "add_rectangles", "AddRectangles");
     rb_define_method(cGraphicsPath, "AddString", RUBY_METHOD_FUNC(gdip_gpath_add_string), 6);
     rb_define_alias(cGraphicsPath, "add_string", "AddString");
+    rb_define_method(cGraphicsPath, "AddPath", RUBY_METHOD_FUNC(gdip_gpath_add_path), -1);
+    rb_define_alias(cGraphicsPath, "add_path", "AddPath");
 }

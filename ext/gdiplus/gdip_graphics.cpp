@@ -466,9 +466,9 @@ gdip_graphics_draw_rectangle(int argc, VALUE *argv, VALUE self)
  *   @return [self]
  */
 static VALUE
-gdip_graphics_draw_rectangles(VALUE self, VALUE pen_v, VALUE ary)
+gdip_graphics_draw_rectangles(VALUE self, VALUE v_pen, VALUE ary)
 {
-    if (!_KIND_OF(pen_v, &tPen)) {
+    if (!_KIND_OF(v_pen, &tPen)) {
         rb_raise(rb_eTypeError, "The first argument should be Pen.");
     }
     if (!_RB_ARRAY_P(ary) && RARRAY_LEN(ary) == 0) {
@@ -477,7 +477,7 @@ gdip_graphics_draw_rectangles(VALUE self, VALUE pen_v, VALUE ary)
 
     Graphics *g = Data_Ptr<Graphics *>(self);
     Check_NULL(g, "The graphics object does not exist.");
-    Pen *pen = Data_Ptr<Pen *>(pen_v);
+    Pen *pen = Data_Ptr<Pen *>(v_pen);
     Check_NULL(pen, "The pen object does not exist.");
 
     VALUE first = rb_ary_entry(ary, 0);
@@ -509,9 +509,9 @@ gdip_graphics_draw_rectangles(VALUE self, VALUE pen_v, VALUE ary)
  *   @return [self]
  */
 static VALUE
-gdip_graphics_fill_rectangles(VALUE self, VALUE brush_v, VALUE ary)
+gdip_graphics_fill_rectangles(VALUE self, VALUE v_brush, VALUE ary)
 {
-    if (!_KIND_OF(brush_v, &tBrush)) {
+    if (!_KIND_OF(v_brush, &tBrush)) {
         rb_raise(rb_eTypeError, "The first argument should be Brush.");
     }
     if (!_RB_ARRAY_P(ary) && RARRAY_LEN(ary) == 0) {
@@ -520,7 +520,7 @@ gdip_graphics_fill_rectangles(VALUE self, VALUE brush_v, VALUE ary)
 
     Graphics *g = Data_Ptr<Graphics *>(self);
     Check_NULL(g, "The graphics object does not exist.");
-    Brush *brush = Data_Ptr<Brush *>(brush_v);
+    Brush *brush = Data_Ptr<Brush *>(v_brush);
     Check_NULL(brush, "This Brush object does not exist.");
 
     VALUE first = rb_ary_entry(ary, 0);
@@ -684,9 +684,9 @@ gdip_graphics_draw_line(int argc, VALUE *argv, VALUE self)
  *   }
  */
 static VALUE
-gdip_graphics_draw_lines(VALUE self, VALUE pen_v, VALUE ary)
+gdip_graphics_draw_lines(VALUE self, VALUE v_pen, VALUE ary)
 {
-    if (!_KIND_OF(pen_v, &tPen)) {
+    if (!_KIND_OF(v_pen, &tPen)) {
         rb_raise(rb_eTypeError, "The first argument should be Pen.");
     }
     if (!_RB_ARRAY_P(ary) && RARRAY_LEN(ary) == 0) {
@@ -695,7 +695,7 @@ gdip_graphics_draw_lines(VALUE self, VALUE pen_v, VALUE ary)
 
     Graphics *g = Data_Ptr<Graphics *>(self);
     Check_NULL(g, "The graphics object does not exist.");
-    Pen *pen = Data_Ptr<Pen *>(pen_v);
+    Pen *pen = Data_Ptr<Pen *>(v_pen);
     Check_NULL(pen, "The pen object does not exist.");
 
     VALUE first = rb_ary_entry(ary, 0);
@@ -1282,9 +1282,9 @@ gdip_graphics_draw_bezier(int argc, VALUE *argv, VALUE self)
  *   }
  */
 static VALUE
-gdip_graphics_draw_beziers(VALUE self, VALUE pen_v, VALUE ary)
+gdip_graphics_draw_beziers(VALUE self, VALUE v_pen, VALUE ary)
 {
-    if (!_KIND_OF(pen_v, &tPen)) {
+    if (!_KIND_OF(v_pen, &tPen)) {
         rb_raise(rb_eTypeError, "The first argument should be Pen.");
     }
     if (!_RB_ARRAY_P(ary) || RARRAY_LEN(ary) == 0) {
@@ -1293,7 +1293,7 @@ gdip_graphics_draw_beziers(VALUE self, VALUE pen_v, VALUE ary)
 
     Graphics *g = Data_Ptr<Graphics *>(self);
     Check_NULL(g, "The graphics object does not exist.");
-    Pen *pen = Data_Ptr<Pen *>(pen_v);
+    Pen *pen = Data_Ptr<Pen *>(v_pen);
     Check_NULL(pen, "The pen object does not exist.");
     VALUE first = rb_ary_entry(ary, 0);
 
@@ -1509,9 +1509,9 @@ gdip_graphics_fill_pie(int argc, VALUE *argv, VALUE self)
  *   }
  */
 static VALUE
-gdip_graphics_draw_polygon(VALUE self, VALUE pen_v, VALUE ary)
+gdip_graphics_draw_polygon(VALUE self, VALUE v_pen, VALUE ary)
 {
-    if (!_KIND_OF(pen_v, &tPen)) {
+    if (!_KIND_OF(v_pen, &tPen)) {
         rb_raise(rb_eTypeError, "The first argument should be Pen.");
     }
     if (!_RB_ARRAY_P(ary) && RARRAY_LEN(ary) == 0) {
@@ -1520,7 +1520,7 @@ gdip_graphics_draw_polygon(VALUE self, VALUE pen_v, VALUE ary)
 
     Graphics *g = Data_Ptr<Graphics *>(self);
     Check_NULL(g, "The graphics object does not exist.");
-    Pen *pen = Data_Ptr<Pen *>(pen_v);
+    Pen *pen = Data_Ptr<Pen *>(v_pen);
     Check_NULL(pen, "The pen object does not exist.");
 
     VALUE first = rb_ary_entry(ary, 0);
@@ -1679,7 +1679,6 @@ gdip_graphics_draw_string(int argc, VALUE *argv, VALUE self)
     if (argc < 4 || 6 < argc) {
         rb_raise(rb_eArgError, "wrong number of arguments (%d for 4..6)", argc);
     }
-
     if (!_RB_STRING_P(argv[0])) {
         rb_raise(rb_eTypeError, "The first argument should be String.");
     }
@@ -1732,6 +1731,64 @@ gdip_graphics_draw_string(int argc, VALUE *argv, VALUE self)
     else {
         rb_raise(rb_eTypeError, "Argument types do not match.");
     }
+    Check_Status(status);
+
+    return self;
+}
+
+/**
+ * @overload DrawPath(pen, path)
+ *   @param pen [Pen]
+ *   @param path [GraphicsPath]
+ *   @return [self]
+ */
+static VALUE
+gdip_graphics_draw_path(VALUE self, VALUE v_pen, VALUE v_path)
+{
+    if (!_KIND_OF(v_pen, &tPen)) {
+        rb_raise(rb_eTypeError, "The first argument should be Pen.");
+    }
+    if (!_KIND_OF(v_path, &tGraphicsPath)) {
+        rb_raise(rb_eTypeError, "The secont argument should be GraphicsPath.");
+    }
+    
+    Graphics *g = Data_Ptr<Graphics *>(self);
+    Check_NULL(g, "This Graphics object does not exist.");
+    Pen *pen = Data_Ptr<Pen *>(v_pen);
+    Check_NULL(pen, "This Pen object does not exist.");
+    GraphicsPath *path = Data_Ptr<GraphicsPath *>(v_path);
+    Check_NULL(path, "This GraphicsPath object does not exist.");
+    
+    Status status = g->DrawPath(pen, path);
+    Check_Status(status);
+
+    return self;
+}
+
+/**
+ * @overload FillPath(brush, path)
+ *   @param brush [Brush]
+ *   @param path [GraphicsPath]
+ *   @return [self]
+ */
+static VALUE
+gdip_graphics_fill_path(VALUE self, VALUE v_brush, VALUE v_path)
+{
+    if (!_KIND_OF(v_brush, &tBrush)) {
+        rb_raise(rb_eTypeError, "The first argument should be Brush.");
+    }
+    if (!_KIND_OF(v_path, &tGraphicsPath)) {
+        rb_raise(rb_eTypeError, "The secont argument should be GraphicsPath.");
+    }
+    
+    Graphics *g = Data_Ptr<Graphics *>(self);
+    Check_NULL(g, "This Graphics object does not exist.");
+    Brush *brush = Data_Ptr<Brush *>(v_brush);
+    Check_NULL(brush, "This Pen object does not exist.");
+    GraphicsPath *path = Data_Ptr<GraphicsPath *>(v_path);
+    Check_NULL(path, "This GraphicsPath object does not exist.");
+    
+    Status status = g->FillPath(brush, path);
     Check_Status(status);
 
     return self;
@@ -1801,5 +1858,9 @@ Init_graphics()
     rb_define_alias(cGraphics, "fill_polygon", "FillPolygon");
     rb_define_method(cGraphics, "DrawString", RUBY_METHOD_FUNC(gdip_graphics_draw_string), -1);
     rb_define_alias(cGraphics, "draw_string", "DrawString");
+    rb_define_method(cGraphics, "DrawPath", RUBY_METHOD_FUNC(gdip_graphics_draw_path), 2);
+    rb_define_alias(cGraphics, "draw_path", "DrawPath");
+    rb_define_method(cGraphics, "FillPath", RUBY_METHOD_FUNC(gdip_graphics_fill_path), 2);
+    rb_define_alias(cGraphics, "fill_path", "FillPath");
     
 }

@@ -252,4 +252,5 @@ Init_gdiplus(void)
     Init_font();
     Init_langid();
     Init_stringformat();
+    Init_graphicspath();
 }
