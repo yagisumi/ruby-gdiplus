@@ -163,6 +163,7 @@ void gdiplus_shutdown();
 bool gdip_arg_to_double(VALUE v, double *dbl, const char *raise_msg=NULL);
 bool gdip_arg_to_single(VALUE v, float *flt, const char *raise_msg=NULL);
 float *alloc_array_of_single(VALUE ary, int& count);
+VALUE gdip_class_const_get(VALUE klass);
 
 static inline void GdiplusAddRef() { ++gdip_refcount; }
 static inline void GdiplusRelease() {

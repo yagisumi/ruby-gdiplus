@@ -50,7 +50,7 @@ gdip_enum_get_table(VALUE klass)
     return static_cast<IMap<TKey, ID>*>(table);
 }
 
-VALUE
+static VALUE
 gdip_enum_const_get(VALUE self)
 {
     return rb_const_get(self, rb_frame_this_func());

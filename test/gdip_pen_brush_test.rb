@@ -68,8 +68,26 @@ class GdiplusPenBrushTest < Test::Unit::TestCase
   end
 
   def test_brush
-    
+    assert_instance_of(SolidBrush, SolidBrush.new(:White))
+    assert_kind_of(Brush, SolidBrush.new(0xffffffff))
+    assert_equal(Color.White, SolidBrush.new(:White).Color)
   end
+  
+  def test_pens
+    assert_instance_of(Pen, Pens.White)
+    assert_equal(1.0, Pens.White.Width)
+    assert_equal(Color.Gold, Pens.Gold.Color)
+    assert_same(Pens.Black, Pens::Black)
+    assert_same(Pens::Transparent, Pens.Transparent)
+  end
+  
+  def test_brushes
+    assert_instance_of(SolidBrush, Brushes.White)
+    assert_equal(Color.Gold, Brushes.Gold.Color)
+    assert_same(Brushes.Black, Brushes::Black)
+    assert_same(Brushes::Transparent, Brushes.Transparent)
+  end
+  
 
 end
 

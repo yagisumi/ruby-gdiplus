@@ -635,6 +635,72 @@ gdip_solidbrush_set_color(VALUE self, VALUE color)
     return self;
 }
 
+static VALUE
+gdip_pens_s_const_missing(VALUE self, VALUE name)
+{
+    if (!RB_SYMBOL_P(name)) {
+        _VERBOSE("unexpected type (%s for Symbol)", __class__(name));
+        return Qnil;
+    }
+
+    ID name_id = RB_SYM2ID(name);
+    if (rb_const_defined_at(self, name_id)) {
+        return rb_const_get_at(self, name_id);
+    }
+
+    Color clr;
+    gdip_arg_to_color(name, &clr);
+    VALUE pen = typeddata_alloc_null<&tPen>(cPen);
+    _DATA_PTR(pen) = gdip_obj_create(new Pen(clr, 1.0f));
+    RB_OBJ_FREEZE(pen);
+    rb_define_const(self, rb_id2name(name_id), pen);
+    rb_define_singleton_method(self, rb_id2name(name_id), RUBY_METHOD_FUNC(gdip_class_const_get), 0);
+
+    return pen;
+}
+
+static VALUE
+gdip_pens_s_method_missing(int argc, VALUE *argv, VALUE self)
+{
+    if (argc < 1 || !RB_SYMBOL_P(argv[0])) {
+        rb_raise(rb_eNoMethodError, "unexpected call of method_missing");
+    }
+    return gdip_pens_s_const_missing(self, argv[0]);
+}
+
+static VALUE
+gdip_brushes_s_const_missing(VALUE self, VALUE name)
+{
+    if (!RB_SYMBOL_P(name)) {
+        _VERBOSE("unexpected type (%s for Symbol)", __class__(name));
+        return Qnil;
+    }
+
+    ID name_id = RB_SYM2ID(name);
+    if (rb_const_defined_at(self, name_id)) {
+        return rb_const_get_at(self, name_id);
+    }
+
+    Color clr;
+    gdip_arg_to_color(name, &clr);
+    VALUE brush = typeddata_alloc_null<&tBrush>(cSolidBrush);
+    _DATA_PTR(brush) = gdip_obj_create(new SolidBrush(clr));
+    RB_OBJ_FREEZE(brush);
+    rb_define_const(self, rb_id2name(name_id), brush);
+    rb_define_singleton_method(self, rb_id2name(name_id), RUBY_METHOD_FUNC(gdip_class_const_get), 0);
+
+    return brush;
+}
+
+static VALUE
+gdip_brushes_s_method_missing(int argc, VALUE *argv, VALUE self)
+{
+    if (argc < 1 || !RB_SYMBOL_P(argv[0])) {
+        rb_raise(rb_eNoMethodError, "unexpected call of method_missing");
+    }
+    return gdip_brushes_s_const_missing(self, argv[0]);
+}
+
 /**
  * Document-class: Gdiplus::Pen
  * Pen.
@@ -691,6 +757,15 @@ Init_pen_brush()
     rb_define_alloc_func(cSolidBrush, &typeddata_alloc_null<&tBrush>);
     rb_define_method(cSolidBrush, "initialize", RUBY_METHOD_FUNC(gdip_solidbrush_init), 1);
     ATTR_RW(cSolidBrush, Color, color, solidbrush);
+
+    VALUE cPens = rb_define_module_under(mGdiplus, "Pens");
+    rb_define_singleton_method(cPens, "const_missing", RUBY_METHOD_FUNC(gdip_pens_s_const_missing), 1);
+    rb_define_singleton_method(cPens, "method_missing", RUBY_METHOD_FUNC(gdip_pens_s_method_missing), -1);
+
+    VALUE cBrushes = rb_define_module_under(mGdiplus, "Brushes");
+    rb_define_singleton_method(cBrushes, "const_missing", RUBY_METHOD_FUNC(gdip_brushes_s_const_missing), 1);
+    rb_define_singleton_method(cBrushes, "method_missing", RUBY_METHOD_FUNC(gdip_brushes_s_method_missing), -1);
+
 }
 
 // ToDo: Pen#Transform

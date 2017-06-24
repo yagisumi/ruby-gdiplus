@@ -229,6 +229,12 @@ gdip_gpobject_object_id(VALUE self)
     }
 }
 
+VALUE
+gdip_class_const_get(VALUE klass)
+{
+    return rb_const_get(klass, rb_frame_this_func());
+}
+
 extern "C" void
 Init_gdiplus(void)
 {

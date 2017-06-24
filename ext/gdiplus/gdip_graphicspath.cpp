@@ -855,7 +855,6 @@ gdip_gpath_add_path(int argc, VALUE *argv, VALUE self)
     GraphicsPath *path = Data_Ptr<GraphicsPath *>(argv[0]);
     Check_NULL(path, "This GraphicsPath object does not exist.");
 
-
     Status status = gp->AddPath(path, RB_TEST(v_connect));
     Check_Status(status);
 
