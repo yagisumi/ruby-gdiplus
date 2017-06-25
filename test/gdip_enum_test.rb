@@ -516,6 +516,23 @@ class GdiplusEnumIntTest < Test::Unit::TestCase
     assert_match(/EllipsisPath/, StringTrimming.EllipsisPath.inspect)
   end
 
+  def test_PathPointType
+    assert_equal(0x00000000, PathPointType.Start.to_i)
+    assert_match(/Start/, PathPointType.Start.inspect)
+    assert_equal(0x00000001, PathPointType.Line.to_i)
+    assert_match(/Line/, PathPointType.Line.inspect)
+    assert_equal(0x00000003, PathPointType.Bezier.to_i)
+    assert_match(/Bezier/, PathPointType.Bezier.inspect)
+    assert_equal(0x00000007, PathPointType.PathTypeMask.to_i)
+    assert_match(/PathTypeMask/, PathPointType.PathTypeMask.inspect)
+    assert_equal(0x00000010, PathPointType.DashMode.to_i)
+    assert_match(/DashMode/, PathPointType.DashMode.inspect)
+    assert_equal(0x00000020, PathPointType.PathMarker.to_i)
+    assert_match(/PathMarker/, PathPointType.PathMarker.inspect)
+    assert_equal(0x00000080, PathPointType.CloseSubpath.to_i)
+    assert_match(/CloseSubpath/, PathPointType.CloseSubpath.inspect)
+  end
+
 end
 
 __END__

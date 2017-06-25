@@ -327,6 +327,39 @@ gdip_enumflags_equal(VALUE self, VALUE other)
 }
 
 static VALUE
+gdip_enumflags_has_flag(VALUE self, VALUE other)
+{
+    if (self == other) return Qtrue;
+    if (_KIND_OF(other, &tEnumInt)) {
+        unsigned int x = Data_Ptr_As<unsigned int>(self);
+        unsigned int y = Data_Ptr_As<unsigned int>(other);
+        if (x == 0) {
+            return y == 0 ? Qtrue : Qfalse;
+        }
+        else {
+            return ((x & y) == y) ? Qtrue : Qfalse;
+        }
+    }
+    else if (_RB_INTEGER_P(other)) {
+        unsigned int x = Data_Ptr_As<unsigned int>(self);
+        unsigned int y = RB_NUM2UINT(other);
+        if (x == 0) {
+            return y == 0 ? Qtrue : Qfalse;
+        }
+        else {
+            return ((x & y) == y) ? Qtrue : Qfalse;
+        }
+    }
+    else return Qfalse;
+}
+
+static VALUE
+gdip_enumflags_flag_check(VALUE self, VALUE other)
+{
+    return gdip_enumflags_has_flag(other, self);
+}
+
+static VALUE
 gdip_enumflags_add_flag(VALUE self)
 {
     VALUE klass = CLASS_OF(self);
@@ -902,6 +935,22 @@ Init_StringTrimming()
     define_enumint(cStringTrimming, table, "EllipsisPath", 5);
 }
 
+static void
+Init_PathPointType()
+{
+    cPathPointType = rb_define_class_under(mGdiplus, "PathPointType", cEnumFlags);
+    SortedArrayMap<unsigned int, ID> *table = new SortedArrayMap<unsigned int, ID>(7);
+    klass_table_map.set(cPathPointType, table);
+
+    define_enumflags(cPathPointType, table, "Start", 0x00000000);
+    define_enumflags(cPathPointType, table, "Line", 0x00000001);
+    define_enumflags(cPathPointType, table, "Bezier", 0x00000003);
+    define_enumflags(cPathPointType, table, "PathTypeMask", 0x00000007);
+    define_enumflags(cPathPointType, table, "DashMode", 0x00000010);
+    define_enumflags(cPathPointType, table, "PathMarker", 0x00000020);
+    define_enumflags(cPathPointType, table, "CloseSubpath", 0x00000080);
+}
+
 
 /* Encoder */
 
@@ -1096,6 +1145,9 @@ Init_enum() {
     rb_define_method(cEnumFlags, "|", RUBY_METHOD_FUNC(gdip_enumflags_or), 1);
     rb_define_method(cEnumFlags, "&", RUBY_METHOD_FUNC(gdip_enumflags_and), 1);
     rb_define_method(cEnumFlags, "==", RUBY_METHOD_FUNC(gdip_enumflags_equal), 1);
+    rb_define_method(cEnumFlags, "===", RUBY_METHOD_FUNC(gdip_enumflags_flag_check), 1);
+    rb_define_method(cEnumFlags, "HasFlag", RUBY_METHOD_FUNC(gdip_enumflags_has_flag), 1);
+    rb_define_alias(cEnumFlags, "has_flag?", "HasFlag");
 
     Init_PixelFormat();
     Init_EncoderParameterValueType();
@@ -1126,6 +1178,7 @@ Init_enum() {
     Init_StringDigitSubstitute();
     Init_StringFormatFlags();
     Init_StringTrimming();
+    Init_PathPointType();
     /* GUID */
     Init_Encoder();
     Init_imageformat();

@@ -1670,7 +1670,7 @@ gdip_graphics_draw_string_at_rect(Graphics *g, VALUE wstr, Font *font, Brush *br
  *   @param str [String]
  *   @param font [Font]
  *   @param brush [Brush]
- *   @param point [Rectangle or RectangleF]
+ *   @param rect [Rectangle or RectangleF]
  *   @param format [StringFormat]
  */
 static VALUE

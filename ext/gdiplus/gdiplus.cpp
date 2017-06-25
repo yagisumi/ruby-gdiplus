@@ -42,6 +42,7 @@ VALUE cStringAlignment;
 VALUE cStringDigitSubstitute;
 VALUE cStringFormatFlags;
 VALUE cStringTrimming;
+VALUE cPathPointType;
 
 VALUE cEncoder;
 VALUE cEncoderValue;

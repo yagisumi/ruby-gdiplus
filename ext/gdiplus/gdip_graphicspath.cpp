@@ -4,13 +4,112 @@
  * Released under the MIT License.
  */
 #include "ruby_gdiplus.h"
+#include <new>
 
 const rb_data_type_t tGraphicsPath = _MAKE_DATA_TYPE(
     "GraphicsPath", 0, GDIP_OBJ_FREE(GraphicsPath *), NULL, NULL, &cGraphicsPath);
 
+
+struct gdipPathData {
+public:
+    int count;
+    VALUE v_points;
+    VALUE v_types;
+};
+
+static void
+gdip_pathdata_mark(gdipPathData *pathdata)
+{
+    if (pathdata != NULL) {
+        rb_gc_mark(pathdata->v_points);
+        rb_gc_mark(pathdata->v_types);
+    }
+}
+
 static VALUE cPathData;
-static const rb_data_type_t tPathData = _MAKE_DATA_TYPE(
-    "PathData", 0, GDIP_OBJ_FREE(PathData *), NULL, NULL, &cPathData);
+const rb_data_type_t tPathData = _MAKE_DATA_TYPE(
+    "PathData", RUBY_DATA_FUNC(gdip_pathdata_mark), GDIP_DEFAULT_FREE(gdipPathData), NULL, NULL, &cPathData);
+
+static VALUE
+gdip_pathdata_create(PathData *pathdata)
+{
+    VALUE r = typeddata_alloc<gdipPathData, &tPathData>(cPathData);
+    gdipPathData *p = Data_Ptr<gdipPathData *>(r);
+    int count = pathdata->Count;
+    p->count = count;
+    if (count <= 0) {
+        p->v_points = rb_ary_new();
+        p->v_types = rb_ary_new();
+        RB_OBJ_FREEZE(p->v_points);
+        RB_OBJ_FREEZE(p->v_types);
+    }
+    else {
+        VALUE points = rb_ary_new_capa(count);
+        VALUE types = rb_ary_new_capa(count);
+        for (int i = 0; i < count; ++i) {
+            rb_ary_push(points, gdip_pointf_create(pathdata->Points[i].X, pathdata->Points[i].Y));
+            rb_ary_push(types, gdip_enumint_create(cPathPointType, pathdata->Types[i]));
+        }
+        RB_OBJ_FREEZE(points);
+        RB_OBJ_FREEZE(types);
+        p->v_points = points;
+        p->v_types = types;
+    }
+    return r;
+}
+
+static VALUE
+gdip_pathdata_get_points(VALUE self)
+{
+    gdipPathData *pathdata = Data_Ptr<gdipPathData *>(self);
+    Check_NULL(pathdata, "This PathData object does not exist.");
+
+    return pathdata->v_points;
+}
+
+static VALUE
+gdip_pathdata_get_types(VALUE self)
+{
+    gdipPathData *pathdata = Data_Ptr<gdipPathData *>(self);
+    Check_NULL(pathdata, "This PathData object does not exist.");
+
+    return pathdata->v_types;
+}
+
+static VALUE
+gdip_pathdata_get_count(VALUE self)
+{
+    gdipPathData *pathdata = Data_Ptr<gdipPathData *>(self);
+    Check_NULL(pathdata, "This PathData object does not exist.");
+
+    return RB_INT2NUM(pathdata->count);
+}
+
+static BYTE *
+alloc_array_of_pptype(VALUE ary, int& count)
+{
+    count = 0;
+    for (long i = 0; i < RARRAY_LEN(ary); ++i) {
+        VALUE elem = rb_ary_entry(ary, i);
+        int enumint;
+        if (gdip_arg_to_enumint(cPathPointType, elem, &enumint)) {
+            count += 1;
+        }
+    }
+    if (count == 0) return NULL;
+
+    int idx = 0;
+    BYTE *tary = static_cast<BYTE *>(ruby_xcalloc(count, sizeof(BYTE)));
+    for (long i = 0; i < RARRAY_LEN(ary); ++i) {
+        VALUE elem = rb_ary_entry(ary, i);
+        int enumint;
+        if (gdip_arg_to_enumint(cPathPointType, elem, &enumint)) {
+            tary[idx] = static_cast<BYTE>(enumint);
+            idx += 1;
+        }
+    }
+    return tary;
+}
 
 /**
  * @overload initialize(fill_mode=FillMode.Alternate)
@@ -29,7 +128,7 @@ gdip_gpath_init(int argc, VALUE *argv, VALUE self)
 
     GraphicsPath *gp = Data_Ptr<GraphicsPath *>(self);
     if (gp != NULL) {
-        _VERBOSE("object already initialized");
+        _VERBOSE("This GraphicsPath object is already initialized.");
         return self;
     }
 
@@ -54,7 +153,53 @@ gdip_gpath_init(int argc, VALUE *argv, VALUE self)
             gdip_arg_to_enumint(cFillMode, v_fill_mode, &enumint, "The argument should be FillMode.");
         }
 
-        rb_raise(rb_eNotImpError, "!!!!!!!!!!!!!!!!!!!!!!!");
+        if (_RB_ARRAY_P(v_points) && _RB_ARRAY_P(v_types)) {
+            if (RARRAY_LEN(v_points) <= 0) {
+                rb_raise(rb_eTypeError, "The first arguments should be Array of Point or PointF.");
+            }
+            
+            VALUE first = rb_ary_entry(v_points, 0);
+            if (_KIND_OF(first, &tPoint)) {
+                int cnt_points = 0;
+                int cnt_types = 0;
+                Point *points = alloc_array_of<Point, &tPoint>(v_points, cnt_points);
+                BYTE *types = alloc_array_of_pptype(v_types, cnt_types);
+                if (cnt_points == cnt_types) {
+                    GraphicsPath *new_gp = new GraphicsPath(points, types, cnt_points, static_cast<FillMode>(enumint));
+                    ruby_xfree(points);
+                    ruby_xfree(types);
+                    _DATA_PTR(self) = gdip_obj_create(new_gp);
+                }
+                else {
+                    ruby_xfree(points);
+                    ruby_xfree(types);
+                    rb_raise(rb_eArgError, "The number of elements in two arrays is different. (Point: %d, PathPointType: %d)", cnt_points, cnt_types);
+                }
+            }
+            else if (_KIND_OF(first, &tPointF)) {
+                int cnt_points = 0;
+                int cnt_types = 0;
+                PointF *points = alloc_array_of<PointF, &tPointF>(v_points, cnt_points);
+                BYTE *types = alloc_array_of_pptype(v_types, cnt_types);
+                if (cnt_points == cnt_types) {
+                    GraphicsPath *new_gp = new GraphicsPath(points, types, cnt_points, static_cast<FillMode>(enumint));
+                    ruby_xfree(points);
+                    ruby_xfree(types);
+                    _DATA_PTR(self) = gdip_obj_create(new_gp);
+                }
+                else {
+                    ruby_xfree(points);
+                    ruby_xfree(types);
+                    rb_raise(rb_eArgError, "The number of elements in two arrays is different. (Point: %d, PathPointType: %d)", cnt_points, cnt_types);
+                }
+            }
+            else {
+                rb_raise(rb_eTypeError, "The first arguments should be Array of Point or PointF.");
+            }
+        }
+        else {
+            rb_raise(rb_eTypeError, "The first and second arguments should be Array.");
+        }
     }
 
     return self;
@@ -93,6 +238,70 @@ gdip_gpath_get_point_count(VALUE self)
     GraphicsPath *gp = Data_Ptr<GraphicsPath *>(self);
     Check_NULL(gp, "This GraphicsPath object does not exist.");
     return RB_INT2NUM(gp->GetPointCount());
+}
+
+static VALUE
+gdip_gpath_get_path_types(VALUE self)
+{
+    GraphicsPath *gp = Data_Ptr<GraphicsPath *>(self);
+    Check_NULL(gp, "This GraphicsPath object does not exist.");
+
+    int count = gp->GetPointCount();
+    if (count < 1) {
+        return rb_ary_new();
+    }
+
+    BYTE *types = static_cast<BYTE *>(RB_ZALLOC_N(BYTE, count));
+    Status status = gp->GetPathTypes(types, count);
+    VALUE r = rb_ary_new_capa(count);
+    for (int i = 0; i < count; ++i) {
+        rb_ary_push(r, gdip_enumint_create(cPathPointType, types[i]));
+    }
+    ruby_xfree(types);
+    Check_Status(status);
+
+    return r;
+}
+
+static VALUE
+gdip_gpath_get_path_points(VALUE self)
+{
+    GraphicsPath *gp = Data_Ptr<GraphicsPath *>(self);
+    Check_NULL(gp, "This GraphicsPath object does not exist.");
+
+    int count = gp->GetPointCount();
+    if (count < 1) {
+        return rb_ary_new();
+    }
+
+    PointF *points = static_cast<PointF *>(RB_ZALLOC_N(PointF, count));
+    Status status = gp->GetPathPoints(points, count);
+    VALUE r = rb_ary_new_capa(count);
+    for (int i = 0; i < count; ++i) {
+        rb_ary_push(r, gdip_pointf_create(points[i].X, points[i].Y));
+    }
+    ruby_xfree(points);
+    Check_Status(status);
+
+    return r;
+}
+
+static VALUE
+gdip_gpath_get_path_data(VALUE self)
+{
+    GraphicsPath *gp = Data_Ptr<GraphicsPath *>(self);
+    Check_NULL(gp, "This GraphicsPath object does not exist.");
+
+    PathData *pathdata = new PathData();
+    Status status = Ok;
+    if (gp->GetPointCount()) {
+        status = gp->GetPathData(pathdata);
+    }
+    VALUE v_pathdata = gdip_pathdata_create(pathdata);
+    delete pathdata;
+    Check_Status(status);
+
+    return v_pathdata;
 }
 
 /**
@@ -867,13 +1076,18 @@ Init_graphicspath()
 {
     cPathData = rb_define_class_under(mGdiplus, "PathData", cGpObject);
     rb_undef_alloc_func(cPathData);
-
+    ATTR_R(cPathData, Points, points, pathdata);
+    ATTR_R(cPathData, Types, types, pathdata);
+    ATTR_R(cPathData, Count, count, pathdata);
 
     cGraphicsPath = rb_define_class_under(mGdiplus, "GraphicsPath", cGpObject);
     rb_define_alloc_func(cGraphicsPath, &typeddata_alloc_null<&tGraphicsPath>);
     rb_define_method(cGraphicsPath, "initialize", RUBY_METHOD_FUNC(gdip_gpath_init), -1);
     ATTR_RW(cGraphicsPath, FillMode, fill_mode, gpath);
     ATTR_R(cGraphicsPath, PointCount, point_count, gpath);
+    ATTR_R(cGraphicsPath, PathTypes, path_types, gpath);
+    ATTR_R(cGraphicsPath, PathPoints, path_points, gpath);
+    ATTR_R(cGraphicsPath, PathData, path_data, gpath);
     
     rb_define_method(cGraphicsPath, "AddArc", RUBY_METHOD_FUNC(gdip_gpath_add_arc), -1);
     rb_define_alias(cGraphicsPath, "add_arc", "AddArc");

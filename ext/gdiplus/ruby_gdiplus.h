@@ -75,6 +75,7 @@ extern VALUE cStringAlignment;
 extern VALUE cStringDigitSubstitute;
 extern VALUE cStringFormatFlags;
 extern VALUE cStringTrimming;
+extern VALUE cPathPointType;
 
 extern VALUE cFontFamily;
 extern VALUE cFontCollection;
@@ -110,6 +111,7 @@ extern const rb_data_type_t tPrivateFontCollection;
 extern const rb_data_type_t tLangId;
 extern const rb_data_type_t tStringFormat;
 extern const rb_data_type_t tGraphicsPath;
+extern const rb_data_type_t tPathData;
 
 void Init_codec();
 void Init_image();
