@@ -4,7 +4,6 @@
  * Released under the MIT License.
  */
 #include "ruby_gdiplus.h"
-#include <new>
 
 const rb_data_type_t tGraphicsPath = _MAKE_DATA_TYPE(
     "GraphicsPath", 0, GDIP_OBJ_FREE(GraphicsPath *), NULL, NULL, &cGraphicsPath);

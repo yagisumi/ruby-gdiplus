@@ -70,6 +70,7 @@ VALUE cPrivateFontCollection;
 VALUE cLangId;
 VALUE cStringFormat;
 VALUE cGraphicsPath;
+VALUE cMatrix;
 
 int gdip_refcount = 0;
 bool gdip_end_flag = false;
@@ -260,4 +261,5 @@ Init_gdiplus(void)
     Init_langid();
     Init_stringformat();
     Init_graphicspath();
+    Init_matrix();
 }

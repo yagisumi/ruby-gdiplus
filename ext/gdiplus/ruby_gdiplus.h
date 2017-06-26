@@ -85,6 +85,7 @@ extern VALUE cPrivateFontCollection;
 extern VALUE cLangId;
 extern VALUE cStringFormat;
 extern VALUE cGraphicsPath;
+extern VALUE cMatrix;
 
 extern const rb_data_type_t tGuid;
 extern const rb_data_type_t tImageCodecInfo;
@@ -112,6 +113,7 @@ extern const rb_data_type_t tLangId;
 extern const rb_data_type_t tStringFormat;
 extern const rb_data_type_t tGraphicsPath;
 extern const rb_data_type_t tPathData;
+extern const rb_data_type_t tMatrix;
 
 void Init_codec();
 void Init_image();
@@ -125,6 +127,7 @@ void Init_font();
 void Init_langid();
 void Init_stringformat();
 void Init_graphicspath();
+void Init_matrix();
 
 /* gdip_enum.cpp */
 extern ID ID_UNKNOWN;
@@ -182,7 +185,7 @@ EncoderParameters *gdip_encprms_build_struct(VALUE v);
 template <typename T> ID gdip_enum_get_id(VALUE klass, T data);
 template <typename T> VALUE gdip_enum_get(VALUE klass, T data);
 VALUE gdip_enumint_create(VALUE klass, int num);
-int gdip_arg_to_enumint(VALUE klass, VALUE arg, int *num, const char *raise_msg=NULL, int option=ArgOptionAcceptInt);
+int gdip_arg_to_enumint(VALUE klass, VALUE arg, void *enumint, const char *raise_msg=NULL, int option=ArgOptionAcceptInt);
 VALUE gdip_enum_guid_create(VALUE klass, GUID *guid);
 
 /* gdip_graphics.cpp */
