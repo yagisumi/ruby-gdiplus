@@ -1069,6 +1069,53 @@ gdip_gpath_add_path(int argc, VALUE *argv, VALUE self)
     return self;
 }
 
+/**
+ * Clears all markers.
+ * @return [self]
+ */
+static VALUE
+gdip_gpath_clear_markers(VALUE self)
+{
+    Check_Frozen(self);
+    GraphicsPath *gp = Data_Ptr<GraphicsPath *>(self);
+    Check_NULL(gp, "This GraphicsPath object does not exist.");
+    
+    Status status = gp->ClearMarkers();
+    Check_Status(status);
+    return self;
+}
+
+/**
+ * Closes all figures.
+ * @return [self]
+ */
+static VALUE
+gdip_gpath_close_all_figures(VALUE self)
+{
+    Check_Frozen(self);
+    GraphicsPath *gp = Data_Ptr<GraphicsPath *>(self);
+    Check_NULL(gp, "This GraphicsPath object does not exist.");
+    
+    Status status = gp->CloseAllFigures();
+    Check_Status(status);
+    return self;
+}
+
+/**
+ * Closes the current figure.
+ * @return [self]
+ */
+static VALUE
+gdip_gpath_close_figure(VALUE self)
+{
+    Check_Frozen(self);
+    GraphicsPath *gp = Data_Ptr<GraphicsPath *>(self);
+    Check_NULL(gp, "This GraphicsPath object does not exist.");
+    
+    Status status = gp->CloseFigure();
+    Check_Status(status);
+    return self;
+}
 
 void
 Init_graphicspath()
@@ -1116,4 +1163,11 @@ Init_graphicspath()
     rb_define_alias(cGraphicsPath, "add_string", "AddString");
     rb_define_method(cGraphicsPath, "AddPath", RUBY_METHOD_FUNC(gdip_gpath_add_path), -1);
     rb_define_alias(cGraphicsPath, "add_path", "AddPath");
+
+    rb_define_method(cGraphicsPath, "ClearMarkers", RUBY_METHOD_FUNC(gdip_gpath_clear_markers), 0);
+    rb_define_alias(cGraphicsPath, "clear_markers", "ClearMarkers");
+    rb_define_method(cGraphicsPath, "CloseAllFigures", RUBY_METHOD_FUNC(gdip_gpath_close_all_figures), 0);
+    rb_define_alias(cGraphicsPath, "close_all_figures", "CloseAllFigures");
+    rb_define_method(cGraphicsPath, "CloseFigure", RUBY_METHOD_FUNC(gdip_gpath_close_figure), 0);
+    rb_define_alias(cGraphicsPath, "close_figure", "CloseFigure");
 }
