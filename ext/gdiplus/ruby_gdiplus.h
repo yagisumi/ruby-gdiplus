@@ -76,6 +76,13 @@ extern VALUE cStringDigitSubstitute;
 extern VALUE cStringFormatFlags;
 extern VALUE cStringTrimming;
 extern VALUE cPathPointType;
+extern VALUE cCombineMode;
+extern VALUE cCoordinateSpace;
+extern VALUE cHatchStyle;
+extern VALUE cImageType;
+extern VALUE cLinearGradientMode;
+extern VALUE cWarpMode;
+extern VALUE cWrapMode;
 
 extern VALUE cFontFamily;
 extern VALUE cFontCollection;

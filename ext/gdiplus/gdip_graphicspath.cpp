@@ -1117,6 +1117,484 @@ gdip_gpath_close_figure(VALUE self)
     return self;
 }
 
+/**
+ * Resets.
+ * @return [self]
+ */
+static VALUE
+gdip_gpath_reset(VALUE self)
+{
+    Check_Frozen(self);
+    GraphicsPath *gp = Data_Ptr<GraphicsPath *>(self);
+    Check_NULL(gp, "This GraphicsPath object does not exist.");
+    
+    Status status = gp->Reset();
+    Check_Status(status);
+    return self;
+}
+
+/**
+ * Reverses the order of points.
+ * @return [self]
+ */
+static VALUE
+gdip_gpath_reverse(VALUE self)
+{
+    Check_Frozen(self);
+    GraphicsPath *gp = Data_Ptr<GraphicsPath *>(self);
+    Check_NULL(gp, "This GraphicsPath object does not exist.");
+    
+    Status status = gp->Reverse();
+    Check_Status(status);
+    return self;
+}
+
+/**
+ * Sets a marker at the current point.
+ * @return [self]
+ */
+static VALUE
+gdip_gpath_set_marker(VALUE self)
+{
+    Check_Frozen(self);
+    GraphicsPath *gp = Data_Ptr<GraphicsPath *>(self);
+    Check_NULL(gp, "This GraphicsPath object does not exist.");
+    
+    Status status = gp->SetMarker();
+    Check_Status(status);
+    return self;
+}
+
+/**
+ * Starts a new figure without closing the current figure.
+ * @return [self]
+ */
+static VALUE
+gdip_gpath_start_figure(VALUE self)
+{
+    Check_Frozen(self);
+    GraphicsPath *gp = Data_Ptr<GraphicsPath *>(self);
+    Check_NULL(gp, "This GraphicsPath object does not exist.");
+    
+    Status status = gp->StartFigure();
+    Check_Status(status);
+    return self;
+}
+
+/**
+ * @overload Flatten(matrix=nil, flatness=0.25)
+ *   Convert each curve to lines.
+ *   @param matrix [Matrix] Transforms before flatten.
+ *   @param flatness [Float] Specify the allowable error. Decreasing the value is close to the curve.
+ *   @return [self]
+ */
+static VALUE
+gdip_gpath_flatten(int argc, VALUE *argv, VALUE self)
+{
+    Check_Frozen(self);
+
+    VALUE v_matrix, v_flatness;
+    rb_scan_args(argc, argv, "02", &v_matrix, &v_flatness);
+
+    GraphicsPath *gp = Data_Ptr<GraphicsPath *>(self);
+    Check_NULL(gp, "This GraphicsPath object does not exist.");
+    
+    Matrix* matrix = NULL;
+    float flatness = 0.25f;
+
+    if (!RB_NIL_P(v_matrix)) {
+        if (_KIND_OF(v_matrix, &tMatrix)) {
+            matrix = Data_Ptr<Matrix *>(v_matrix);
+        }
+        else {
+            rb_raise(rb_eTypeError, "The first argument should be Matrix.");
+        }
+    }
+
+    if (!RB_NIL_P(v_flatness)) {
+        gdip_arg_to_single(v_flatness, &flatness, "The second argument should be Float.");
+    }
+
+    Status status = gp->Flatten(matrix, flatness);
+    Check_Status(status);
+    return self;
+}
+
+/**
+ * @overload Transform(matrix)
+ *   Transforms with the specified matrix.
+ *   @param matrix [Matrix]
+ *   @return [self]
+ */
+static VALUE
+gdip_gpath_transform(VALUE self, VALUE v_matrix)
+{
+    Check_Frozen(self);
+    GraphicsPath *gp = Data_Ptr<GraphicsPath *>(self);
+    Check_NULL(gp, "This GraphicsPath object does not exist.");
+
+    if (_KIND_OF(v_matrix, &tMatrix)) {
+        Matrix *matrix = Data_Ptr<Matrix *>(v_matrix);
+        Status status = gp->Transform(matrix);
+        Check_Status(status);
+    }
+    else {
+        rb_raise(rb_eTypeError, "The first argument should be Matrix.");
+    }
+
+    return self;
+}
+
+/**
+ * @overload Warp(dest_points, src_rect, matrix=nil, mode=WarpMode.Perspective, flatness=0.25)
+ *   @param dest_points [Array<PointF>]
+ *   @param src_rect [RectangleF]
+ *   @param matrix [Matrix]
+ *   @param mode [WarpMode]
+ *   @param flatness [Float] see {#flatten}
+ *   @return [self]
+ */
+static VALUE
+gdip_gpath_warp(int argc, VALUE *argv, VALUE self)
+{
+    Check_Frozen(self);
+
+    VALUE v_points, v_rect, v_matrix, v_mode, v_flatness;
+    rb_scan_args(argc, argv, "23", &v_points, &v_rect, &v_matrix, &v_mode, &v_flatness);
+
+    if (!_RB_ARRAY_P(v_points) && RARRAY_LEN(v_points) < 1) {
+        rb_raise(rb_eTypeError, "The first argument should be Array of PointF.");
+    }
+
+    VALUE first = rb_ary_entry(v_points, 0);
+    if (!_KIND_OF(first, &tPointF)) {
+        rb_raise(rb_eTypeError, "The first argument should be Array of PointF.");
+    }
+
+    if (!_KIND_OF(v_rect, &tRectangleF)) {
+        rb_raise(rb_eTypeError, "The second argument should be RectangleF.");
+    }
+
+    Matrix *matrix = NULL;
+    WarpMode mode = WarpModePerspective;
+    float flatness = 0.25f;
+
+    if (!RB_NIL_P(v_matrix)) {
+        if (_KIND_OF(v_matrix, &tMatrix)) {
+            matrix = Data_Ptr<Matrix *>(v_matrix);
+        }
+        else {
+            rb_raise(rb_eTypeError, "The third argument should be Matrix.");
+        }
+    }
+
+    if (!RB_NIL_P(v_mode)) {
+        gdip_arg_to_enumint(cWarpMode, v_mode, &mode, "The fourth argument should be Float.");
+    }
+
+    if (!RB_NIL_P(v_flatness)) {
+        gdip_arg_to_single(v_flatness, &flatness, "The fifth argument should be Float.");
+    }
+
+    GraphicsPath *gp = Data_Ptr<GraphicsPath *>(self);
+    Check_NULL(gp, "This GraphicsPath object does not exist.");
+
+    int count = 0;
+    PointF *points = alloc_array_of<PointF, &tPointF>(v_points, count);
+    if (count < 3) {
+        ruby_xfree(points);
+        rb_raise(rb_eArgError, "The second argument should be Array with three or four Point.");
+    }
+    RectF *rect = Data_Ptr<RectF *>(v_rect);
+
+    Status status = gp->Warp(points, count == 3 ? 3 : 4, *rect, matrix, mode, flatness);
+    ruby_xfree(points);
+    Check_Status(status);
+
+    return self;
+}
+
+/**
+ * @overload Widen(pen, matrix=nil, flatness=0.25)
+ *   Widens this path.
+ *   @param pen [Pen]
+ *   @param matrix [Matrix]
+ *   @param flatness [Float]
+ *   @return [self]
+ */
+static VALUE
+gdip_gpath_widen(int argc, VALUE *argv, VALUE self)
+{
+    Check_Frozen(self);
+
+    VALUE v_pen, v_matrix, v_flatness;
+    rb_scan_args(argc, argv, "12", &v_pen, &v_matrix, &v_flatness);
+
+    Pen *pen = NULL;
+    if (_KIND_OF(v_pen, &tPen)) {
+        pen = Data_Ptr<Pen *>(v_pen);
+    }
+    else {
+        rb_raise(rb_eTypeError, "The first argument should be Pen.");
+    }
+
+    GraphicsPath *gp = Data_Ptr<GraphicsPath *>(self);
+    Check_NULL(gp, "This GraphicsPath object does not exist.");
+    
+    Matrix* matrix = NULL;
+    float flatness = 0.25f;
+
+    if (!RB_NIL_P(v_matrix)) {
+        if (_KIND_OF(v_matrix, &tMatrix)) {
+            matrix = Data_Ptr<Matrix *>(v_matrix);
+        }
+        else {
+            rb_raise(rb_eTypeError, "The second argument should be Matrix.");
+        }
+    }
+
+    if (!RB_NIL_P(v_flatness)) {
+        gdip_arg_to_single(v_flatness, &flatness, "The third argument should be Float.");
+    }
+
+    Status status = gp->Widen(pen, matrix, flatness);
+    Check_Status(status);
+
+    return self;
+}
+
+/**
+ * @overload GetBounds(matrix=nil, pen=nil)
+ *   Convert curves to lines.
+ *   @param matrix [Matrix] Transforms before flatten.
+ *   @param pen [Pen]
+ *   @return [RectangleF]
+ */
+static VALUE
+gdip_gpath_get_bounds(int argc, VALUE *argv, VALUE self)
+{
+    VALUE v_matrix, v_pen;
+    rb_scan_args(argc, argv, "02", &v_matrix, &v_pen);
+
+    GraphicsPath *gp = Data_Ptr<GraphicsPath *>(self);
+    Check_NULL(gp, "This GraphicsPath object does not exist.");
+    
+    Matrix* matrix = NULL;
+    Pen *pen = NULL;
+
+
+    if (!RB_NIL_P(v_matrix)) {
+        if (_KIND_OF(v_matrix, &tMatrix)) {
+            matrix = Data_Ptr<Matrix *>(v_matrix);
+        }
+        else {
+            rb_raise(rb_eTypeError, "The first argument should be Matrix.");
+        }
+    }
+
+    if (!RB_NIL_P(v_pen)) {
+        if (_KIND_OF(v_pen, &tPen)) {
+            pen = Data_Ptr<Pen *>(v_pen);
+        }
+        else {
+            rb_raise(rb_eTypeError, "The second argument should be Pen.");
+        }
+    }
+
+    RectF rect;
+    Status status = gp->GetBounds(&rect, matrix, pen);
+    Check_Status(status);
+    return gdip_rectf_create(&rect);
+}
+
+/**
+ * Gets the last point.
+ * @return [PointF]
+ */
+static VALUE
+gdip_gpath_get_last_point(VALUE self)
+{
+    GraphicsPath *gp = Data_Ptr<GraphicsPath *>(self);
+    Check_NULL(gp, "This GraphicsPath object does not exist.");
+
+    PointF point;
+    Status status = gp->GetLastPoint(&point);
+    Check_Status(status);
+    return gdip_pointf_create(point.X, point.Y);
+}
+
+/**
+ * Whether the specified point is contained within the outline of this path.
+ * @overload IsOutlineVisible(x, y, pen, graphics=nil)
+ *   @param x [Integer or Float]
+ *   @param y [Integer or Float]
+ *   @param pen [Pen]
+ *   @param graphics [Graphics]
+ * @overload IsOutlineVisible(point, pen, graphics=nil)
+ *   @param point [Point or PointF]
+ *   @param pen [Pen]
+ *   @param graphics [Graphics]
+ * @return [Boolean]
+ */
+static VALUE
+gdip_gpath_is_oubline_visible(int argc, VALUE *argv, VALUE self)
+{
+    if (argc < 2 || 4 < argc) {
+        rb_raise(rb_eArgError, "wrong number of arguments (%d for 2..4)", argc);
+    }
+
+    GraphicsPath *gp = Data_Ptr<GraphicsPath *>(self);
+    Check_NULL(gp, "This GraphicsPath object does not exist.");
+    
+    BOOL b = false;
+    if (Integer_p(argv[0])) {
+        if (!Integer_p(argv[1])) {
+            rb_raise(rb_eTypeError, "The second argument should be Integer.");
+        }
+        if (argc < 3 || !_KIND_OF(argv[2], &tPen)) {
+            rb_raise(rb_eTypeError, "The third argument should be Pen.");
+        }
+        if (argc == 4 && !_KIND_OF(argv[3], &tGraphics)) {
+            rb_raise(rb_eTypeError, "The fourth argument should be Graphics.");
+        }
+
+        Pen *pen = Data_Ptr<Pen *>(argv[2]);
+        Graphics *g = (argc == 4) ? Data_Ptr<Graphics *>(argv[3]) : NULL;
+        b = gp->IsOutlineVisible(RB_NUM2INT(argv[0]), RB_NUM2INT(argv[1]), pen, g);
+    }
+    else if (Float_p(argv[0])) {
+        if (!Float_p(argv[1])) {
+            rb_raise(rb_eTypeError, "The second argument should be Float.");
+        }
+        if (argc < 3 || !_KIND_OF(argv[2], &tPen)) {
+            rb_raise(rb_eTypeError, "The third argument should be Pen.");
+        }
+        if (argc == 4 && !_KIND_OF(argv[3], &tGraphics)) {
+            rb_raise(rb_eTypeError, "The fourth argument should be Graphics.");
+        }
+
+        Pen *pen = Data_Ptr<Pen *>(argv[2]);
+        Graphics *g = (argc == 4) ? Data_Ptr<Graphics *>(argv[3]) : NULL;
+        b = gp->IsOutlineVisible(NUM2SINGLE(argv[0]), NUM2SINGLE(argv[1]), pen, g);
+    }
+    else if (_KIND_OF(argv[0], &tPoint)) {
+        if (argc == 4) {
+            rb_raise(rb_eArgError, "wrong number of argument");
+        }
+        if (!_KIND_OF(argv[1], &tPen)) {
+            rb_raise(rb_eTypeError, "The second argument should be Pen.");
+        }
+        if (argc == 3 && !_KIND_OF(argv[2], &tGraphics)) {
+            rb_raise(rb_eTypeError, "The third argument should be Graphics.");
+        }
+
+        Point *point = Data_Ptr<Point *>(argv[0]);
+        Pen *pen = Data_Ptr<Pen *>(argv[1]);
+        Graphics *g = (argc == 3) ? Data_Ptr<Graphics *>(argv[2]) : NULL;
+        b = gp->IsOutlineVisible(*point, pen, g);
+    }
+    else if (_KIND_OF(argv[0], &tPointF)) {
+        if (argc == 4) {
+            rb_raise(rb_eArgError, "wrong number of argument");
+        }
+        if (!_KIND_OF(argv[1], &tPen)) {
+            rb_raise(rb_eTypeError, "The second argument should be Pen.");
+        }
+        if (argc == 3 && !_KIND_OF(argv[2], &tGraphics)) {
+            rb_raise(rb_eTypeError, "The third argument should be Graphics.");
+        }
+
+        PointF *point = Data_Ptr<PointF *>(argv[0]);
+        Pen *pen = Data_Ptr<Pen *>(argv[1]);
+        Graphics *g = (argc == 3) ? Data_Ptr<Graphics *>(argv[2]) : NULL;
+        b = gp->IsOutlineVisible(*point, pen, g);
+    }
+    else {
+        rb_raise(rb_eTypeError, "The first argument should be Point, PointF, Integer or Float.");
+    }
+
+    Check_LastStatus(gp);
+
+    return b ? Qtrue : Qfalse;
+}
+
+/**
+ * Whether the specified point is contained within this path.
+ * @overload IsVisible(x, y, graphics=nil)
+ *   @param x [Integer or Float]
+ *   @param y [Integer or Float]
+ *   @param graphics [Graphics]
+ * @overload IsVisible(point, graphics=nil)
+ *   @param point [Point or PointF]
+ *   @param graphics [Graphics]
+ * @return [Boolean]
+ */
+static VALUE
+gdip_gpath_is_visible(int argc, VALUE *argv, VALUE self)
+{
+    if (argc < 1 || 3 < argc) {
+        rb_raise(rb_eArgError, "wrong number of arguments (%d for 1..3)", argc);
+    }
+
+    GraphicsPath *gp = Data_Ptr<GraphicsPath *>(self);
+    Check_NULL(gp, "This GraphicsPath object does not exist.");
+    
+    BOOL b = false;
+    if (Integer_p(argv[0])) {
+        if (argc == 1 || !Integer_p(argv[1])) {
+            rb_raise(rb_eTypeError, "The second argument should be Integer.");
+        }
+        if (argc == 3 && !_KIND_OF(argv[2], &tGraphics)) {
+            rb_raise(rb_eTypeError, "The third argument should be Graphics.");
+        }
+
+        Graphics *g = (argc == 3) ? Data_Ptr<Graphics *>(argv[2]) : NULL;
+        b = gp->IsVisible(RB_NUM2INT(argv[0]), RB_NUM2INT(argv[1]), g);
+    }
+    else if (Float_p(argv[0])) {
+        if (argc == 1 || !Float_p(argv[1])) {
+            rb_raise(rb_eTypeError, "The second argument should be Float.");
+        }
+        if (argc == 3 && !_KIND_OF(argv[2], &tGraphics)) {
+            rb_raise(rb_eTypeError, "The third argument should be Graphics.");
+        }
+
+        Graphics *g = (argc == 3) ? Data_Ptr<Graphics *>(argv[2]) : NULL;
+        b = gp->IsVisible(NUM2SINGLE(argv[0]), NUM2SINGLE(argv[1]), g);
+    }
+    else if (_KIND_OF(argv[0], &tPoint)) {
+        if (argc == 3) {
+            rb_raise(rb_eArgError, "wrong number of argument");
+        }
+        if (argc == 2 && !_KIND_OF(argv[1], &tGraphics)) {
+            rb_raise(rb_eTypeError, "The second argument should be Graphics.");
+        }
+
+        Point *point = Data_Ptr<Point *>(argv[0]);
+        Graphics *g = (argc == 2) ? Data_Ptr<Graphics *>(argv[1]) : NULL;
+        b = gp->IsVisible(*point, g);
+    }
+    else if (_KIND_OF(argv[0], &tPointF)) {
+        if (argc == 3) {
+            rb_raise(rb_eArgError, "wrong number of argument");
+        }
+        if (argc == 2 && !_KIND_OF(argv[1], &tGraphics)) {
+            rb_raise(rb_eTypeError, "The second argument should be Graphics.");
+        }
+
+        PointF *point = Data_Ptr<PointF *>(argv[0]);
+        Graphics *g = (argc == 2) ? Data_Ptr<Graphics *>(argv[1]) : NULL;
+        b = gp->IsVisible(*point, g);
+    }
+    else {
+        rb_raise(rb_eTypeError, "The first argument should be Point, PointF, Integer or Float.");
+    }
+
+    Check_LastStatus(gp);
+
+    return b ? Qtrue : Qfalse;
+}
+
 void
 Init_graphicspath()
 {
@@ -1170,4 +1648,33 @@ Init_graphicspath()
     rb_define_alias(cGraphicsPath, "close_all_figures", "CloseAllFigures");
     rb_define_method(cGraphicsPath, "CloseFigure", RUBY_METHOD_FUNC(gdip_gpath_close_figure), 0);
     rb_define_alias(cGraphicsPath, "close_figure", "CloseFigure");
+    rb_define_method(cGraphicsPath, "Reset", RUBY_METHOD_FUNC(gdip_gpath_reset), 0);
+    rb_define_alias(cGraphicsPath, "reset", "Reset");
+    rb_define_method(cGraphicsPath, "Reverse", RUBY_METHOD_FUNC(gdip_gpath_reverse), 0);
+    rb_define_alias(cGraphicsPath, "reverse", "Reverse");
+    rb_define_method(cGraphicsPath, "SetMarker", RUBY_METHOD_FUNC(gdip_gpath_set_marker), 0);
+    rb_define_alias(cGraphicsPath, "set_marker", "SetMarker");
+    rb_define_alias(cGraphicsPath, "SetMarkers", "SetMarker");
+    rb_define_alias(cGraphicsPath, "set_markers", "SetMarker");
+    rb_define_method(cGraphicsPath, "StartFigure", RUBY_METHOD_FUNC(gdip_gpath_start_figure), 0);
+    rb_define_alias(cGraphicsPath, "start_figure", "StartFigure");
+
+    rb_define_method(cGraphicsPath, "Flatten", RUBY_METHOD_FUNC(gdip_gpath_flatten), -1);
+    rb_define_alias(cGraphicsPath, "flatten", "Flatten");
+    rb_define_method(cGraphicsPath, "Transform", RUBY_METHOD_FUNC(gdip_gpath_transform), 1);
+    rb_define_alias(cGraphicsPath, "transform", "Transform");
+    rb_define_method(cGraphicsPath, "Warp", RUBY_METHOD_FUNC(gdip_gpath_warp), -1);
+    rb_define_alias(cGraphicsPath, "warp", "Warp");
+    rb_define_method(cGraphicsPath, "Widen", RUBY_METHOD_FUNC(gdip_gpath_widen), -1);
+    rb_define_alias(cGraphicsPath, "widen", "Widen");
+
+    rb_define_method(cGraphicsPath, "GetBounds", RUBY_METHOD_FUNC(gdip_gpath_get_bounds), -1);
+    rb_define_alias(cGraphicsPath, "get_bounds", "GetBounds");
+    rb_define_method(cGraphicsPath, "GetLastPoint", RUBY_METHOD_FUNC(gdip_gpath_get_last_point), 0);
+    rb_define_alias(cGraphicsPath, "get_last_point", "GetLastPoint");
+
+    rb_define_method(cGraphicsPath, "IsOutlineVisible", RUBY_METHOD_FUNC(gdip_gpath_is_oubline_visible), -1);
+    rb_define_alias(cGraphicsPath, "is_outline_visible?", "IsOutlineVisible");
+    rb_define_method(cGraphicsPath, "IsVisible", RUBY_METHOD_FUNC(gdip_gpath_is_visible), -1);
+    rb_define_alias(cGraphicsPath, "is_visible?", "IsVisible");
 }

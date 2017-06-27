@@ -70,7 +70,7 @@ int
 gdip_arg_to_enumint(VALUE klass, VALUE arg, void *enumint, const char *raise_msg, int option)
 {
     int *num = static_cast<int *>(enumint);
-    
+
     if (RB_SYMBOL_P(arg) && rb_const_defined_at(klass, RB_SYM2ID(arg))) {
         arg = rb_const_get(klass, RB_SYM2ID(arg));
     }
@@ -257,6 +257,50 @@ gdip_enumflags_inspect(VALUE self)
 }
 
 /**
+ * @return [String]
+ */
+static VALUE
+gdip_pathpointtype_inspect(VALUE self)
+{
+    unsigned int num = Data_Ptr_As<unsigned int>(self);
+    VALUE r = Qnil;
+    VALUE symbols = rb_str_new(NULL, 0);
+    unsigned int flags = num;
+    unsigned int type = flags & 0x07;
+
+    if (type == 0) {
+        rb_str_cat_cstr(symbols, "Start");
+    }
+    else if (type == 1) {
+        rb_str_cat_cstr(symbols, "Line");
+    }
+    else if (type == 3) {
+        rb_str_cat_cstr(symbols, "Bezier");
+    } 
+    else if (type == 0x07) {
+        rb_str_cat_cstr(symbols, "PathTypeMask");
+    }
+    else {
+        rb_str_cat_cstr(symbols, "__UNKNOWN__");
+    }
+
+    if (flags & 0x10) {
+        rb_str_cat_cstr(symbols, " | DashMode");
+    }
+    if (flags & 0x20) {
+        rb_str_cat_cstr(symbols, " | PathMarker");
+    }
+    if (flags & 0x80) {
+        rb_str_cat_cstr(symbols, " | CloseSubpath");
+    }
+
+    r = util_utf8_sprintf("#<%s 0x%02x: %s >", __class__(self), num, RSTRING_PTR(symbols));
+    RB_GC_GUARD(symbols);
+
+    return r;
+}
+
+/**
  * @return [Integer]
  */
 static VALUE
@@ -431,14 +475,17 @@ template <typename TKey>
 static void
 gdip_enum_define(VALUE klass, IMap<TKey, ID> *table, const char *name, TKey data, VALUE v)
 {
-    ID id = rb_intern(name);
     rb_define_const(klass, name, v);
     rb_define_singleton_method(klass, name, RUBY_METHOD_FUNC(gdip_enum_const_get), 0);
-    table->append(data, id);
+    if (table != NULL) {
+        ID id = rb_intern(name);
+        table->append(data, id);
+    }
 }
 
 
 #define define_enumint(klass, table, name, num) gdip_enum_define<int>(klass, table, name, num, gdip_enumint_create(klass, num))
+#define define_enumint_alias(klass, name, num) gdip_enum_define<int>(klass, NULL, name, num, gdip_enumint_create(klass, num))
 #define define_enumflags(klass, table, name, num) \
     do {\
         gdip_enum_define<unsigned int>(klass, table, name, num, gdip_enumint_create(klass, num));\
@@ -733,7 +780,7 @@ Init_SmoothingMode()
 {
     cSmoothingMode = rb_define_class_under(mGdiplus, "SmoothingMode", cEnumInt);
     rb_undef_alloc_func(cSmoothingMode);
-    SortedArrayMap<int, ID> *table = new SortedArrayMap<int, ID>(8);
+    SortedArrayMap<int, ID> *table = new SortedArrayMap<int, ID>(7);
     klass_table_map.set(cSmoothingMode, table);
 
     define_enumint(cSmoothingMode, table, "Invalid", -1);
@@ -742,7 +789,7 @@ Init_SmoothingMode()
     define_enumint(cSmoothingMode, table, "HighQuality", 2);
     define_enumint(cSmoothingMode, table, "None", 3);
     define_enumint(cSmoothingMode, table, "AntiAlias", 4);
-    define_enumint(cSmoothingMode, table, "AntiAlias8x4", 4);
+    define_enumint_alias(cSmoothingMode, "AntiAlias8x4", 4);
     define_enumint(cSmoothingMode, table, "AntiAlias8x8", 5);
 }
 
@@ -937,10 +984,97 @@ Init_StringTrimming()
     define_enumint(cStringTrimming, table, "EllipsisPath", 5);
 }
 
+/**
+ * Whether this point type is +PathPointType.Start+.
+ * @return [Boolean]
+ */
+static VALUE
+gdip_pathpointtype_start_p(VALUE self)
+{
+    unsigned int num = Data_Ptr_As<unsigned int>(self);
+    unsigned int type = num & 0x07;
+    return type == 0 ? Qtrue : Qfalse;
+}
+
+/**
+ * Whether this point type is +PathPointType.Line+.
+ * @return [Boolean]
+ */
+static VALUE
+gdip_pathpointtype_line_p(VALUE self)
+{
+    unsigned int num = Data_Ptr_As<unsigned int>(self);
+    unsigned int type = num & 0x07;
+    return type == 1 ? Qtrue : Qfalse;
+}
+
+/**
+ * Whether this point type is +PathPointType.Bezier+.
+ * @return [Boolean]
+ */
+static VALUE
+gdip_pathpointtype_bezier_p(VALUE self)
+{
+    unsigned int num = Data_Ptr_As<unsigned int>(self);
+    unsigned int type = num & 0x07;
+    return type == 3 ? Qtrue : Qfalse;
+}
+
+/**
+ * Whether this point type has +PathPointType.DashMode+.
+ * @return [Boolean]
+ */
+static VALUE
+gdip_pathpointtype_dash_mode_p(VALUE self)
+{
+    unsigned int num = Data_Ptr_As<unsigned int>(self);
+    return num & 0x10 ? Qtrue : Qfalse;
+}
+
+/**
+ * Whether this point type has +PathPointType.PathMarker+.
+ * @return [Boolean]
+ */
+static VALUE
+gdip_pathpointtype_path_marker_p(VALUE self)
+{
+    unsigned int num = Data_Ptr_As<unsigned int>(self);
+    return num & 0x20 ? Qtrue : Qfalse;
+}
+
+/**
+ * Whether this point type has +PathPointType.CloseSubpath+.
+ * @return [Boolean]
+ */
+static VALUE
+gdip_pathpointtype_close_subpath_p(VALUE self)
+{
+    unsigned int num = Data_Ptr_As<unsigned int>(self);
+    return num & 0x80 ? Qtrue : Qfalse;
+}
+
 static void
 Init_PathPointType()
 {
     cPathPointType = rb_define_class_under(mGdiplus, "PathPointType", cEnumFlags);
+    rb_define_method(cPathPointType, "inspect", RUBY_METHOD_FUNC(gdip_pathpointtype_inspect), 0);
+    rb_define_method(cPathPointType, "start?", RUBY_METHOD_FUNC(gdip_pathpointtype_start_p), 0);
+    rb_define_alias(cPathPointType, "Start?", "start?");
+    rb_define_method(cPathPointType, "line?", RUBY_METHOD_FUNC(gdip_pathpointtype_line_p), 0);
+    rb_define_alias(cPathPointType, "Line?", "line?");
+    rb_define_method(cPathPointType, "bezier?", RUBY_METHOD_FUNC(gdip_pathpointtype_bezier_p), 0);
+    rb_define_alias(cPathPointType, "Bezier?", "bezier?");
+    rb_define_method(cPathPointType, "dash_mode?", RUBY_METHOD_FUNC(gdip_pathpointtype_dash_mode_p), 0);
+    rb_define_alias(cPathPointType, "DashMode?", "dash_mode?");
+    rb_define_alias(cPathPointType, "dash?", "dash_mode?");
+    rb_define_method(cPathPointType, "path_marker?", RUBY_METHOD_FUNC(gdip_pathpointtype_path_marker_p), 0);
+    rb_define_alias(cPathPointType, "PathMarker?", "path_marker?");
+    rb_define_alias(cPathPointType, "marker?", "path_marker?");
+    rb_define_method(cPathPointType, "close_subpath?", RUBY_METHOD_FUNC(gdip_pathpointtype_close_subpath_p), 0);
+    rb_define_alias(cPathPointType, "CloseSubpath?", "close_subpath?");
+    rb_define_alias(cPathPointType, "close?", "close_subpath?");
+    rb_define_alias(cPathPointType, "closed?", "close_subpath?");
+
     SortedArrayMap<unsigned int, ID> *table = new SortedArrayMap<unsigned int, ID>(7);
     klass_table_map.set(cPathPointType, table);
 
@@ -953,6 +1087,155 @@ Init_PathPointType()
     define_enumflags(cPathPointType, table, "CloseSubpath", 0x00000080);
 }
 
+static void
+Init_CombineMode()
+{
+    cCombineMode = rb_define_class_under(mGdiplus, "CombineMode", cEnumInt);
+    rb_undef_alloc_func(cCombineMode);
+    IndexArrayMap<ID> *table = new IndexArrayMap<ID>(6);
+    klass_table_map.set(cCombineMode, table);
+
+    define_enumint(cCombineMode, table, "Replace", 0);
+    define_enumint(cCombineMode, table, "Intersect", 1);
+    define_enumint(cCombineMode, table, "Union", 2);
+    define_enumint(cCombineMode, table, "Xor", 3);
+    define_enumint(cCombineMode, table, "Exclude", 4);
+    define_enumint(cCombineMode, table, "Complement", 5);
+}
+
+static void
+Init_CoordinateSpace()
+{
+    cCoordinateSpace = rb_define_class_under(mGdiplus, "CoordinateSpace", cEnumInt);
+    rb_undef_alloc_func(cCoordinateSpace);
+    IndexArrayMap<ID> *table = new IndexArrayMap<ID>(3);
+    klass_table_map.set(cCoordinateSpace, table);
+
+    define_enumint(cCoordinateSpace, table, "World", 0);
+    define_enumint(cCoordinateSpace, table, "Page", 1);
+    define_enumint(cCoordinateSpace, table, "Device", 2);
+}
+
+static void
+Init_HatchStyle()
+{
+    cHatchStyle = rb_define_class_under(mGdiplus, "HatchStyle", cEnumInt);
+    rb_undef_alloc_func(cHatchStyle);
+    IndexArrayMap<ID> *table = new IndexArrayMap<ID>(54);
+    klass_table_map.set(cHatchStyle, table);
+
+    define_enumint(cHatchStyle, table, "Horizontal", 0);
+    define_enumint(cHatchStyle, table, "Vertical", 1);
+    define_enumint(cHatchStyle, table, "ForwardDiagonal", 2);
+    define_enumint(cHatchStyle, table, "BackwardDiagonal", 3);
+    define_enumint(cHatchStyle, table, "Cross", 4);
+    define_enumint(cHatchStyle, table, "DiagonalCross", 5);
+    define_enumint(cHatchStyle, table, "Percent05", 6);
+    define_enumint(cHatchStyle, table, "Percent10", 7);
+    define_enumint(cHatchStyle, table, "Percent20", 8);
+    define_enumint(cHatchStyle, table, "Percent25", 9);
+    define_enumint(cHatchStyle, table, "Percent30", 10);
+    define_enumint(cHatchStyle, table, "Percent40", 11);
+    define_enumint(cHatchStyle, table, "Percent50", 12);
+    define_enumint(cHatchStyle, table, "Percent60", 13);
+    define_enumint(cHatchStyle, table, "Percent70", 14);
+    define_enumint(cHatchStyle, table, "Percent75", 15);
+    define_enumint(cHatchStyle, table, "Percent80", 16);
+    define_enumint(cHatchStyle, table, "Percent90", 17);
+    define_enumint(cHatchStyle, table, "LightDownwardDiagonal", 18);
+    define_enumint(cHatchStyle, table, "LightUpwardDiagonal", 19);
+    define_enumint(cHatchStyle, table, "DarkDownwardDiagonal", 20);
+    define_enumint(cHatchStyle, table, "DarkUpwardDiagonal", 21);
+    define_enumint(cHatchStyle, table, "WideDownwardDiagonal", 22);
+    define_enumint(cHatchStyle, table, "WideUpwardDiagonal", 23);
+    define_enumint(cHatchStyle, table, "LightVertical", 24);
+    define_enumint(cHatchStyle, table, "LightHorizontal", 25);
+    define_enumint(cHatchStyle, table, "NarrowVertical", 26);
+    define_enumint(cHatchStyle, table, "NarrowHorizontal", 27);
+    define_enumint(cHatchStyle, table, "DarkVertical", 28);
+    define_enumint(cHatchStyle, table, "DarkHorizontal", 29);
+    define_enumint(cHatchStyle, table, "DashedDownwardDiagonal", 30);
+    define_enumint(cHatchStyle, table, "DashedUpwardDiagonal", 31);
+    define_enumint(cHatchStyle, table, "DashedHorizontal", 32);
+    define_enumint(cHatchStyle, table, "DashedVertical", 33);
+    define_enumint(cHatchStyle, table, "SmallConfetti", 34);
+    define_enumint(cHatchStyle, table, "LargeConfetti", 35);
+    define_enumint(cHatchStyle, table, "ZigZag", 36);
+    define_enumint(cHatchStyle, table, "Wave", 37);
+    define_enumint(cHatchStyle, table, "DiagonalBrick", 38);
+    define_enumint(cHatchStyle, table, "HorizontalBrick", 39);
+    define_enumint(cHatchStyle, table, "Weave", 40);
+    define_enumint(cHatchStyle, table, "Plaid", 41);
+    define_enumint(cHatchStyle, table, "Divot", 42);
+    define_enumint(cHatchStyle, table, "DottedGrid", 43);
+    define_enumint(cHatchStyle, table, "DottedDiamond", 44);
+    define_enumint(cHatchStyle, table, "Shingle", 45);
+    define_enumint(cHatchStyle, table, "Trellis", 46);
+    define_enumint(cHatchStyle, table, "Sphere", 47);
+    define_enumint(cHatchStyle, table, "SmallGrid", 48);
+    define_enumint(cHatchStyle, table, "SmallCheckerBoard", 49);
+    define_enumint(cHatchStyle, table, "LargeCheckerBoard", 50);
+    define_enumint(cHatchStyle, table, "OutlinedDiamond", 51);
+    define_enumint(cHatchStyle, table, "SolidDiamond", 52);
+    define_enumint(cHatchStyle, table, "Total", 53);
+    define_enumint_alias(cHatchStyle, "LargeGrid", 4);
+    define_enumint_alias(cHatchStyle, "Min", 0);
+    define_enumint_alias(cHatchStyle, "Max", 52);
+}
+
+static void
+Init_ImageType()
+{
+    cImageType = rb_define_class_under(mGdiplus, "ImageType", cEnumInt);
+    rb_undef_alloc_func(cImageType);
+    IndexArrayMap<ID> *table = new IndexArrayMap<ID>(3);
+    klass_table_map.set(cImageType, table);
+
+    define_enumint(cImageType, table, "Unknown", 0);
+    define_enumint(cImageType, table, "Bitmap", 1);
+    define_enumint(cImageType, table, "Metafile", 2);
+}
+
+static void
+Init_LinearGradientMode()
+{
+    cLinearGradientMode = rb_define_class_under(mGdiplus, "LinearGradientMode", cEnumInt);
+    rb_undef_alloc_func(cLinearGradientMode);
+    IndexArrayMap<ID> *table = new IndexArrayMap<ID>(4);
+    klass_table_map.set(cLinearGradientMode, table);
+
+    define_enumint(cLinearGradientMode, table, "Horizontal", 0);
+    define_enumint(cLinearGradientMode, table, "Vertical", 1);
+    define_enumint(cLinearGradientMode, table, "ForwardDiagonal", 2);
+    define_enumint(cLinearGradientMode, table, "BackwardDiagonal", 3);
+}
+
+static void
+Init_WarpMode()
+{
+    cWarpMode = rb_define_class_under(mGdiplus, "WarpMode", cEnumInt);
+    rb_undef_alloc_func(cWarpMode);
+    IndexArrayMap<ID> *table = new IndexArrayMap<ID>(2);
+    klass_table_map.set(cWarpMode, table);
+
+    define_enumint(cWarpMode, table, "Perspective", 0);
+    define_enumint(cWarpMode, table, "Bilinear", 1);
+}
+
+static void
+Init_WrapMode()
+{
+    cWrapMode = rb_define_class_under(mGdiplus, "WrapMode", cEnumInt);
+    rb_undef_alloc_func(cWrapMode);
+    IndexArrayMap<ID> *table = new IndexArrayMap<ID>(5);
+    klass_table_map.set(cWrapMode, table);
+
+    define_enumint(cWrapMode, table, "Tile", 0);
+    define_enumint(cWrapMode, table, "TileFlipX", 1);
+    define_enumint(cWrapMode, table, "TileFlipY", 2);
+    define_enumint(cWrapMode, table, "TileFlipXY", 3);
+    define_enumint(cWrapMode, table, "Clamp", 4);
+}
 
 /* Encoder */
 
@@ -1181,6 +1464,13 @@ Init_enum() {
     Init_StringFormatFlags();
     Init_StringTrimming();
     Init_PathPointType();
+    Init_CombineMode();
+    Init_CoordinateSpace();
+    Init_HatchStyle();
+    Init_ImageType();
+    Init_LinearGradientMode();
+    Init_WarpMode();
+    Init_WrapMode();
     /* GUID */
     Init_Encoder();
     Init_imageformat();

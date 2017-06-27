@@ -43,6 +43,13 @@ VALUE cStringDigitSubstitute;
 VALUE cStringFormatFlags;
 VALUE cStringTrimming;
 VALUE cPathPointType;
+VALUE cCombineMode;
+VALUE cCoordinateSpace;
+VALUE cHatchStyle;
+VALUE cImageType;
+VALUE cLinearGradientMode;
+VALUE cWarpMode;
+VALUE cWrapMode;
 
 VALUE cEncoder;
 VALUE cEncoderValue;
