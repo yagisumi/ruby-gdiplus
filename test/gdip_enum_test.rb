@@ -682,8 +682,8 @@ class GdiplusEnumIntTest < Test::Unit::TestCase
     assert_match(/OutlinedDiamond/, HatchStyle.OutlinedDiamond.inspect)
     assert_equal(52, HatchStyle.SolidDiamond.to_i)
     assert_match(/SolidDiamond/, HatchStyle.SolidDiamond.inspect)
-    assert_equal(53, HatchStyle.Total.to_i)
-    assert_match(/Total/, HatchStyle.Total.inspect)
+    #assert_equal(53, HatchStyle.Total.to_i)
+    #assert_match(/Total/, HatchStyle.Total.inspect)
     assert_equal(4, HatchStyle.LargeGrid.to_i) # alias
     assert_equal(0, HatchStyle.Min.to_i) # alias
     assert_equal(52, HatchStyle.Max.to_i) # alias

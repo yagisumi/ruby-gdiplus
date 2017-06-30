@@ -78,6 +78,7 @@ VALUE cLangId;
 VALUE cStringFormat;
 VALUE cGraphicsPath;
 VALUE cMatrix;
+VALUE cRegion;
 
 int gdip_refcount = 0;
 bool gdip_end_flag = false;
@@ -269,4 +270,5 @@ Init_gdiplus(void)
     Init_stringformat();
     Init_graphicspath();
     Init_matrix();
+    Init_region();
 }

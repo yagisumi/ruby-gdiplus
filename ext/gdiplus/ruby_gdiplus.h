@@ -93,6 +93,7 @@ extern VALUE cLangId;
 extern VALUE cStringFormat;
 extern VALUE cGraphicsPath;
 extern VALUE cMatrix;
+extern VALUE cRegion;
 
 extern const rb_data_type_t tGuid;
 extern const rb_data_type_t tImageCodecInfo;
@@ -121,6 +122,7 @@ extern const rb_data_type_t tStringFormat;
 extern const rb_data_type_t tGraphicsPath;
 extern const rb_data_type_t tPathData;
 extern const rb_data_type_t tMatrix;
+extern const rb_data_type_t tRegion;
 
 void Init_codec();
 void Init_image();
@@ -135,6 +137,7 @@ void Init_langid();
 void Init_stringformat();
 void Init_graphicspath();
 void Init_matrix();
+void Init_region();
 
 /* gdip_enum.cpp */
 extern ID ID_UNKNOWN;

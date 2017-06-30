@@ -1121,7 +1121,7 @@ Init_HatchStyle()
 {
     cHatchStyle = rb_define_class_under(mGdiplus, "HatchStyle", cEnumInt);
     rb_undef_alloc_func(cHatchStyle);
-    IndexArrayMap<ID> *table = new IndexArrayMap<ID>(54);
+    IndexArrayMap<ID> *table = new IndexArrayMap<ID>(53);
     klass_table_map.set(cHatchStyle, table);
 
     define_enumint(cHatchStyle, table, "Horizontal", 0);
@@ -1177,7 +1177,7 @@ Init_HatchStyle()
     define_enumint(cHatchStyle, table, "LargeCheckerBoard", 50);
     define_enumint(cHatchStyle, table, "OutlinedDiamond", 51);
     define_enumint(cHatchStyle, table, "SolidDiamond", 52);
-    define_enumint(cHatchStyle, table, "Total", 53);
+    //define_enumint(cHatchStyle, table, "Total", 53);
     define_enumint_alias(cHatchStyle, "LargeGrid", 4);
     define_enumint_alias(cHatchStyle, "Min", 0);
     define_enumint_alias(cHatchStyle, "Max", 52);

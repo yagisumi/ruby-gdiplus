@@ -8,7 +8,6 @@
 const rb_data_type_t tGraphics = _MAKE_DATA_TYPE(
     "Graphics", 0, GDIP_OBJ_FREE(Graphics *), NULL, NULL, &cGraphics);
 
-
 VALUE
 gdip_graphics_create(Graphics *g)
 {
@@ -376,6 +375,44 @@ gdip_graphics_get_visible_clip_bounds(VALUE self)
     return gdip_rectf_create(&rect);
 }
 
+/**
+ * Gets or sets the clipping Region of this Graphics.
+ * @return [Region]
+ * @see #SetClip
+ */
+static VALUE
+gdip_graphics_get_clip(VALUE self)
+{
+    Graphics *g = Data_Ptr<Graphics *>(self);
+    Check_NULL(g, "The graphics object does not exist.");
+
+    VALUE r = typeddata_alloc_null<&tRegion>(cRegion);
+    Region *region = new Region();
+    _DATA_PTR(r) = gdip_obj_create(region);
+
+    Status status = g->GetClip(region);
+    Check_Status(status);
+
+    return r;
+}
+
+static VALUE
+gdip_graphics_set_clip(VALUE self, VALUE v_region)
+{
+    if (!_KIND_OF(v_region, &tRegion)) {
+        rb_raise(rb_eTypeError, "The argument should be Region.");
+    }
+
+    Graphics *g = Data_Ptr<Graphics *>(self);
+    Check_NULL(g, "The graphics object does not exist.");
+    Region *region = Data_Ptr<Region *>(v_region);
+    Check_NULL(region, "The Region object of argument does not exist.");
+
+    Status status = g->SetClip(region);
+    Check_Status(status);
+
+    return self;
+}
 
 /**
  * @overload Clear(color)
@@ -1784,11 +1821,40 @@ gdip_graphics_fill_path(VALUE self, VALUE v_brush, VALUE v_path)
     Graphics *g = Data_Ptr<Graphics *>(self);
     Check_NULL(g, "This Graphics object does not exist.");
     Brush *brush = Data_Ptr<Brush *>(v_brush);
-    Check_NULL(brush, "This Pen object does not exist.");
+    Check_NULL(brush, "The Brush object of argument does not exist.");
     GraphicsPath *path = Data_Ptr<GraphicsPath *>(v_path);
     Check_NULL(path, "This GraphicsPath object does not exist.");
     
     Status status = g->FillPath(brush, path);
+    Check_Status(status);
+
+    return self;
+}
+
+/**
+ * @overload FillRegion(brush, region)
+ *   @param brush [Brush]
+ *   @param region [Region]
+ *   @return [self]
+ */
+static VALUE
+gdip_graphics_fill_region(VALUE self, VALUE v_brush, VALUE v_region)
+{
+    if (!_KIND_OF(v_brush, &tBrush)) {
+        rb_raise(rb_eTypeError, "The first argument should be Brush.");
+    }
+    if (!_KIND_OF(v_region, &tRegion)) {
+        rb_raise(rb_eTypeError, "The secont argument should be Region.");
+    }
+    
+    Graphics *g = Data_Ptr<Graphics *>(self);
+    Check_NULL(g, "This Graphics object does not exist.");
+    Brush *brush = Data_Ptr<Brush *>(v_brush);
+    Check_NULL(brush, "The Brush object of argument does not exist.");
+    Region *region = Data_Ptr<Region *>(v_region);
+    Check_NULL(region, "The Region object of argument does not exist.");
+    
+    Status status = g->FillRegion(brush, region);
     Check_Status(status);
 
     return self;
@@ -1800,6 +1866,7 @@ Init_graphics()
     cGraphics = rb_define_class_under(mGdiplus, "Graphics", cGpObject);
     rb_undef_alloc_func(cGraphics);
 
+    ATTR_RW(cGraphics, Clip, clip, graphics);
     ATTR_R(cGraphics, ClipBounds, clip_bounds, graphics);
     ATTR_RW(cGraphics, CompositingMode, compositing_mode, graphics);
     ATTR_RW(cGraphics, CompositingQuality, compositing_quality, graphics);
@@ -1862,5 +1929,6 @@ Init_graphics()
     rb_define_alias(cGraphics, "draw_path", "DrawPath");
     rb_define_method(cGraphics, "FillPath", RUBY_METHOD_FUNC(gdip_graphics_fill_path), 2);
     rb_define_alias(cGraphics, "fill_path", "FillPath");
-    
+    rb_define_method(cGraphics, "FillRegion", RUBY_METHOD_FUNC(gdip_graphics_fill_region), 2);
+    rb_define_alias(cGraphics, "fill_region", "FillRegion");
 }
