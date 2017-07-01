@@ -33,7 +33,6 @@ class GdiplusRegionTest < Test::Unit::TestCase
     assert_not_same(region, region2)
     bmp = Bitmap.new(300, 300)
     bmp.draw { |g|
-      p g.gdiplus_id
       assert_equal(true, region.Equals(region2, g))
     }
     

@@ -552,5 +552,8 @@
   }
 #endif
 
+#define _PROTECT_FUNC(func) ((VALUE (*)(VALUE))(func))
+
+
 #endif /* RUBY_COMPATIBLE_H_ */
 

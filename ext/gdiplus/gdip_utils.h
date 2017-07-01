@@ -11,6 +11,7 @@
 #define _RB_INTEGER_P(v) RB_INTEGER_TYPE_P(v)
 #define _RB_FLOAT_P(v) RB_TYPE_P(v, RUBY_T_FLOAT)
 #define _RB_SYMBOL_P(v) RB_SYMBOL_P(v)
+#define _RB_HASH_P(v) RB_TYPE_P(v, RUBY_T_HASH)
 
 #if SIZEOF_LONG_LONG == SIZEOF_VOIDP
 #define _RB_ID2NUM(v) ULL2NUM(v)

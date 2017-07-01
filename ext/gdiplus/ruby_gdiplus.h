@@ -83,6 +83,9 @@ extern VALUE cImageType;
 extern VALUE cLinearGradientMode;
 extern VALUE cWarpMode;
 extern VALUE cWrapMode;
+extern VALUE cColorAdjustType;
+extern VALUE cColorChannelFlag;
+extern VALUE cColorMatrixFlag;
 
 extern VALUE cFontFamily;
 extern VALUE cFontCollection;
@@ -94,6 +97,7 @@ extern VALUE cStringFormat;
 extern VALUE cGraphicsPath;
 extern VALUE cMatrix;
 extern VALUE cRegion;
+extern VALUE cImageAttributes;
 
 extern const rb_data_type_t tGuid;
 extern const rb_data_type_t tImageCodecInfo;
@@ -123,6 +127,7 @@ extern const rb_data_type_t tGraphicsPath;
 extern const rb_data_type_t tPathData;
 extern const rb_data_type_t tMatrix;
 extern const rb_data_type_t tRegion;
+extern const rb_data_type_t tImageAttributes;
 
 void Init_codec();
 void Init_image();
@@ -138,6 +143,7 @@ void Init_stringformat();
 void Init_graphicspath();
 void Init_matrix();
 void Init_region();
+void Init_image_attrs();
 
 /* gdip_enum.cpp */
 extern ID ID_UNKNOWN;
@@ -349,10 +355,10 @@ Data_Ptr(VALUE obj)
     return static_cast<T>(_DATA_PTR(obj));
 }
 
-template<typename T>
+template<typename TA, typename TB>
 union castunion {
-    T t;
-    void *ptr;
+    TA a;
+    TB b;
 };
 
 template<typename T>
@@ -363,9 +369,9 @@ Data_Ptr_As(VALUE obj)
         rb_raise(rb_eTypeError, "wrong argument type");
     }
     //return *reinterpret_cast<T *>(&_DATA_PTR(obj)); // warning: dereferencing type-punned pointer will break strict-aliasing rules
-    castunion<T> uni;
-    uni.ptr = _DATA_PTR(obj);
-    return uni.t;
+    castunion<void *, T> uni;
+    uni.a = _DATA_PTR(obj);
+    return uni.b;
 }
 
 template<typename T>

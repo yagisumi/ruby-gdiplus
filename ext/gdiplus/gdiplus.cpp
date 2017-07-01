@@ -50,6 +50,9 @@ VALUE cImageType;
 VALUE cLinearGradientMode;
 VALUE cWarpMode;
 VALUE cWrapMode;
+VALUE cColorAdjustType;
+VALUE cColorChannelFlag;
+VALUE cColorMatrixFlag;
 
 VALUE cEncoder;
 VALUE cEncoderValue;
@@ -79,6 +82,7 @@ VALUE cStringFormat;
 VALUE cGraphicsPath;
 VALUE cMatrix;
 VALUE cRegion;
+VALUE cImageAttributes;
 
 int gdip_refcount = 0;
 bool gdip_end_flag = false;
@@ -174,6 +178,10 @@ gdip_arg_to_double(VALUE v, double *dbl, const char *raise_msg)
         *dbl = NUM2DBL(v);
         return true;
     }
+    else if (RB_FIXNUM_P(v)) {
+        *dbl = 1.0 * RB_FIX2INT(v);
+        return true;
+    }
     else if (_RB_INTEGER_P(v)) {
         *dbl = 1.0 * RB_NUM2INT(v);
         return true;
@@ -191,9 +199,25 @@ gdip_arg_to_single(VALUE v, float *flt, const char *raise_msg)
         *flt = NUM2SINGLE(v);
         return true;
     }
-    else if (_RB_INTEGER_P(v)) {
-        *flt = 1.0f * RB_NUM2INT(v);
+    else if (RB_FIXNUM_P(v)) {
+        *flt = 1.0f * RB_FIX2INT(v);
         return true;
+    }
+    else if (_RB_INTEGER_P(v)) {
+        if (raise_msg != NULL) {
+            *flt = 1.0f * RB_NUM2INT(v);
+            return true;
+        }
+        else {
+            int state = 0;
+            castunion<VALUE, int> uni;
+            uni.a = rb_protect(_PROTECT_FUNC(rb_num2long), v, &state);
+            if (state != 0) {
+                return false;
+            }
+            *flt = 1.0f * uni.b;
+            return true;
+        }
     }
     else if (raise_msg != NULL) {
         rb_raise(rb_eTypeError, raise_msg);
@@ -271,4 +295,5 @@ Init_gdiplus(void)
     Init_graphicspath();
     Init_matrix();
     Init_region();
+    Init_image_attrs();
 }

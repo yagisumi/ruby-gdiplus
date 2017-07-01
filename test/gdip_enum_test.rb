@@ -3,13 +3,13 @@ require 'test_helper'
 
 class GdiplusEnumIntTest < Test::Unit::TestCase
   include Gdiplus
-  
+
   def test_PixelFormat
     assert_equal(0, PixelFormat::Undefined.to_i)
     assert_match(/Undefined/, PixelFormat::Undefined.inspect)
     assert_equal(0, PixelFormat::DontCare.to_i)
     assert_match(/Undefined/, PixelFormat::DontCare.inspect) #
-    
+
     assert_equal(0x00010000, PixelFormat::Indexed.to_i)
     assert_match(/Indexed/, PixelFormat::Indexed.inspect)
     assert_equal(0x00020000, PixelFormat::GDI.to_i)
@@ -24,7 +24,7 @@ class GdiplusEnumIntTest < Test::Unit::TestCase
     assert_match(/Canonical/, PixelFormat::Canonical.inspect)
     assert_equal(16, PixelFormat::Max.to_i)
     assert_match(/Max/, PixelFormat::Max.inspect)
-    
+
     _PixelFormat1bppIndexed = (1 | ( 1 << 8) | PixelFormat::Indexed | PixelFormat::GDI)
     _PixelFormat4bppIndexed = (2 | ( 4 << 8) | PixelFormat::Indexed | PixelFormat::GDI)
     _PixelFormat8bppIndexed = (3 | ( 8 << 8) | PixelFormat::Indexed | PixelFormat::GDI)
@@ -41,7 +41,7 @@ class GdiplusEnumIntTest < Test::Unit::TestCase
     _PixelFormat64bppPARGB = (14 | (64 << 8) | PixelFormat::Alpha  | PixelFormat::PAlpha | PixelFormat::Extended)
     _PixelFormat32bppCMYK = (15 | (32 << 8))
     _PixelFormatMax = 16
-    
+
     assert_equal(_PixelFormat1bppIndexed, PixelFormat::Format1bppIndexed.to_i)
     assert_match(/Format1bppIndexed/, PixelFormat::Format1bppIndexed.inspect)
     assert_equal(_PixelFormat4bppIndexed, PixelFormat::Format4bppIndexed.to_i)
@@ -75,7 +75,7 @@ class GdiplusEnumIntTest < Test::Unit::TestCase
     assert_equal(_PixelFormat32bppCMYK, PixelFormat::Format32bppCMYK.to_i)
     assert_match(/Format32bppCMYK/, PixelFormat::Format32bppCMYK.inspect)
   end
-  
+
   def test_enumint
     assert_equal(PixelFormat::Format32bppARGB.object_id, PixelFormat.Format32bppARGB.object_id)
     #<Gdiplus::PixelFormat.Format32bppARGB: 0x0026200a>
@@ -86,7 +86,7 @@ class GdiplusEnumIntTest < Test::Unit::TestCase
     assert_equal(0x30000, PixelFormat.Indexed | PixelFormat.GDI)
     assert_raise(TypeError) { "str" + PixelFormat::Undefined }
   end
-  
+
   def test_EncoderValue
     assert_equal(0, EncoderValue.ColorTypeCMYK.to_i)
     assert_match(/ColorTypeCMYK/, EncoderValue.ColorTypeCMYK.inspect)
@@ -141,7 +141,7 @@ class GdiplusEnumIntTest < Test::Unit::TestCase
     assert_equal(25, EncoderValue.ColorTypeRGB.to_i)
     assert_match(/ColorTypeRGB/, EncoderValue.ColorTypeRGB.inspect)
   end
-  
+
   def test_EncoderParameter
     assert_equal(1, EncoderParameterValueType.ValueTypeByte.to_i)
     assert_match(/ValueTypeByte/, EncoderParameterValueType.ValueTypeByte.inspect)
@@ -162,7 +162,7 @@ class GdiplusEnumIntTest < Test::Unit::TestCase
     assert_equal(9, EncoderParameterValueType.ValueTypePointer.to_i)
     assert_match(/ValueTypePointer/, EncoderParameterValueType.ValueTypePointer.inspect)
   end
-  
+
   def test_Encoder
     assert_kind_of(Guid, Encoder.Quality)
     assert_equal("1d5be4b5-fa4a-452d-9cdd-5db35105e7eb", Encoder.Quality.to_s)
@@ -177,7 +177,7 @@ class GdiplusEnumIntTest < Test::Unit::TestCase
     assert_match(/ChrominanceTable/, Encoder.ChrominanceTable.inspect)
     assert_match(/SaveFlag/, Encoder.SaveFlag.inspect)
   end
-  
+
   def test_BrushType
     assert_equal(0, BrushType.SolidColor.to_i)
     assert_match(/SolidColor/, BrushType.SolidColor.inspect)
@@ -286,7 +286,7 @@ class GdiplusEnumIntTest < Test::Unit::TestCase
     assert_equal(-1, PenType.Unknown.to_i)
     assert_match(/Unknown/, PenType.Unknown.inspect)
   end
-  
+
   def test_FontStyle
     assert_equal(0, FontStyle.Regular.to_i)
     assert_match(/Regular/, FontStyle.Regular.inspect)
@@ -300,7 +300,7 @@ class GdiplusEnumIntTest < Test::Unit::TestCase
     assert_match(/Underline/, FontStyle.Underline.inspect)
     assert_equal(8, FontStyle.Strikeout.to_i)
     assert_match(/Strikeout/, FontStyle.Strikeout.inspect)
-    
+
     # EnumFlags
     assert_equal(FontStyle.new(3), FontStyle.Bold | FontStyle.Italic)
     assert_equal(FontStyle.new(3), FontStyle.new(:Bold, :Italic))
@@ -365,7 +365,7 @@ class GdiplusEnumIntTest < Test::Unit::TestCase
     assert_equal(5, TextRenderingHint.ClearTypeGridFit.to_i)
     assert_match(/ClearTypeGridFit/, TextRenderingHint.ClearTypeGridFit.inspect)
   end
-  
+
   def test_CompositingMode
     assert_equal(0, CompositingMode.SourceOver.to_i)
     assert_match(/SourceOver/, CompositingMode.SourceOver.inspect)
@@ -411,7 +411,7 @@ class GdiplusEnumIntTest < Test::Unit::TestCase
     assert_equal(6, GraphicsUnit.Millimeter.to_i)
     assert_match(/Millimeter/, GraphicsUnit.Millimeter.inspect)
   end
-  
+
   def test_InterpolationMode
     assert_equal(-1, InterpolationMode.Invalid.to_i)
     assert_match(/Invalid/, InterpolationMode.Invalid.inspect)
@@ -432,7 +432,7 @@ class GdiplusEnumIntTest < Test::Unit::TestCase
     assert_equal(7, InterpolationMode.HighQualityBicubic.to_i)
     assert_match(/HighQualityBicubic/, InterpolationMode.HighQualityBicubic.inspect)
   end
-  
+
   def test_DriverStringOptions
     assert_equal(0x00000001, DriverStringOptions.CmapLookup.to_i)
     assert_match(/CmapLookup/, DriverStringOptions.CmapLookup.inspect)
@@ -727,6 +727,51 @@ class GdiplusEnumIntTest < Test::Unit::TestCase
     assert_match(/TileFlipXY/, WrapMode.TileFlipXY.inspect)
     assert_equal(4, WrapMode.Clamp.to_i)
     assert_match(/Clamp/, WrapMode.Clamp.inspect)
+  end
+
+  def test_ColorAdjustType
+    assert_equal(0, ColorAdjustType.Default.to_i)
+    assert_match(/Default/, ColorAdjustType.Default.inspect)
+    assert_equal(1, ColorAdjustType.Bitmap.to_i)
+    assert_match(/Bitmap/, ColorAdjustType.Bitmap.inspect)
+    assert_equal(2, ColorAdjustType.Brush.to_i)
+    assert_match(/Brush/, ColorAdjustType.Brush.inspect)
+    assert_equal(3, ColorAdjustType.Pen.to_i)
+    assert_match(/Pen/, ColorAdjustType.Pen.inspect)
+    assert_equal(4, ColorAdjustType.Text.to_i)
+    assert_match(/Text/, ColorAdjustType.Text.inspect)
+    assert_equal(5, ColorAdjustType.Count.to_i)
+    assert_match(/Count/, ColorAdjustType.Count.inspect)
+    assert_equal(6, ColorAdjustType.Any.to_i)
+    assert_match(/Any/, ColorAdjustType.Any.inspect)
+  end
+
+  def test_ColorChannelFlag
+    assert_equal(0, ColorChannelFlag.ColorChannelC.to_i)
+    assert_match(/ColorChannelC/, ColorChannelFlag.ColorChannelC.inspect)
+    assert_equal(1, ColorChannelFlag.ColorChannelM.to_i)
+    assert_match(/ColorChannelM/, ColorChannelFlag.ColorChannelM.inspect)
+    assert_equal(2, ColorChannelFlag.ColorChannelY.to_i)
+    assert_match(/ColorChannelY/, ColorChannelFlag.ColorChannelY.inspect)
+    assert_equal(3, ColorChannelFlag.ColorChannelK.to_i)
+    assert_match(/ColorChannelK/, ColorChannelFlag.ColorChannelK.inspect)
+    assert_equal(4, ColorChannelFlag.ColorChannelLast.to_i)
+    assert_match(/ColorChannelLast/, ColorChannelFlag.ColorChannelLast.inspect)
+
+    assert_equal(0, ColorChannelFlag.C.to_i)
+    assert_equal(1, ColorChannelFlag.M.to_i)
+    assert_equal(2, ColorChannelFlag.Y.to_i)
+    assert_equal(3, ColorChannelFlag.K.to_i)
+    assert_equal(4, ColorChannelFlag.Last.to_i)
+  end
+
+  def test_ColorMatrixFlag
+    assert_equal(0, ColorMatrixFlag.Default.to_i)
+    assert_match(/Default/, ColorMatrixFlag.Default.inspect)
+    assert_equal(1, ColorMatrixFlag.SkipGrays.to_i)
+    assert_match(/SkipGrays/, ColorMatrixFlag.SkipGrays.inspect)
+    assert_equal(2, ColorMatrixFlag.AltGray.to_i)
+    assert_match(/AltGray/, ColorMatrixFlag.AltGray.inspect)
   end
 
 end

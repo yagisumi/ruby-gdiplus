@@ -13,7 +13,15 @@ bool
 gdip_arg_to_color(VALUE v, Color *color, const char *raise_msg, int option)
 {
     if (RB_SYMBOL_P(v)) {
-        v = rb_const_get(cColor, RB_SYM2ID(v));
+        if (rb_const_defined_at(cColor, RB_SYM2ID(v))) {
+            v = rb_const_get_at(cColor, RB_SYM2ID(v));
+        }
+        else if (raise_msg != NULL) {
+            rb_raise(rb_eTypeError, raise_msg);
+        }
+        else {
+            return false;
+        }
     }
 
     if (_KIND_OF(v, &tColor)) {
@@ -21,7 +29,18 @@ gdip_arg_to_color(VALUE v, Color *color, const char *raise_msg, int option)
         return true;
     }
     else if ((option & ArgOptionAcceptInt) && _RB_INTEGER_P(v)) {
-        color->SetValue(RB_NUM2UINT(v));
+        if (raise_msg != NULL) {
+            color->SetValue(RB_NUM2UINT(v));
+        }
+        else {
+            int state = 0;
+            castunion<VALUE, unsigned int> uni;
+            uni.a = rb_protect(_PROTECT_FUNC(rb_num2ulong), v, &state);
+            if (state != 0) {
+                return false;
+            }
+            color->SetValue(uni.b);
+        }
         return true;
     }
     else if (option & ArgOptionToInt) {

@@ -79,9 +79,25 @@ gdip_arg_to_enumint(VALUE klass, VALUE arg, void *enumint, const char *raise_msg
         *num = Data_Ptr_As<int>(arg);
         return true;
     }
-    else if ((option & ArgOptionAcceptInt) && Integer_p(arg)) {
-        *num = RB_NUM2INT(arg);
+    else if ((option & ArgOptionAcceptInt) && RB_FIXNUM_P(arg)) {
+        *num = RB_FIX2INT(arg);
         return true;
+    }
+    else if ((option & ArgOptionAcceptInt) && Integer_p(arg)) {
+        if (raise_msg != NULL) {
+            *num = RB_NUM2INT(arg);
+            return true;
+        }
+        else {
+            int state = 0;
+            castunion<VALUE, int> uni;
+            uni.a = rb_protect(_PROTECT_FUNC(rb_num2long), arg, &state);
+            if (state != 0) {
+                return false;
+            }
+            *num = uni.b;
+            return true;
+        }
     }
     else if (option & ArgOptionToInt) {
         VALUE v_num = rb_to_int(arg);
@@ -1237,6 +1253,57 @@ Init_WrapMode()
     define_enumint(cWrapMode, table, "Clamp", 4);
 }
 
+static void
+Init_ColorAdjustType()
+{
+    cColorAdjustType = rb_define_class_under(mGdiplus, "ColorAdjustType", cEnumInt);
+    rb_undef_alloc_func(cColorAdjustType);
+    IndexArrayMap<ID> *table = new IndexArrayMap<ID>(7);
+    klass_table_map.set(cColorAdjustType, table);
+
+    define_enumint(cColorAdjustType, table, "Default", 0);
+    define_enumint(cColorAdjustType, table, "Bitmap", 1);
+    define_enumint(cColorAdjustType, table, "Brush", 2);
+    define_enumint(cColorAdjustType, table, "Pen", 3);
+    define_enumint(cColorAdjustType, table, "Text", 4);
+    define_enumint(cColorAdjustType, table, "Count", 5);
+    define_enumint(cColorAdjustType, table, "Any", 6);
+}
+
+static void
+Init_ColorChannelFlag()
+{
+    cColorChannelFlag = rb_define_class_under(mGdiplus, "ColorChannelFlag", cEnumInt);
+    rb_undef_alloc_func(cColorChannelFlag);
+    IndexArrayMap<ID> *table = new IndexArrayMap<ID>(5);
+    klass_table_map.set(cColorChannelFlag, table);
+
+    define_enumint(cColorChannelFlag, table, "ColorChannelC", 0);
+    define_enumint(cColorChannelFlag, table, "ColorChannelM", 1);
+    define_enumint(cColorChannelFlag, table, "ColorChannelY", 2);
+    define_enumint(cColorChannelFlag, table, "ColorChannelK", 3);
+    define_enumint(cColorChannelFlag, table, "ColorChannelLast", 4);
+    define_enumint_alias(cColorChannelFlag, "C", 0);
+    define_enumint_alias(cColorChannelFlag, "M", 1);
+    define_enumint_alias(cColorChannelFlag, "Y", 2);
+    define_enumint_alias(cColorChannelFlag, "K", 3);
+    define_enumint_alias(cColorChannelFlag, "Last", 4);
+}
+
+static void
+Init_ColorMatrixFlag()
+{
+    cColorMatrixFlag = rb_define_class_under(mGdiplus, "ColorMatrixFlag", cEnumInt);
+    rb_undef_alloc_func(cColorMatrixFlag);
+    IndexArrayMap<ID> *table = new IndexArrayMap<ID>(3);
+    klass_table_map.set(cColorMatrixFlag, table);
+
+    define_enumint(cColorMatrixFlag, table, "Default", 0);
+    define_enumint(cColorMatrixFlag, table, "SkipGrays", 1);
+    define_enumint(cColorMatrixFlag, table, "AltGray", 2);
+}
+
+
 /* Encoder */
 
 /**
@@ -1471,6 +1538,9 @@ Init_enum() {
     Init_LinearGradientMode();
     Init_WarpMode();
     Init_WrapMode();
+    Init_ColorAdjustType();
+    Init_ColorChannelFlag();
+    Init_ColorMatrixFlag();
     /* GUID */
     Init_Encoder();
     Init_imageformat();
