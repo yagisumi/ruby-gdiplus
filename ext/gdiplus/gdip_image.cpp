@@ -269,7 +269,7 @@ gdip_image_draw(VALUE self)
 {
     Check_Frozen(self);
     Image *image = Data_Ptr<Image *>(self);
-    Check_NULL(image, "The image object does not exist.");
+    Check_NULL(image, "This Image object does not exist.");
 
     if (rb_block_given_p()) {
         Graphics *g = Graphics::FromImage(image);
@@ -279,6 +279,52 @@ gdip_image_draw(VALUE self)
     return self;
 }
 
+static VALUE
+gdip_image_get_bounds(VALUE self)
+{
+    Image *image = Data_Ptr<Image *>(self);
+    Check_NULL(image, "This Image object does not exist.");
+
+    Unit unit = UnitWorld;
+    RectF rect;
+
+    Status status = image->GetBounds(&rect, &unit);
+    Check_Status(status);
+
+    return gdip_rectf_create(&rect);
+}
+
+static VALUE
+gdip_image_get_bounds_unit(int argc, VALUE *argv, VALUE self)
+{
+    if (argc > 1) {
+        rb_raise(rb_eArgError, "wrong number of arguments (%d for 0..1)", argc);
+    }
+
+    Image *image = Data_Ptr<Image *>(self);
+    Check_NULL(image, "This Image object does not exist.");
+    
+    Unit unit = UnitWorld;
+
+    Status status = Ok;
+    if (argc == 1) {
+        if (_KIND_OF(argv[0], &tRectangleF)) {
+            Check_Frozen(argv[0]);
+            RectF *rect = Data_Ptr<RectF *>(argv[0]);
+            status = image->GetBounds(rect, &unit);
+        }
+        else {
+            rb_raise(rb_eTypeError, "The first argument should be RectangleF.");
+        }
+    }
+    else {
+        RectF rect;
+        status = image->GetBounds(&rect, &unit);
+    }
+    Check_Status(status);
+
+    return gdip_enumint_create(cGraphicsUnit, static_cast<int>(unit));
+}
 /*
 Document-class: Gdiplus::Image
 abstruct class
@@ -298,16 +344,9 @@ void Init_image()
     ATTR_R(cImage, VerticalResolution, vertical_resolution, image);
     ATTR_R(cImage, PixelFormat, pixel_format, image);
     ATTR_R(cImage, RawFormat, raw_format, image);
-    /*rb_define_method(cImage, "Width", RUBY_METHOD_FUNC(gdip_image_get_width), 0);
-    rb_define_method(cImage, "width", RUBY_METHOD_FUNC(gdip_image_get_width), 0);
-    rb_define_method(cImage, "Height", RUBY_METHOD_FUNC(gdip_image_get_height), 0);
-    rb_define_method(cImage, "height", RUBY_METHOD_FUNC(gdip_image_get_height), 0);
-    rb_define_method(cImage, "HorizontalResolution", RUBY_METHOD_FUNC(gdip_image_get_horizontal_resolution), 0);
-    rb_define_method(cImage, "horizontal_resolution", RUBY_METHOD_FUNC(gdip_image_get_horizontal_resolution), 0);
-    rb_define_method(cImage, "VerticalResolution", RUBY_METHOD_FUNC(gdip_image_get_vertical_resolution), 0);
-    rb_define_method(cImage, "vertical_resolution", RUBY_METHOD_FUNC(gdip_image_get_vertical_resolution), 0);
-    rb_define_method(cImage, "PixelFormat", RUBY_METHOD_FUNC(gdip_image_get_pixel_format), 0);
-    rb_define_method(cImage, "pixel_format", RUBY_METHOD_FUNC(gdip_image_get_pixel_format), 0);
-    rb_define_method(cImage, "RawFormat", RUBY_METHOD_FUNC(gdip_image_get_raw_format), 0);
-    rb_define_method(cImage, "raw_format", RUBY_METHOD_FUNC(gdip_image_get_raw_format), 0);*/
+
+    rb_define_method(cImage, "GetBounds", RUBY_METHOD_FUNC(gdip_image_get_bounds), 0);
+    rb_define_alias(cImage, "get_bounds", "GetBounds");    
+    rb_define_method(cImage, "GetBoundsUnit", RUBY_METHOD_FUNC(gdip_image_get_bounds_unit), -1);
+    rb_define_alias(cImage, "get_bounds_unit", "GetBoundsUnit");    
 }

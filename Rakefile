@@ -19,7 +19,7 @@ end
 require "yard"
 YARD::Rake::YardocTask.new(:doc) do |t|
   require_relative "lib/gdiplus/yard_gdiplus_handler"
-  t.options.push(*%w[--no-private -p templates -t gdiplus --tag figure:Figure])
+  t.options.push(*%w[--no-private -p templates -t gdiplus --tag figure:Figure --markup markdown --markup-provider redcarpet])
   t.files = FileList['lib/**/*.rb', 'ext/**/*.cpp']
 end
 

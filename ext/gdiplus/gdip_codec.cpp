@@ -19,7 +19,7 @@ gdip_guid_create(GUID *guid)
 
 /*
  * @overload initialize(str)
- *   @param str [String] GUID string. Exclude braces. <br>(e.g. +\"b96b3ca9-0728-11d3-9d7b-0000f81ef32e\"+)
+ *   @param str [String] GUID string. Exclude braces. <br>(e.g. <code>"b96b3ca9-0728-11d3-9d7b-0000f81ef32e"</code>)
  *
  */
 static VALUE
@@ -36,7 +36,7 @@ gdip_guid_init(VALUE self, VALUE str)
 /*
  * @overload to_s()
  *   Returns a GUID string. 
- *   @return [String] Returns GUID string.<br>(e.g. +b96b3ca9-0728-11d3-9d7b-0000f81ef32e+)
+ *   @return [String] Returns GUID string.<br>(e.g. <code>b96b3ca9-0728-11d3-9d7b-0000f81ef32e</code>)
  */
 static VALUE
 gdip_guid_to_s(VALUE self)

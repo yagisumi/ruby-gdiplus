@@ -424,7 +424,7 @@ static VALUE
 gdip_graphics_clear(VALUE self, VALUE color_v)
 {
     Color color;
-    gdip_arg_to_color(color_v, &color);
+    gdip_arg_to_color(color_v, &color, "The first argument should be Color.");
     Graphics *g = Data_Ptr<Graphics *>(self);
     Check_NULL(g, "The graphics object does not exist.");
     g->Clear(color);
@@ -1860,6 +1860,895 @@ gdip_graphics_fill_region(VALUE self, VALUE v_brush, VALUE v_region)
     return self;
 }
 
+/**
+ * @overload DrawImagePoint(image, point)
+ *   @param image [Image]
+ *   @param point [Point or PointF] The drawing destination.
+ * @overload DrawImagePoint(image, x, y)
+ *   @param image [Image]
+ *   @param x [Integer or Float] The drawing destination.
+ *   @param y [Integer or Float]
+ * @return [self]
+ */
+static VALUE
+gdip_graphics_draw_image_point(int argc, VALUE *argv, VALUE self)
+{
+    if (argc != 2 && argc != 3) {
+        rb_raise(rb_eArgError, "wrong number of arguments (%d for 2..3)", argc);
+    }
+
+    if (!_KIND_OF(argv[0], &tImage)) {
+        rb_raise(rb_eTypeError, "The first argument should be a subclass of Image.");
+    }
+
+    Graphics *g = Data_Ptr<Graphics *>(self);
+    Check_NULL(g, "This Graphics object does not exist.");
+    Image *image = Data_Ptr<Image *>(argv[0]);
+    Check_NULL(image, "The Image object of the argument does not exist.");
+
+    Status status = Ok;
+    if (argc == 2) {
+        if (_KIND_OF(argv[1], &tPoint)) {
+            Point *point = Data_Ptr<Point *>(argv[1]);
+            status = g->DrawImage(image, *point);
+        }
+        else if (_KIND_OF(argv[1], &tPointF)) {
+            PointF *point = Data_Ptr<PointF *>(argv[1]);
+            status = g->DrawImage(image, *point);
+        }
+        else {
+            rb_raise(rb_eTypeError, "The second argument should be Point or PointF.");
+        }
+    }
+    else if (argc == 3) {
+        if (Integer_p(argv[1], argv[2])) {
+            status = g->DrawImage(image, RB_NUM2INT(argv[1]), RB_NUM2INT(argv[2]));
+        }
+        else if (Float_p(argv[1], argv[2])) {
+            status = g->DrawImage(image, NUM2SINGLE(argv[1]), NUM2SINGLE(argv[2]));
+        }
+        else {
+            rb_raise(rb_eTypeError, "Invalid types of arguments representing coordinates.");
+        }
+    }
+    Check_Status(status);
+
+    return self;
+}
+
+/**
+ * @overload DrawImageRect(image, rect)
+ *   @param image [Image]
+ *   @param rect [Rectangle or RectangleF] The drawing destination.
+ * @overload DrawImageRect(image, x, y, w, h)
+ *   @param image [Image]
+ *   @param x [Integer or Float] The drawing destination.
+ *   @param y [Integer or Float]
+ *   @param w [Integer or Float]
+ *   @param h [Integer or Float]
+ * @return [self]
+ */
+static VALUE
+gdip_graphics_draw_image_rect(int argc, VALUE *argv, VALUE self)
+{
+    if (argc != 2 && argc != 5) {
+        rb_raise(rb_eArgError, "wrong number of arguments (%d for 2 or 5)", argc);
+    }
+
+    if (!_KIND_OF(argv[0], &tImage)) {
+        rb_raise(rb_eTypeError, "The first argument should be a subclass of Image.");
+    }
+
+    Graphics *g = Data_Ptr<Graphics *>(self);
+    Check_NULL(g, "This Graphics object does not exist.");
+    Image *image = Data_Ptr<Image *>(argv[0]);
+    Check_NULL(image, "The Image object of the argument does not exist.");
+
+    Status status = Ok;
+    if (argc == 2) {
+        if (_KIND_OF(argv[1], &tRectangle)) {
+            Rect *rect = Data_Ptr<Rect *>(argv[1]);
+            status = g->DrawImage(image, *rect);
+        }
+        else if (_KIND_OF(argv[1], &tRectangleF)) {
+            RectF *rect = Data_Ptr<RectF *>(argv[1]);
+            status = g->DrawImage(image, *rect);
+        }
+        else {
+            rb_raise(rb_eTypeError, "The second argument should be Rectangle or RectangleF.");
+        }
+    }
+    else if (argc == 5) {
+        if (Integer_p(4, &argv[1])) {
+            status = g->DrawImage(image, RB_NUM2INT(argv[1]), RB_NUM2INT(argv[2]), RB_NUM2INT(argv[3]), RB_NUM2INT(argv[4]));
+        }
+        else if (Float_p(4, &argv[1])) {
+            status = g->DrawImage(image, NUM2SINGLE(argv[1]), NUM2SINGLE(argv[2]), NUM2SINGLE(argv[3]), NUM2SINGLE(argv[4]));
+        }
+        else {
+            rb_raise(rb_eTypeError, "Invalid types of arguments representing coordinates.");
+        }
+    }
+    Check_Status(status);
+
+    return self;
+}
+
+/**
+ * @overload DrawImagePoints(image, points)
+ *   @param image [Image]
+ *   @param points [Array<Point or PointF>] The coordinates of the upper-left corner, upper-right corner, and lower-left corner of the parallelogram of the drawing destination.
+ *
+ */
+static VALUE
+gdip_graphics_draw_image_points(VALUE self, VALUE v_image, VALUE v_points)
+{
+    if (!_KIND_OF(v_image, &tImage)) {
+        rb_raise(rb_eTypeError, "The first argument should be a subclass of Image.");
+    }
+
+    if (!_RB_ARRAY_P(v_points) || RARRAY_LEN(v_points) <= 0) {
+        rb_raise(rb_eTypeError, "The second argument should be Array of Point or PointF.");
+    }
+
+    Graphics *g = Data_Ptr<Graphics *>(self);
+    Check_NULL(g, "This Graphics object does not exist.");
+    Image *image = Data_Ptr<Image *>(v_image);
+    Check_NULL(image, "The Image object of the argument does not exist.");
+
+    VALUE first = rb_ary_entry(v_points, 0);
+
+    Status status = Ok;
+    if (_KIND_OF(first, &tPoint)) {
+        int count = 0;
+        Point *points = alloc_array_of<Point, &tPoint>(v_points, count);
+        if (count != 3) {
+            ruby_xfree(points);
+            rb_raise(rb_eArgError, "The number of points should be 3.");
+        }
+        status = g->DrawImage(image, points, count);
+        ruby_xfree(points);
+    }
+    else if (_KIND_OF(first, &tPointF)) {
+        int count = 0;
+        PointF *points = alloc_array_of<PointF, &tPointF>(v_points, count);
+        if (count != 3) {
+            ruby_xfree(points);
+            rb_raise(rb_eArgError, "The number of points should be 3.");
+        }
+        status = g->DrawImage(image, points, count);
+        ruby_xfree(points);
+    }
+    else {
+        rb_raise(rb_eTypeError, "The second argument should be Array of Point or PointF.");
+    }
+    Check_Status(status);
+
+    return self;
+}
+
+/**
+ * @overload DrawImagePointRect(image, dest_point, src_rect, src_unit=GraphicsUnit.Pixel)
+ *   @param image [Image]
+ *   @param dest_point [Point or PointF]
+ *   @param src_rect [Rectangle or RectangleF]
+ *   @param src_unit [GraphicsUnit]
+ * @overload DrawimagePointRect(image, dx, dy, src_rect, src_unit=GraphicsUnit.Pixel)
+ *   @param image [Image]
+ *   @param dx [Integer or Float]
+ *   @param dy [Integer or Float]
+ *   @param src_rect [Rectangle or RectangleF]
+ *   @param src_unit [GraphicsUnit]
+ * @overload DrawImagePointRect(image, dest_point, sx, sy, sw, sh, src_unit=GraphicsUnit.Pixel)
+ *   @param image [Image]
+ *   @param dest_point [Point or PointF]
+ *   @param sx [Integer or Float]
+ *   @param sy [Integer or Float]
+ *   @param sw [Integer or Float]
+ *   @param sh [Integer or Float]
+ *   @param src_unit [GraphicsUnit]
+ * @overload DrawImagePointRect(image, dx, dy, sx, sy, sw, sh, src_unit=GraphicsUnit.Pixel)
+ *   @param image [Image]
+ *   @param dx [Integer or Float]
+ *   @param dy [Integer or Float]
+ *   @param sx [Integer or Float]
+ *   @param sy [Integer or Float]
+ *   @param sw [Integer or Float]
+ *   @param sh [Integer or Float]
+ *   @param src_unit [GraphicsUnit]
+ * @return [self]
+ */
+static VALUE
+gdip_graphics_draw_image_point_rect(int argc, VALUE *argv, VALUE self)
+{
+    if (argc < 3 || 8 < argc) {
+        rb_raise(rb_eArgError, "wrong number of arguments (%d for 3..8)", argc);
+    }
+
+    if (!_KIND_OF(argv[0], &tImage)) {
+        rb_raise(rb_eTypeError, "The first argument should be a subclass of Image.");
+    }
+
+    Graphics *g = Data_Ptr<Graphics *>(self);
+    Check_NULL(g, "This Graphics object does not exist.");
+    Image *image = Data_Ptr<Image *>(argv[0]);
+    Check_NULL(image, "The Image object of the argument does not exist.");
+    Unit unit = UnitPixel;
+
+    Status status = Ok;
+    if (argc == 3) {
+        if (_KIND_OF(argv[1], &tPoint) && _KIND_OF(argv[2], &tRectangle)) {
+            Point *point = Data_Ptr<Point *>(argv[1]);
+            Rect *rect = Data_Ptr<Rect *>(argv[2]);
+            status = g->DrawImage(image, point->X, point->Y, rect->X, rect->Y, rect->Width, rect->Height, unit);
+        }
+        else if (_KIND_OF(argv[1], &tPointF) && _KIND_OF(argv[2], &tRectangleF)) {
+            PointF *point = Data_Ptr<PointF *>(argv[1]);
+            RectF *rect = Data_Ptr<RectF *>(argv[2]);
+            status = g->DrawImage(image, point->X, point->Y, rect->X, rect->Y, rect->Width, rect->Height, unit);
+        }
+        else {
+            rb_raise(rb_eTypeError, "wrong types of arguments");
+        }
+    }
+    else if (argc == 4) {
+        if (Integer_p(argv[1], argv[2]) && _KIND_OF(argv[3], &tRectangle)) {
+            Rect *rect = Data_Ptr<Rect *>(argv[3]);
+            status = g->DrawImage(image, RB_NUM2INT(argv[1]), RB_NUM2INT(argv[2]), rect->X, rect->Y, rect->Width, rect->Height, unit);
+        }
+        else if (Float_p(argv[1], argv[2]) && _KIND_OF(argv[3], &tRectangleF)) {
+            RectF *rect = Data_Ptr<RectF *>(argv[3]);
+            status = g->DrawImage(image, NUM2SINGLE(argv[1]), NUM2SINGLE(argv[2]), rect->X, rect->Y, rect->Width, rect->Height, unit);
+        }
+        else {
+            gdip_arg_to_enumint(cGraphicsUnit, argv[3], &unit, "The last argument should be GraphicsUnit.");
+            if (_KIND_OF(argv[1], &tPoint) && _KIND_OF(argv[2], &tRectangle)) {
+                Point *point = Data_Ptr<Point *>(argv[1]);
+                Rect *rect = Data_Ptr<Rect *>(argv[2]);
+                status = g->DrawImage(image, point->X, point->Y, rect->X, rect->Y, rect->Width, rect->Height, unit);
+            }
+            else if (_KIND_OF(argv[1], &tPointF) && _KIND_OF(argv[2], &tRectangleF)) {
+                PointF *point = Data_Ptr<PointF *>(argv[1]);
+                RectF *rect = Data_Ptr<RectF *>(argv[2]);
+                status = g->DrawImage(image, point->X, point->Y, rect->X, rect->Y, rect->Width, rect->Height, unit);
+            }
+            else {
+                rb_raise(rb_eTypeError, "wrong types of arguments");
+            }
+
+        }
+    }
+    else if (argc == 5) {
+        gdip_arg_to_enumint(cGraphicsUnit, argv[4], &unit, "The last argument should be GraphicsUnit.");
+        if (Integer_p(argv[1], argv[2]) && _KIND_OF(argv[3], &tRectangle)) {
+            Rect *rect = Data_Ptr<Rect *>(argv[3]);
+            status = g->DrawImage(image, RB_NUM2INT(argv[1]), RB_NUM2INT(argv[2]), rect->X, rect->Y, rect->Width, rect->Height, unit);
+        }
+        else if (Float_p(argv[1], argv[2]) && _KIND_OF(argv[3], &tRectangleF)) {
+            RectF *rect = Data_Ptr<RectF *>(argv[3]);
+            status = g->DrawImage(image, NUM2SINGLE(argv[1]), NUM2SINGLE(argv[2]), rect->X, rect->Y, rect->Width, rect->Height, unit);
+        }
+        else {
+            rb_raise(rb_eTypeError, "wrong types of arguments");
+        }
+    }
+    else if (argc == 6) {
+        if (_KIND_OF(argv[1], &tPoint) && Integer_p(4, &argv[2])) {
+            Point *point = Data_Ptr<Point *>(argv[1]);
+            status = g->DrawImage(image, point->X, point->Y, RB_NUM2INT(argv[2]), RB_NUM2INT(argv[3]), RB_NUM2INT(argv[4]), RB_NUM2INT(argv[5]), unit);
+        }
+        else if (_KIND_OF(argv[1], &tPointF) && Float_p(4, &argv[2])) {
+            PointF *point = Data_Ptr<PointF *>(argv[1]);
+            status = g->DrawImage(image, point->X, point->Y, NUM2SINGLE(argv[2]), NUM2SINGLE(argv[3]), NUM2SINGLE(argv[4]), NUM2SINGLE(argv[5]), unit);
+        }
+        else {
+            rb_raise(rb_eTypeError, "wrong types of arguments");
+        }
+    }
+    else if (argc == 7) {
+        if (Integer_p(6, &argv[1])) {
+            status = g->DrawImage(image, RB_NUM2INT(argv[1]), RB_NUM2INT(argv[2]), RB_NUM2INT(argv[3]), RB_NUM2INT(argv[4]), RB_NUM2INT(argv[5]), RB_NUM2INT(argv[6]), unit);
+        }
+        else if (Integer_p(6, &argv[1])) {
+            status = g->DrawImage(image, NUM2SINGLE(argv[1]), NUM2SINGLE(argv[2]), NUM2SINGLE(argv[3]), NUM2SINGLE(argv[4]), NUM2SINGLE(argv[5]), NUM2SINGLE(argv[6]), unit);
+        }
+        else {
+            gdip_arg_to_enumint(cGraphicsUnit, argv[6], &unit, "The last argument should be GraphicsUnit.");
+            if (_KIND_OF(argv[1], &tPoint) && Integer_p(4, &argv[2])) {
+                Point *point = Data_Ptr<Point *>(argv[1]);
+                status = g->DrawImage(image, point->X, point->Y, RB_NUM2INT(argv[2]), RB_NUM2INT(argv[3]), RB_NUM2INT(argv[4]), RB_NUM2INT(argv[5]), unit);
+            }
+            else if (_KIND_OF(argv[1], &tPointF) && Float_p(4, &argv[2])) {
+                PointF *point = Data_Ptr<PointF *>(argv[1]);
+                status = g->DrawImage(image, point->X, point->Y, NUM2SINGLE(argv[2]), NUM2SINGLE(argv[3]), NUM2SINGLE(argv[4]), NUM2SINGLE(argv[5]), unit);
+            }
+            else {
+                rb_raise(rb_eTypeError, "wrong types of arguments");
+            }
+        }
+    }
+    else if (argc == 8) {
+        gdip_arg_to_enumint(cGraphicsUnit, argv[7], &unit, "The last argument should be GraphicsUnit.");
+        if (Integer_p(6, &argv[1])) {
+            status = g->DrawImage(image, RB_NUM2INT(argv[1]), RB_NUM2INT(argv[2]), RB_NUM2INT(argv[3]), RB_NUM2INT(argv[4]), RB_NUM2INT(argv[5]), RB_NUM2INT(argv[6]), unit);
+        }
+        else if (Integer_p(6, &argv[1])) {
+            status = g->DrawImage(image, NUM2SINGLE(argv[1]), NUM2SINGLE(argv[2]), NUM2SINGLE(argv[3]), NUM2SINGLE(argv[4]), NUM2SINGLE(argv[5]), NUM2SINGLE(argv[6]), unit);
+        }
+        else {
+            rb_raise(rb_eTypeError, "wrong types of arguments");
+        }
+    }
+    Check_Status(status);
+
+    return self;
+}
+
+/**
+ * @overload DrawImageRectRect(image, dest_rect, src_rect, src_unit=GraphicsUnit.Pixel, attributes=nil)
+ *   @param image [Image]
+ *   @param dest_rect [Rectangle or RectangleF]
+ *   @param src_rect [Rectangle or RectangleF]
+ *   @param src_unit [GraphicsUnit]
+ *   @param attributes [ImageAttributes]
+ * @overload DrawImageRectRect(image, dx, dy, dw, dh, src_rect, src_unit=GraphicsUnit.Pixel, attributes=nil)
+ *   @param image [Image]
+ *   @param dx [Integer or Float]
+ *   @param dy [Integer or Float]
+ *   @param dw [Integer or Float]
+ *   @param dh [Integer or Float]
+ *   @param src_rect [Rectangle or RectangleF]
+ *   @param src_unit [GraphicsUnit]
+ *   @param attributes [ImageAttributes]
+ * @overload DrawImageRectRect(image, dest_rect, sx, sy, sw, sh, src_unit=GraphicsUnit.Pixel, attributes=nil)
+ *   @param image [Image]
+ *   @param dest_rect [Rectangle or RectangleF]
+ *   @param sx [Integer or Float]
+ *   @param sy [Integer or Float]
+ *   @param sw [Integer or Float]
+ *   @param sh [Integer or Float]
+ *   @param src_unit [GraphicsUnit]
+ *   @param attributes [ImageAttributes]
+ * @overload DrawImageRectRect(image, dx, dy, dw, dh, sx, sy, sw, sh, src_unit=GraphicsUnit.Pixel, attributes=nil)
+ *   @param image [Image]
+ *   @param dx [Integer or Float]
+ *   @param dy [Integer or Float]
+ *   @param dw [Integer or Float]
+ *   @param dh [Integer or Float]
+ *   @param sx [Integer or Float]
+ *   @param sy [Integer or Float]
+ *   @param sw [Integer or Float]
+ *   @param sh [Integer or Float]
+ *   @param src_unit [GraphicsUnit]
+ *   @param attributes [ImageAttributes]
+ * @return [self]
+ */
+static VALUE
+gdip_graphics_draw_image_rect_rect(int argc, VALUE *argv, VALUE self)
+{
+    if (argc < 3 || 11 < argc) {
+        rb_raise(rb_eArgError, "wrong number of arguments (%d for 3..11)", argc);
+    }
+
+    if (!_KIND_OF(argv[0], &tImage)) {
+        rb_raise(rb_eTypeError, "The first argument should be a subclass of Image.");
+    }
+
+    Graphics *g = Data_Ptr<Graphics *>(self);
+    Check_NULL(g, "This Graphics object does not exist.");
+    Image *image = Data_Ptr<Image *>(argv[0]);
+    Check_NULL(image, "The Image object of the argument does not exist.");
+    Unit unit = UnitPixel;
+    ImageAttributes *attributes = NULL;
+
+    Status status = Ok;
+    if (argc <= 8 && _KIND_OF(argv[1], &tRectangle)) {
+        Rect *dest_rect = Data_Ptr<Rect *>(argv[1]);
+
+        if (argc <= 5 && _KIND_OF(argv[2], &tRectangle)) {
+            Rect *src_rect = Data_Ptr<Rect *>(argv[2]);
+            if (argc >= 4) {
+                gdip_arg_to_enumint(cGraphicsUnit, argv[3], &unit, "The fourth argument should be GraphicsUnit.");
+            }
+
+            if (argc == 5) {
+                if (_KIND_OF(argv[4], &tImageAttributes)) {
+                    attributes = Data_Ptr<ImageAttributes *>(argv[4]);
+                }
+                else {
+                    rb_raise(rb_eTypeError, "wrong types of arguments");
+                }
+            }
+
+            status = g->DrawImage(image, *dest_rect, src_rect->X, src_rect->Y, src_rect->Width, src_rect->Height, unit, attributes);
+        }
+        else if (argc >= 6 && Integer_p(4, &argv[2])) {
+            if (argc >= 7) {
+                gdip_arg_to_enumint(cGraphicsUnit, argv[6], &unit, "The seventh argument should be GraphicsUnit.");
+            }
+
+            if (argc == 8) {
+                if (_KIND_OF(argv[7], &tImageAttributes)) {
+                    attributes = Data_Ptr<ImageAttributes *>(argv[7]);
+                }
+                else {
+                    rb_raise(rb_eTypeError, "wrong types of arguments");
+                }
+            }
+
+            status = g->DrawImage(image, *dest_rect, RB_NUM2INT(argv[2]), RB_NUM2INT(argv[3]), RB_NUM2INT(argv[4]), RB_NUM2INT(argv[5]), unit, attributes);
+        }
+        else {
+            rb_raise(rb_eTypeError, "wrong types of arguments");
+        }
+    }
+    else if (argc <= 8 && _KIND_OF(argv[1], &tRectangleF)) {
+        RectF *dest_rect = Data_Ptr<RectF *>(argv[1]);
+
+        if (argc <= 5 && _KIND_OF(argv[2], &tRectangleF)) {
+            RectF *src_rect = Data_Ptr<RectF *>(argv[2]);
+            if (argc >= 4) {
+                gdip_arg_to_enumint(cGraphicsUnit, argv[3], &unit, "The fourth argument should be GraphicsUnit.");
+            }
+
+            if (argc == 5) {
+                if (_KIND_OF(argv[4], &tImageAttributes)) {
+                    attributes = Data_Ptr<ImageAttributes *>(argv[4]);
+                }
+                else {
+                    rb_raise(rb_eTypeError, "wrong types of arguments");
+                }
+            }
+
+            status = g->DrawImage(image, *dest_rect, src_rect->X, src_rect->Y, src_rect->Width, src_rect->Height, unit, attributes);
+        }
+        else if (argc >= 6 && Float_p(4, &argv[2])) {
+            if (argc >= 7) {
+                gdip_arg_to_enumint(cGraphicsUnit, argv[6], &unit, "The seventh argument should be GraphicsUnit.");
+            }
+
+            if (argc == 8) {
+                if (_KIND_OF(argv[7], &tImageAttributes)) {
+                    attributes = Data_Ptr<ImageAttributes *>(argv[7]);
+                }
+                else {
+                    rb_raise(rb_eTypeError, "wrong types of arguments");
+                }
+            }
+
+            status = g->DrawImage(image, *dest_rect, NUM2SINGLE(argv[2]), NUM2SINGLE(argv[3]), NUM2SINGLE(argv[4]), NUM2SINGLE(argv[5]), unit, attributes);
+        }
+        else {
+            rb_raise(rb_eTypeError, "wrong types of arguments");
+        }
+    }
+    else if (argc >= 6 && Integer_p(4, argv[1])) {
+        Rect dest_rect;
+        dest_rect.X = RB_NUM2INT(argv[1]);
+        dest_rect.Y = RB_NUM2INT(argv[2]);
+        dest_rect.Width = RB_NUM2INT(argv[3]);
+        dest_rect.Height = RB_NUM2INT(argv[4]);
+
+        if (argc <= 8 && _KIND_OF(argv[5], &tRectangle)) {
+            Rect *src_rect = Data_Ptr<Rect *>(argv[5]);
+
+            if (argc >= 7) {
+                gdip_arg_to_enumint(cGraphicsUnit, argv[6], &unit, "The seventh argument should be GraphicsUnit.");
+            }
+
+            if (argc == 8) {
+                if (_KIND_OF(argv[7], &tImageAttributes)) {
+                    attributes = Data_Ptr<ImageAttributes *>(argv[7]);
+                }
+                else {
+                    rb_raise(rb_eTypeError, "wrong types of arguments");
+                }
+            }
+
+            status = g->DrawImage(image, dest_rect, src_rect->X, src_rect->Y, src_rect->Width, src_rect->Height, unit, attributes);
+        }
+        else if (argc >= 9 && Integer_p(4, argv[5])) {
+            if (argc >= 10) {
+                gdip_arg_to_enumint(cGraphicsUnit, argv[9], &unit, "The seventh argument should be GraphicsUnit.");
+            }
+            else if (argc == 11) {
+                if (_KIND_OF(argv[10], &tImageAttributes)) {
+                    attributes = Data_Ptr<ImageAttributes *>(argv[10]);
+                }
+                else {
+                    rb_raise(rb_eTypeError, "wrong types of arguments");
+                }
+            }
+
+            status = g->DrawImage(image, dest_rect, RB_NUM2INT(argv[5]), RB_NUM2INT(argv[6]), RB_NUM2INT(argv[7]), RB_NUM2INT(argv[8]), unit, attributes);
+        }
+        else {
+            rb_raise(rb_eTypeError, "wrong types of arguments");
+        }
+    }
+    else if (argc >= 6 && Float_p(4, argv[1])) {
+        RectF dest_rect;
+        dest_rect.X = NUM2SINGLE(argv[1]);
+        dest_rect.Y = NUM2SINGLE(argv[2]);
+        dest_rect.Width = NUM2SINGLE(argv[3]);
+        dest_rect.Height = NUM2SINGLE(argv[4]);
+
+        if (argc <= 8 && _KIND_OF(argv[5], &tRectangleF)) {
+            RectF *src_rect = Data_Ptr<RectF *>(argv[5]);
+
+            if (argc >= 7) {
+                gdip_arg_to_enumint(cGraphicsUnit, argv[6], &unit, "The seventh argument should be GraphicsUnit.");
+            }
+
+            if (argc == 8) {
+                if (_KIND_OF(argv[7], &tImageAttributes)) {
+                    attributes = Data_Ptr<ImageAttributes *>(argv[7]);
+                }
+                else {
+                    rb_raise(rb_eTypeError, "wrong types of arguments");
+                }
+            }
+
+            status = g->DrawImage(image, dest_rect, src_rect->X, src_rect->Y, src_rect->Width, src_rect->Height, unit, attributes);
+        }
+        else if (argc >= 9 && Float_p(4, argv[5])) {
+            if (argc >= 10) {
+                gdip_arg_to_enumint(cGraphicsUnit, argv[9], &unit, "The seventh argument should be GraphicsUnit.");
+            }
+            else if (argc == 11) {
+                if (_KIND_OF(argv[10], &tImageAttributes)) {
+                    attributes = Data_Ptr<ImageAttributes *>(argv[10]);
+                }
+                else {
+                    rb_raise(rb_eTypeError, "wrong types of arguments");
+                }
+            }
+
+            status = g->DrawImage(image, dest_rect, NUM2SINGLE(argv[5]), NUM2SINGLE(argv[6]), NUM2SINGLE(argv[7]), NUM2SINGLE(argv[8]), unit, attributes);
+        }
+        else {
+            rb_raise(rb_eTypeError, "wrong types of arguments");
+        }
+    }
+    else {
+        rb_raise(rb_eTypeError, "wrong types of arguments");
+    }
+    Check_Status(status);
+
+    return self;
+}
+
+/**
+ * @overload DrawImagePointsRect(image, dest_points, src_rect, src_unit=GraphicsUnit.Pixel, attributes=nil)
+ *   @param dest_points [Array<Point or PointF>]
+ *   @param src_rect [Rectangle or RectangleF]
+ *   @param src_unit [GraphicsUnit]
+ *   @param attributes [ImageAttribute]
+ * @overload DrawImagePointsRect(image, dest_points, sx, sy, sw, sh, src_unit=GraphicsUnit.Pixel, attributes=nil)
+ *   @param dest_points [Array<Point or PointF>]
+ *   @param sx [Integer or Float]
+ *   @param sy [Integer or Float]
+ *   @param sw [Integer or Float]
+ *   @param sh [Integer or Float]
+ *   @param src_unit [GraphicsUnit]
+ *   @param attributes [ImageAttribute]
+ * @return [self]
+ */
+static VALUE
+gdip_graphics_draw_image_points_rect(int argc, VALUE *argv, VALUE self)
+{
+    if (argc < 3 || 8 < argc) {
+        rb_raise(rb_eArgError, "wrong number of arguments (%d for 3..11)", argc);
+    }
+
+    if (!_KIND_OF(argv[0], &tImage)) {
+        rb_raise(rb_eTypeError, "The first argument should be a subclass of Image.");
+    }
+
+    if (!_RB_ARRAY_P(argv[1]) || RARRAY_LEN(argv[1]) <= 0) {
+        rb_raise(rb_eTypeError, "The second argument should be Array of Point or PointF.");
+    }
+
+    Graphics *g = Data_Ptr<Graphics *>(self);
+    Check_NULL(g, "This Graphics object does not exist.");
+    Image *image = Data_Ptr<Image *>(argv[0]);
+    Check_NULL(image, "The Image object of the argument does not exist.");
+    Unit unit = UnitPixel;
+    ImageAttributes *attributes = NULL;
+
+    VALUE first = rb_ary_entry(argv[1], 0);
+
+    Status status = Ok;
+    if (_KIND_OF(first, &tPoint)) {
+        if (argc <= 5) {
+            if (_KIND_OF(argv[2], &tRectangle)) {
+                Rect *rect = Data_Ptr<Rect *>(argv[2]);
+
+                if (argc >= 4) {
+                    gdip_arg_to_enumint(cGraphicsUnit, argv[3], &unit, "The fourth argument should be GraphicsUnit.");
+                }
+
+                if (argc == 5) {
+                    if (_KIND_OF(argv[4], &tImageAttributes)) {
+                        attributes = Data_Ptr<ImageAttributes *>(argv[4]);
+                    }
+                    else {
+                        rb_raise(rb_eTypeError, "wrong types of arguments");
+                    }
+                }
+
+                int count = 0;
+                Point *points = alloc_array_of<Point, &tPoint>(argv[1], count);
+                if (count != 3) {
+                    ruby_xfree(points);
+                    rb_raise(rb_eArgError, "The number of points should be 3.");
+                }
+
+                status = g->DrawImage(image, points, count, rect->X, rect->Y, rect->Width, rect->Height, unit, attributes);
+                ruby_xfree(points);
+            }
+            else {
+                rb_raise(rb_eTypeError, "wrong types of arguments.");
+            }
+        }
+        else if (argc >= 6) {
+            if (Integer_p(4, &argv[2])) {
+                if (argc >= 7) {
+                    gdip_arg_to_enumint(cGraphicsUnit, argv[6], &unit, "The seventh argument should be GraphicsUnit.");
+                }
+
+                if (argc == 8) {
+                    if (_KIND_OF(argv[7], &tImageAttributes)) {
+                        attributes = Data_Ptr<ImageAttributes *>(argv[7]);
+                    }
+                    else {
+                        rb_raise(rb_eTypeError, "wrong types of arguments");
+                    }
+                }
+
+                int count = 0;
+                Point *points = alloc_array_of<Point, &tPoint>(argv[1], count);
+                if (count != 3) {
+                    ruby_xfree(points);
+                    rb_raise(rb_eArgError, "The number of points should be 3.");
+                }
+
+                status = g->DrawImage(image, points, count, RB_NUM2INT(argv[2]), RB_NUM2INT(argv[3]), RB_NUM2INT(argv[4]), RB_NUM2INT(argv[5]), unit, attributes);
+                ruby_xfree(points);
+            }
+            else {
+                rb_raise(rb_eTypeError, "wrong types of arguments.");
+            }
+        }
+    }
+    else if (_KIND_OF(first, &tPointF)) {
+        if (argc <= 5) {
+            if (_KIND_OF(argv[2], &tRectangleF)) {
+                RectF *rect = Data_Ptr<RectF *>(argv[2]);
+
+                if (argc >= 4) {
+                    gdip_arg_to_enumint(cGraphicsUnit, argv[3], &unit, "The fourth argument should be GraphicsUnit.");
+                }
+
+                if (argc == 5) {
+                    if (_KIND_OF(argv[4], &tImageAttributes)) {
+                        attributes = Data_Ptr<ImageAttributes *>(argv[4]);
+                    }
+                    else {
+                        rb_raise(rb_eTypeError, "wrong types of arguments");
+                    }
+                }
+
+                int count = 0;
+                Point *points = alloc_array_of<Point, &tPoint>(argv[1], count);
+                if (count != 3) {
+                    ruby_xfree(points);
+                    rb_raise(rb_eArgError, "The number of points should be 3.");
+                }
+
+                status = g->DrawImage(image, points, count, rect->X, rect->Y, rect->Width, rect->Height, unit, attributes);
+                ruby_xfree(points);
+            }
+            else {
+                rb_raise(rb_eTypeError, "wrong types of arguments.");
+            }
+        }
+        else if (argc >= 6) {
+            if (Float_p(4, &argv[2])) {
+                if (argc >= 7) {
+                    gdip_arg_to_enumint(cGraphicsUnit, argv[6], &unit, "The seventh argument should be GraphicsUnit.");
+                }
+
+                if (argc == 8) {
+                    if (_KIND_OF(argv[7], &tImageAttributes)) {
+                        attributes = Data_Ptr<ImageAttributes *>(argv[7]);
+                    }
+                    else {
+                        rb_raise(rb_eTypeError, "wrong types of arguments");
+                    }
+                }
+
+                int count = 0;
+                Point *points = alloc_array_of<Point, &tPoint>(argv[1], count);
+                if (count != 3) {
+                    ruby_xfree(points);
+                    rb_raise(rb_eArgError, "The number of points should be 3.");
+                }
+
+                status = g->DrawImage(image, points, count, NUM2SINGLE(argv[2]), NUM2SINGLE(argv[3]), NUM2SINGLE(argv[4]), NUM2SINGLE(argv[5]), unit, attributes);
+                ruby_xfree(points);
+            }
+            else {
+                rb_raise(rb_eTypeError, "wrong types of arguments.");
+            }
+        }
+    }
+    else {
+        rb_raise(rb_eTypeError, "The second argument should be Array of Point or PointF.");
+    }
+    Check_Status(status);
+
+    return self;
+}
+
+
+/**
+ * See {#DrawImagePoint}, {#DrawImageRect}, {#DrawImagePoints}, {#DrawImagePointRect}, {#DrawImageRectRect}, {#DrawImagePointsRect}
+ * ##Arguments list
+ * |                     |       |        dest        |         src        |              |                |
+ * |---------------------|-------|:------------------:|:------------------:|--------------|----------------|
+ * | DrawImagePoint      | image |    point<br>x, y   |                    |              |                |
+ * | DrawImageRect       | image | rect<br>x, y, w, h |                    |              |                |
+ * | DrawImagePoints     | image |       points       |                    |              |                |
+ * | DrawImagePointRect  | image |    point<br>x, y   | rect<br>x, y, w, h | GraphicsUnit |                |
+ * | DrawImageRectRect   | image | rect<br>x, y, w, h | rect<br>x, y, w, h | GraphicsUnit | ImageAttribute |
+ * | DrawImagePointsRect | image |       points       | rect<br>x, y, w, h | GraphicsUnit | ImageAttribute |
+ * @figure Graphics_DrawImage.png
+ * @return [self]
+ * @!endgroup
+ */
+static VALUE
+gdip_graphics_draw_image(int argc, VALUE *argv, VALUE self)
+{
+    if (argc < 2 || 11 < argc) {
+        rb_raise(rb_eArgError, "wrong number of arguments (%d for 2..11)", argc);
+    }
+
+    if (!_KIND_OF(argv[0], &tImage)) {
+        rb_raise(rb_eTypeError, "The first argument should be a subclass of Image.");
+    }
+
+    if (argc == 2) {
+        if (_KIND_OF(argv[1], &tPoint) || _KIND_OF(argv[1], &tPointF)) {
+            gdip_graphics_draw_image_point(argc, argv, self);
+        }
+        else if (_KIND_OF(argv[1], &tRectangle) || _KIND_OF(argv[1], &tRectangleF)) {
+            gdip_graphics_draw_image_rect(argc, argv, self);
+        }
+        else if (_RB_ARRAY_P(argv[1])) {
+            gdip_graphics_draw_image_points(self, argv[0], argv[1]);
+        }
+        else {
+            rb_raise(rb_eTypeError, "wrong types of arguments");
+        }
+    }
+    else if (argc == 3) {
+        if (Integer_p(argv[1]) || Float_p(argv[1])) {
+            gdip_graphics_draw_image_point(argc, argv, self);
+        }
+        else if (_KIND_OF(argv[1], &tPoint) || _KIND_OF(argv[1], &tPointF)) {
+            gdip_graphics_draw_image_point_rect(argc, argv, self);
+        }
+        else if (_KIND_OF(argv[1], &tRectangle) || _KIND_OF(argv[1], &tRectangleF)) {
+            gdip_graphics_draw_image_rect_rect(argc, argv, self);
+        }
+        else if (_RB_ARRAY_P(argv[1])) {
+            gdip_graphics_draw_image_points_rect(argc, argv, self);
+        }
+        else {
+            rb_raise(rb_eTypeError, "wrong types of arguments");
+        }
+    }
+    else if (argc == 4) {
+        if (Integer_p(argv[1]) || Float_p(argv[1])) {
+            gdip_graphics_draw_image_point_rect(argc, argv, self);
+        }
+        else if (_KIND_OF(argv[1], &tPoint) || _KIND_OF(argv[1], &tPointF)) {
+            gdip_graphics_draw_image_point_rect(argc, argv, self);
+        }
+        else if (_KIND_OF(argv[1], &tRectangle) || _KIND_OF(argv[1], &tRectangleF)) {
+            gdip_graphics_draw_image_rect_rect(argc, argv, self);
+        }
+        else if (_RB_ARRAY_P(argv[1])) {
+            gdip_graphics_draw_image_points_rect(argc, argv, self);
+        }
+        else {
+            rb_raise(rb_eTypeError, "wrong types of arguments");
+        }
+    }
+    else if (argc == 5) {
+        if (Integer_p(argv[1], argv[3]) || Float_p(argv[1], argv[3])) {
+            gdip_graphics_draw_image_rect(argc, argv, self);
+        }
+        else if (Integer_p(argv[1]) || Float_p(argv[1])) {
+            gdip_graphics_draw_image_point_rect(argc, argv, self);
+        }
+        else if (_KIND_OF(argv[1], &tRectangle) || _KIND_OF(argv[1], &tRectangleF)) {
+            gdip_graphics_draw_image_rect_rect(argc, argv, self);
+        }
+        else if (_RB_ARRAY_P(argv[1])) {
+            gdip_graphics_draw_image_points_rect(argc, argv, self);
+        }
+        else {
+            rb_raise(rb_eTypeError, "wrong types of arguments");
+        }
+    }
+    else if (argc == 6) {
+        if (Integer_p(argv[1]) || Float_p(argv[1])) {
+            gdip_graphics_draw_image_rect_rect(argc, argv, self);
+        }
+        else if (_KIND_OF(argv[1], &tPoint) || _KIND_OF(argv[1], &tPointF)) {
+            gdip_graphics_draw_image_point_rect(argc, argv, self);
+        }
+        else if (_KIND_OF(argv[1], &tRectangle) || _KIND_OF(argv[1], &tRectangleF)) {
+            gdip_graphics_draw_image_rect_rect(argc, argv, self);
+        }
+        else if (_RB_ARRAY_P(argv[1])) {
+            gdip_graphics_draw_image_points_rect(argc, argv, self);
+        }
+        else {
+            rb_raise(rb_eTypeError, "wrong types of arguments");
+        }
+    }
+    else if (argc == 7) {
+        if (Integer_p(argv[1], argv[5]) || Float_p(argv[1], argv[5])) {
+            gdip_graphics_draw_image_point_rect(argc, argv, self);
+        }
+        else if (Integer_p(argv[1]) || Float_p(argv[1])) {
+            gdip_graphics_draw_image_rect_rect(argc, argv, self);
+        }
+        else if (_KIND_OF(argv[1], &tPoint) || _KIND_OF(argv[1], &tPointF)) {
+            gdip_graphics_draw_image_point_rect(argc, argv, self);
+        }
+        else if (_KIND_OF(argv[1], &tRectangle) || _KIND_OF(argv[1], &tRectangleF)) {
+            gdip_graphics_draw_image_rect_rect(argc, argv, self);
+        }
+        else if (_RB_ARRAY_P(argv[1])) {
+            gdip_graphics_draw_image_points_rect(argc, argv, self);
+        }
+        else {
+            rb_raise(rb_eTypeError, "wrong types of arguments");
+        }
+    }
+    else if (argc == 8) {
+        if (Integer_p(argv[1], argv[5]) || Float_p(argv[1], argv[5])) {
+            gdip_graphics_draw_image_point_rect(argc, argv, self);
+        }
+        else if (Integer_p(argv[1]) || Float_p(argv[1])) {
+            gdip_graphics_draw_image_rect_rect(argc, argv, self);
+        }
+        else if (_KIND_OF(argv[1], &tRectangle) || _KIND_OF(argv[1], &tRectangleF)) {
+            gdip_graphics_draw_image_rect_rect(argc, argv, self);
+        }
+        else if (_RB_ARRAY_P(argv[1])) {
+            gdip_graphics_draw_image_points_rect(argc, argv, self);
+        }
+        else {
+            rb_raise(rb_eTypeError, "wrong types of arguments");
+        }
+    }
+    else if (argc >= 9) {
+        if (Integer_p(argv[1]) || Float_p(argv[1])) {
+            gdip_graphics_draw_image_rect_rect(argc, argv, self);
+        }
+        else {
+            rb_raise(rb_eTypeError, "wrong types of arguments");
+        }
+    }
+
+    return self;
+}
+
 void
 Init_graphics()
 {
@@ -1931,4 +2820,19 @@ Init_graphics()
     rb_define_alias(cGraphics, "fill_path", "FillPath");
     rb_define_method(cGraphics, "FillRegion", RUBY_METHOD_FUNC(gdip_graphics_fill_region), 2);
     rb_define_alias(cGraphics, "fill_region", "FillRegion");
+
+    rb_define_method(cGraphics, "DrawImagePoint", RUBY_METHOD_FUNC(gdip_graphics_draw_image_point), -1);
+    rb_define_alias(cGraphics, "draw_image_point", "DrawImagePoint");
+    rb_define_method(cGraphics, "DrawImageRect", RUBY_METHOD_FUNC(gdip_graphics_draw_image_rect), -1);
+    rb_define_alias(cGraphics, "draw_image_rect", "DrawImageRect");
+    rb_define_method(cGraphics, "DrawImagePoints", RUBY_METHOD_FUNC(gdip_graphics_draw_image_points), 2);
+    rb_define_alias(cGraphics, "draw_image_points", "DrawImagePoints");
+    rb_define_method(cGraphics, "DrawImagePointRect", RUBY_METHOD_FUNC(gdip_graphics_draw_image_point_rect), -1);
+    rb_define_alias(cGraphics, "draw_image_point_rect", "DrawImagePointRect");
+    rb_define_method(cGraphics, "DrawImageRectRect", RUBY_METHOD_FUNC(gdip_graphics_draw_image_rect_rect), -1);
+    rb_define_alias(cGraphics, "draw_image_rect_rect", "DrawImageRectRect");    
+    rb_define_method(cGraphics, "DrawImagePointsRect", RUBY_METHOD_FUNC(gdip_graphics_draw_image_points_rect), -1);
+    rb_define_alias(cGraphics, "draw_image_points_rect", "DrawImagePointsRect");
+    rb_define_method(cGraphics, "DrawImage", RUBY_METHOD_FUNC(gdip_graphics_draw_image), -1);
+    rb_define_alias(cGraphics, "draw_image", "DrawImage");
 }

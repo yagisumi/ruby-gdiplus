@@ -25,9 +25,9 @@ end
 def figure
   return unless object.has_tag?("figure")
   @img_dir = "../" * object.namespace.parent.to_s.split(/::/).size + "img/"
+  @name = 'figure'
   erb('figure')
 end
-
 
 private
 
