@@ -892,8 +892,8 @@ Init_InterpolationMode()
 
     define_enumint(cInterpolationMode, table, "Invalid", -1);
     define_enumint(cInterpolationMode, table, "Default", 0);
-    define_enumint(cInterpolationMode, table, "LowQuality", 1);
-    define_enumint(cInterpolationMode, table, "HighQuality", 2);
+    define_enumint(cInterpolationMode, table, "Low", 1);
+    define_enumint(cInterpolationMode, table, "High", 2);
     define_enumint(cInterpolationMode, table, "Bilinear", 3);
     define_enumint(cInterpolationMode, table, "Bicubic", 4);
     define_enumint(cInterpolationMode, table, "NearestNeighbor", 5);

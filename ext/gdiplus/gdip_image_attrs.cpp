@@ -721,7 +721,7 @@ gdip_imgattrs_set_remap_table(int argc, VALUE *argv, VALUE self)
         gdip_arg_to_enumint(cColorAdjustType, argv[1], &type, "The second argument should be ColorAdjustType.");
     }
 
-    int size = RB_NUM2INT(rb_hash_size(argv[0]));
+    int size = RHASH_SIZE(argv[0]);
     if (size <= 0) {
         rb_raise(rb_eTypeError, "The key and value of Hash should be Color.");
     }
@@ -784,7 +784,7 @@ gdip_imgattrs_set_brush_remap_table(VALUE self, VALUE color_map)
     ImageAttributes *attrs = Data_Ptr<ImageAttributes *>(self);
     Check_NULL(attrs, "This ImageAttributes object does not exist.");
 
-    int size = RB_NUM2INT(rb_hash_size(color_map));
+    int size = RHASH_SIZE(color_map);
     GdipColorMaps *cmaps = new GdipColorMaps(size);
     
     rb_hash_foreach(color_map, _FOREACH_FUNC(foreach_remap_table_i), reinterpret_cast<VALUE>(cmaps));

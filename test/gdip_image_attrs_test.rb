@@ -137,7 +137,7 @@ class GdiplusImageAttributesTest < Test::Unit::TestCase
     assert_same(attrs, attrs.SetRemapTable({Color.Red => Color.Blue}, ColorAdjustType.Bitmap))
     assert_same(attrs, attrs.ClearRemapTable(ColorAdjustType.Bitmap))
     attrs = ImageAttributes.new
-    assert_raise(TypeError) { attrs.SetRemapTable({a: :b}) }
+    assert_raise(TypeError) { attrs.SetRemapTable({:a => :b}) }
     
     # SetBrushRemapTable
     attrs = ImageAttributes.new

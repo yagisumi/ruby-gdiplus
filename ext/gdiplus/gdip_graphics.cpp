@@ -119,7 +119,7 @@ gdip_graphics_get_interpolation_mode(VALUE self)
 {
     Graphics *g = Data_Ptr<Graphics *>(self);
     Check_NULL(g, "The graphics object does not exist.");
-    return gdip_enumint_create(cCompositingQuality, g->GetInterpolationMode());
+    return gdip_enumint_create(cInterpolationMode, g->GetInterpolationMode());
 }
 
 static VALUE
@@ -409,6 +409,44 @@ gdip_graphics_set_clip(VALUE self, VALUE v_region)
     Check_NULL(region, "The Region object of argument does not exist.");
 
     Status status = g->SetClip(region);
+    Check_Status(status);
+
+    return self;
+}
+
+/**
+ * Gets or sets the matrix of this Graphics.
+ * @return [Matrix]
+ */
+static VALUE
+gdip_graphics_get_transform(VALUE self)
+{
+    Graphics *g = Data_Ptr<Graphics *>(self);
+    Check_NULL(g, "The graphics object does not exist.");
+
+    VALUE r = typeddata_alloc_null<&tMatrix>(cMatrix);
+    Matrix *matrix = new Matrix();
+    _DATA_PTR(r) = gdip_obj_create(matrix);
+
+    Status status = g->GetTransform(matrix);
+    Check_Status(status);
+
+    return r;
+}
+
+static VALUE
+gdip_graphics_set_transform(VALUE self, VALUE v_matrix)
+{
+    if (!_KIND_OF(v_matrix, &tMatrix)) {
+        rb_raise(rb_eTypeError, "The argument should be Matrix.");
+    }
+
+    Graphics *g = Data_Ptr<Graphics *>(self);
+    Check_NULL(g, "The graphics object does not exist.");
+    Matrix *matrix = Data_Ptr<Matrix *>(v_matrix);
+    Check_NULL(matrix, "The Matrix object of argument does not exist.");
+
+    Status status = g->SetTransform(matrix);
     Check_Status(status);
 
     return self;
@@ -1131,7 +1169,7 @@ gdip_graphics_fill_closed_curve(int argc, VALUE *argv, VALUE self)
  *   bmp.draw {|g|
  *     g.DrawArc(pen, rect, -30, 60)
  *     g.DrawArc(pen, 20, 20, 160, 160, 90.0, 180.0)
- *     g.DrawArc(pen1, 20.0, 220.0, 160.0, 160.0, 90.0, 180.0)
+ *     g.DrawArc(pen, 20.0, 220.0, 160.0, 160.0, 90.0, 180.0)
  *   }
  * @overload DrawArc(pen, rect, start_angle, sweep_angle)
  *   @param pen [Pen]
@@ -2322,7 +2360,7 @@ gdip_graphics_draw_image_rect_rect(int argc, VALUE *argv, VALUE self)
             rb_raise(rb_eTypeError, "wrong types of arguments");
         }
     }
-    else if (argc >= 6 && Integer_p(4, argv[1])) {
+    else if (argc >= 6 && Integer_p(4, &argv[1])) {
         Rect dest_rect;
         dest_rect.X = RB_NUM2INT(argv[1]);
         dest_rect.Y = RB_NUM2INT(argv[2]);
@@ -2347,7 +2385,7 @@ gdip_graphics_draw_image_rect_rect(int argc, VALUE *argv, VALUE self)
 
             status = g->DrawImage(image, dest_rect, src_rect->X, src_rect->Y, src_rect->Width, src_rect->Height, unit, attributes);
         }
-        else if (argc >= 9 && Integer_p(4, argv[5])) {
+        else if (argc >= 9 && Integer_p(4, &argv[5])) {
             if (argc >= 10) {
                 gdip_arg_to_enumint(cGraphicsUnit, argv[9], &unit, "The seventh argument should be GraphicsUnit.");
             }
@@ -2366,7 +2404,7 @@ gdip_graphics_draw_image_rect_rect(int argc, VALUE *argv, VALUE self)
             rb_raise(rb_eTypeError, "wrong types of arguments");
         }
     }
-    else if (argc >= 6 && Float_p(4, argv[1])) {
+    else if (argc >= 6 && Float_p(4, &argv[1])) {
         RectF dest_rect;
         dest_rect.X = NUM2SINGLE(argv[1]);
         dest_rect.Y = NUM2SINGLE(argv[2]);
@@ -2391,7 +2429,7 @@ gdip_graphics_draw_image_rect_rect(int argc, VALUE *argv, VALUE self)
 
             status = g->DrawImage(image, dest_rect, src_rect->X, src_rect->Y, src_rect->Width, src_rect->Height, unit, attributes);
         }
-        else if (argc >= 9 && Float_p(4, argv[5])) {
+        else if (argc >= 9 && Float_p(4, &argv[5])) {
             if (argc >= 10) {
                 gdip_arg_to_enumint(cGraphicsUnit, argv[9], &unit, "The seventh argument should be GraphicsUnit.");
             }
@@ -2749,6 +2787,21 @@ gdip_graphics_draw_image(int argc, VALUE *argv, VALUE self)
     return self;
 }
 
+/**
+ * Excludes the specified area from the clip region of this Graphics.
+ * @overload ExcludeClip(rect)
+ *   @param rect [Rectangle or RectangleF]
+ * @overload ExcludeClip(region)
+ *   @param region [Region]
+ * @return [self]
+ */
+static VALUE
+gdip_graphics_exclude_clip(VALUE self, VALUE area)
+{
+
+    return self;
+}
+
 void
 Init_graphics()
 {
@@ -2771,6 +2824,7 @@ Init_graphics()
     ATTR_RW(cGraphics, SmoothingMode, smoothing_mode, graphics);
     ATTR_RW(cGraphics, TextContrast, text_contrast, graphics);
     ATTR_RW(cGraphics, TextRenderingHint, text_rendering_hint, graphics);
+    ATTR_RW(cGraphics, Transform, transform, graphics);
     ATTR_R(cGraphics, VisibleClipBounds, visible_clip_bounds, graphics);
 
     rb_define_method(cGraphics, "Clear", RUBY_METHOD_FUNC(gdip_graphics_clear), 1);
@@ -2835,4 +2889,6 @@ Init_graphics()
     rb_define_alias(cGraphics, "draw_image_points_rect", "DrawImagePointsRect");
     rb_define_method(cGraphics, "DrawImage", RUBY_METHOD_FUNC(gdip_graphics_draw_image), -1);
     rb_define_alias(cGraphics, "draw_image", "DrawImage");
+
+    
 }
