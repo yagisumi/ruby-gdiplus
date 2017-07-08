@@ -168,8 +168,16 @@ extern GUID _EncoderSaveAsCMYK;
 extern GUID _ImageFormatEXIF;
 extern GUID _ImageFormatUndefined;
 
-
+#if !defined(__func__)
+#define __func__ __FUNCTION__
+#endif
+#ifdef _MSC_VER
+#define IFVC 1
+#else
+#define IFVC 0
+#endif
 /* gdiplus.cpp */
+
 enum ArgOption {
     ArgOptionNone = 0,
     ArgOptionAcceptInt = 1,
@@ -467,7 +475,7 @@ gdip_default_free(void *ptr)
 
 template<typename T>
 static inline T
-gdip_obj_create(T obj)
+gdip_obj_create(T obj, bool ignore_status=false)
 {
     if (obj == NULL) {
         DPT("error obj == NULL");
@@ -475,12 +483,12 @@ gdip_obj_create(T obj)
         return NULL;
     }
     Status status = obj->GetLastStatus();
-    if (status == Ok) {
+    if (status == Ok || ignore_status) {
         DPT("new");
         GdiplusAddRef();
         return obj;
     }
-    DPT("error and delete");
+    DPT("new error and delete");
     delete obj;
     if (status < 22) {
         rb_raise(eGdiplus, "Status.%s, Some error occurred.", GpStatusStrs[status]);
@@ -497,8 +505,8 @@ gdip_obj_free(void *ptr)
 {
     T obj = static_cast<T>(ptr);
     if (obj != NULL) {
-        delete obj;
         DPT("delete");
+        delete obj;
         GdiplusRelease();
     }
 }

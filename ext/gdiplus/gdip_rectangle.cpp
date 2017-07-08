@@ -597,7 +597,7 @@ static VALUE
 gdip_sizef_get_height(VALUE self)
 {
     SizeF *size = Data_Ptr<SizeF *>(self);
-    return RB_INT2NUM(size->Height);
+    return SINGLE2NUM(size->Height);
 }
 
 static VALUE
@@ -1395,7 +1395,7 @@ gdip_rectf_set_location(VALUE self, VALUE loc)
     Check_Frozen(self);
     if (_KIND_OF(loc, &tPointF)) {
         RectF *rect = Data_Ptr<RectF *>(self);
-        Point *point = Data_Ptr<Point *>(loc);
+        PointF *point = Data_Ptr<PointF *>(loc);
         rect->X = point->X;
         rect->Y = point->Y;
     }

@@ -66,7 +66,11 @@ gdip_strfmt_s_get_generic_default(VALUE self)
 {
     if (RB_NIL_P(vGenericDefault)) {
         vGenericDefault = typeddata_alloc_null<&tStringFormat>(cStringFormat);
-        _DATA_PTR(vGenericDefault) = gdip_obj_create(const_cast<StringFormat *>(StringFormat::GenericDefault()));
+        #if IFVC
+            _DATA_PTR(vGenericDefault) = gdip_obj_create(StringFormat::GenericDefault()->Clone());
+        #else
+            _DATA_PTR(vGenericDefault) = gdip_obj_create(const_cast<StringFormat *>(StringFormat::GenericDefault()));
+        #endif
         RB_OBJ_FREEZE(vGenericDefault);
         rb_gc_register_address(&vGenericDefault);
     }
@@ -82,7 +86,11 @@ gdip_strfmt_s_get_generic_typographic(VALUE self)
 {
     if (RB_NIL_P(vGenericTypographic)) {
         vGenericTypographic = typeddata_alloc_null<&tStringFormat>(cStringFormat);
-        _DATA_PTR(vGenericTypographic) = gdip_obj_create(const_cast<StringFormat *>(StringFormat::GenericTypographic()));
+        #if IFVC
+            _DATA_PTR(vGenericTypographic) = gdip_obj_create(StringFormat::GenericTypographic()->Clone());
+        #else
+            _DATA_PTR(vGenericTypographic) = gdip_obj_create(const_cast<StringFormat *>(StringFormat::GenericTypographic()));
+        #endif
         RB_OBJ_FREEZE(vGenericTypographic);
         rb_gc_register_address(&vGenericTypographic);
     }

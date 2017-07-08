@@ -40,7 +40,15 @@ static VALUE
 gdip_fontfamily_s_get_generic_sans_serif(VALUE self)
 {
     if (RB_NIL_P(vGenericSansSerif)) {
-        vGenericSansSerif = gdip_fontfamily_create(const_cast<FontFamily *>(FontFamily::GenericSansSerif()));
+        #if IFVC
+            const FontFamily *family = FontFamily::GenericSansSerif();
+            if (family == NULL) {
+                return Qnil;
+            }
+            vGenericSansSerif = gdip_fontfamily_create(family->Clone());
+        #else
+            vGenericSansSerif = gdip_fontfamily_create(const_cast<FontFamily *>(FontFamily::GenericSansSerif()));
+        #endif
         rb_gc_register_address(&vGenericSansSerif);
     }
     return vGenericSansSerif;
@@ -50,7 +58,15 @@ static VALUE
 gdip_fontfamily_s_get_generic_serif(VALUE self)
 {
     if (RB_NIL_P(vGenericSerif)) {
-        vGenericSerif = gdip_fontfamily_create(const_cast<FontFamily *>(FontFamily::GenericSerif()));
+        #if IFVC
+            const FontFamily *family = FontFamily::GenericSerif();
+            if (family == NULL) {
+                return Qnil;
+            }
+            vGenericSerif = gdip_fontfamily_create(family->Clone());
+        #else
+            vGenericSerif = gdip_fontfamily_create(const_cast<FontFamily *>(FontFamily::GenericSerif()));
+        #endif
         rb_gc_register_address(&vGenericSerif);
     }
     return vGenericSerif;
@@ -60,7 +76,15 @@ static VALUE
 gdip_fontfamily_s_get_generic_monospace(VALUE self)
 {
     if (RB_NIL_P(vGenericMonospace)) {
-        vGenericMonospace = gdip_fontfamily_create(const_cast<FontFamily *>(FontFamily::GenericMonospace()));
+        #if IFVC
+            const FontFamily *family = FontFamily::GenericMonospace();
+            if (family == NULL) {
+                return Qnil;
+            }
+            vGenericMonospace = gdip_fontfamily_create(family->Clone());
+        #else
+            vGenericMonospace = gdip_fontfamily_create(const_cast<FontFamily *>(FontFamily::GenericMonospace()));
+        #endif
         rb_gc_register_address(&vGenericMonospace);
     }
     return vGenericMonospace;
@@ -161,7 +185,7 @@ gdip_fontfamily_get_em_height(int argc, VALUE *argv, VALUE self)
     if (!RB_NIL_P(v_style)) {
         gdip_arg_to_enumint(cFontStyle, v_style, &style, "The argument should be FontStyle.", ArgOptionAcceptInt);
     }
-    Gdiplus::UINT16 h = fontfamily->GetEmHeight(style);
+    UINT16 h = fontfamily->GetEmHeight(style);
     return RB_UINT2NUM(h);
 }
 
@@ -178,7 +202,7 @@ gdip_fontfamily_get_cell_ascent(int argc, VALUE *argv, VALUE self)
     if (!RB_NIL_P(v_style)) {
         gdip_arg_to_enumint(cFontStyle, v_style, &style, "The argument should be FontStyle.", ArgOptionAcceptInt);
     }
-    Gdiplus::UINT16 h = fontfamily->GetCellAscent(style);
+    UINT16 h = fontfamily->GetCellAscent(style);
     return RB_UINT2NUM(h);
 }
 
@@ -195,7 +219,7 @@ gdip_fontfamily_get_cell_descent(int argc, VALUE *argv, VALUE self)
     if (!RB_NIL_P(v_style)) {
         gdip_arg_to_enumint(cFontStyle, v_style, &style, "The argument should be FontStyle.", ArgOptionAcceptInt);
     }
-    Gdiplus::UINT16 h = fontfamily->GetCellDescent(style);
+    UINT16 h = fontfamily->GetCellDescent(style);
     return RB_UINT2NUM(h);
 }
 
@@ -212,7 +236,7 @@ gdip_fontfamily_get_line_spacing(int argc, VALUE *argv, VALUE self)
     if (!RB_NIL_P(v_style)) {
         gdip_arg_to_enumint(cFontStyle, v_style, &style, "The argument should be FontStyle.", ArgOptionAcceptInt);
     }
-    Gdiplus::UINT16 h = fontfamily->GetLineSpacing(style);
+    UINT16 h = fontfamily->GetLineSpacing(style);
     return RB_UINT2NUM(h);
 }
 

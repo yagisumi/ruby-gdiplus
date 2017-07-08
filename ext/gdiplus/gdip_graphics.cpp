@@ -2578,7 +2578,7 @@ gdip_graphics_draw_image_points_rect(int argc, VALUE *argv, VALUE self)
                 }
 
                 int count = 0;
-                Point *points = alloc_array_of<Point, &tPoint>(argv[1], count);
+                PointF *points = alloc_array_of<PointF, &tPointF>(argv[1], count);
                 if (count != 3) {
                     ruby_xfree(points);
                     rb_raise(rb_eArgError, "The number of points should be 3.");
@@ -2607,7 +2607,7 @@ gdip_graphics_draw_image_points_rect(int argc, VALUE *argv, VALUE self)
                 }
 
                 int count = 0;
-                Point *points = alloc_array_of<Point, &tPoint>(argv[1], count);
+                PointF *points = alloc_array_of<PointF, &tPointF>(argv[1], count);
                 if (count != 3) {
                     ruby_xfree(points);
                     rb_raise(rb_eArgError, "The number of points should be 3.");
@@ -2788,7 +2788,66 @@ gdip_graphics_draw_image(int argc, VALUE *argv, VALUE self)
 }
 
 /**
- * Excludes the specified area from the clip region of this Graphics.
+ * Sets the clipping region.
+ * @overload SetClip(graphics, mode=CombineMode.Replace)
+ *   @param graphics [Graphics]
+ *   @param mode [CombineMode]
+ * @overload SetClip(path, mode=CombineMode.Replace)
+ *   @param path [GraphicsPath]
+ *   @param mode [CombineMode]
+ * @overload SetClip(rect, mode=CombineMode.Replace)
+ *   @param rect [Rectangle or RectangleF]
+ *   @param mode [CombineMode]
+ * @overload SetClip(region, mode=CombineMode.Replace)
+ *   @param region [Region]
+ *   @param mode [CombineMode]
+ * @return [self]
+ */
+static VALUE
+gdip_graphics_m_set_clip(int argc, VALUE *argv, VALUE self)
+{
+    VALUE area, v_mode;
+    rb_scan_args(argc, argv, "11", &area, &v_mode);
+
+    Graphics *g = Data_Ptr<Graphics *>(self);
+    Check_NULL(g, "This Graphics object does not exist.");
+
+    CombineMode mode = CombineModeReplace;
+    if (!RB_NIL_P(v_mode)) {
+        gdip_arg_to_enumint(cCombineMode, v_mode, &mode, "The second argument should be CombineMode.");
+    }
+
+    Status status = Ok;
+    if (_KIND_OF(area, &tGraphics)) {
+        Graphics *graphics = Data_Ptr<Graphics *>(area);
+        status = g->SetClip(graphics, mode);
+    }
+    else if (_KIND_OF(area, &tGraphicsPath)) {
+        GraphicsPath *path = Data_Ptr<GraphicsPath *>(area);
+        status = g->SetClip(path, mode);
+    }
+    else if (_KIND_OF(area, &tRectangle)) {
+        Rect *rect = Data_Ptr<Rect *>(area);
+        status = g->SetClip(*rect, mode);
+    }
+    else if (_KIND_OF(area, &tRectangleF)) {
+        RectF *rect = Data_Ptr<RectF *>(area);
+        status = g->SetClip(*rect, mode);
+    }
+    else if (_KIND_OF(area, &tRegion)) {
+        Region *region = Data_Ptr<Region *>(area);
+        status = g->SetClip(region, mode);
+    }
+    else {
+        rb_raise(rb_eTypeError, "The first argument should be Graphics, GraphicsPath, Rectangle, RectangleF or Region.");
+    }
+    Check_Status(status);
+
+    return self;
+}
+
+/**
+ * Excludes the specified area from the clipping region of this Graphics.
  * @overload ExcludeClip(rect)
  *   @param rect [Rectangle or RectangleF]
  * @overload ExcludeClip(region)
@@ -2798,7 +2857,322 @@ gdip_graphics_draw_image(int argc, VALUE *argv, VALUE self)
 static VALUE
 gdip_graphics_exclude_clip(VALUE self, VALUE area)
 {
+    Graphics *g = Data_Ptr<Graphics *>(self);
+    Check_NULL(g, "This Graphics object does not exist.");
 
+    Status status = Ok;
+    if (_KIND_OF(area, &tRectangle)) {
+        Rect *rect = Data_Ptr<Rect *>(area);
+        status = g->ExcludeClip(*rect);
+    }
+    else if (_KIND_OF(area, &tRectangleF)) {
+        RectF *rect = Data_Ptr<RectF *>(area);
+        status = g->ExcludeClip(*rect);
+    }
+    else if (_KIND_OF(area, &tRegion)) {
+        Region *region = Data_Ptr<Region *>(area);
+        status = g->ExcludeClip(region);
+    }
+    else {
+        rb_raise(rb_eTypeError, "The argument should be Rectangle, RectangleF or Region.");
+    }
+    Check_Status(status);
+
+    return self;
+}
+
+/**
+ * Updates the clipping region of this Graphics to the intersection.
+ * @overload IntersectClip(rect)
+ *   @param rect [Rectangle or RectangleF]
+ * @overload IntersectClip(region)
+ *   @param region [Region]
+ * @return [self]
+ */
+static VALUE
+gdip_graphics_intersect_clip(VALUE self, VALUE area)
+{
+    Graphics *g = Data_Ptr<Graphics *>(self);
+    Check_NULL(g, "This Graphics object does not exist.");
+
+    Status status = Ok;
+    if (_KIND_OF(area, &tRectangle)) {
+        Rect *rect = Data_Ptr<Rect *>(area);
+        status = g->IntersectClip(*rect);
+    }
+    else if (_KIND_OF(area, &tRectangleF)) {
+        RectF *rect = Data_Ptr<RectF *>(area);
+        status = g->IntersectClip(*rect);
+    }
+    else if (_KIND_OF(area, &tRegion)) {
+        Region *region = Data_Ptr<Region *>(area);
+        status = g->IntersectClip(region);
+    }
+    else {
+        rb_raise(rb_eTypeError, "The argument should be Rectangle, RectangleF or Region.");
+    }
+    Check_Status(status);
+
+    return self;
+}
+
+/**
+ * Reset the clipping region of this Graphics.
+ * @return [self]
+ */
+static VALUE
+gdip_graphics_reset_clip(VALUE self)
+{
+    Graphics *g = Data_Ptr<Graphics *>(self);
+    Check_NULL(g, "This Graphics object does not exist.");
+
+    Status status = g->ResetClip();
+    Check_Status(status);
+
+    return self;
+}
+
+/**
+ * Translates the clipping region of this Graphics.
+ * @param dx [Integer or Float]
+ * @param dy [Integer or Float]
+ * @return [self]
+ */
+static VALUE
+gdip_graphics_translate_clip(VALUE self, VALUE dx, VALUE dy)
+{
+    Graphics *g = Data_Ptr<Graphics *>(self);
+    Check_NULL(g, "This Graphics object does not exist.");
+
+    Status status = Ok;
+    if (Integer_p(dx, dy)) {
+        status = g->TranslateClip(RB_NUM2INT(dx), RB_NUM2INT(dy));
+    }
+    else if (Float_p(dx, dy)) {
+        status = g->TranslateClip(NUM2SINGLE(dx), NUM2SINGLE(dy));
+    }
+    else {
+        rb_raise(rb_eTypeError, "Every arguments should be Integer or Float.");
+    }
+    Check_Status(status);
+
+    return self;
+}
+
+/**
+ * Whether the specified Point or Rectangle is contained within the visible clip region.
+ * @overload IsVisible(point)
+ *   @param point [Point or PointF]
+ * @overload IsVisible(x, y)
+ *   @param x [Integer or Float]
+ *   @param y [Integer or Float]
+ * @overload IsVisible(rect)
+ *   @param rect [Rectangle or RectangleF]
+ * @overload IsVisible(x, y, w, h)
+ *   @param x [Integer or Float]
+ *   @param y [Integer or Float]
+ *   @param w [Integer or Float]
+ *   @param h [Integer or Float]
+ * @return [Boolean]
+ */
+static VALUE
+gdip_graphics_is_visible(int argc, VALUE *argv, VALUE self)
+{
+    if (argc != 1 && argc != 2 && argc != 4) {
+        rb_raise(rb_eArgError, "wrong number of arguments (%d for 1, 2, 4)", argc);
+    }
+
+    Graphics *g = Data_Ptr<Graphics *>(self);
+    Check_NULL(g, "This Graphics object does not exist.");
+
+    BOOL r = false;
+    if (argc == 1) {
+        if (_KIND_OF(argv[0], &tPoint)) {
+            Point *point = Data_Ptr<Point *>(argv[0]);
+            r = g->IsVisible(*point);
+        }
+        else if (_KIND_OF(argv[0], &tPointF)) {
+            PointF *point = Data_Ptr<PointF *>(argv[0]);
+            r = g->IsVisible(*point);
+        }
+        else if (_KIND_OF(argv[0], &tRectangle)) {
+            Rect *rect = Data_Ptr<Rect *>(argv[0]);
+            r = g->IsVisible(*rect);
+        }
+        else if (_KIND_OF(argv[0], &tRectangleF)) {
+            RectF *rect = Data_Ptr<RectF *>(argv[0]);
+            r = g->IsVisible(*rect);
+        }
+        else {
+            rb_raise(rb_eTypeError, "The argument should be Point, PointF, Rectangle or RectangleF.");
+        }
+    }
+    else if (argc == 2) {
+        if (Integer_p(argv[0], argv[1])) {
+            r = g->IsVisible(RB_NUM2INT(argv[0]), RB_NUM2INT(argv[1]));
+        }
+        else if (Float_p(argv[0], argv[1])) {
+            r = g->IsVisible(NUM2SINGLE(argv[0]), NUM2SINGLE(argv[1]));
+        }
+        else {
+            rb_raise(rb_eTypeError, "The arguments should be Integer or Float.");
+        }
+    }
+    else if (argc == 4) {
+        if (Integer_p(4, argv)) {
+            r = g->IsVisible(RB_NUM2INT(argv[0]), RB_NUM2INT(argv[1]), RB_NUM2INT(argv[2]), RB_NUM2INT(argv[3]));
+        }
+        else if (Float_p(4, argv)) {
+            r = g->IsVisible(NUM2SINGLE(argv[0]), NUM2SINGLE(argv[1]), NUM2SINGLE(argv[2]), NUM2SINGLE(argv[3]));
+        }
+        else {
+            rb_raise(rb_eTypeError, "The arguments should be Integer or Float.");
+        }
+    }
+    Check_LastStatus(g);
+
+    return r ? Qtrue : Qfalse;
+}
+
+/**
+ * Resets the transformation matrix.
+ * @return [self]
+ */
+static VALUE
+gdip_graphics_reset_transform(VALUE self)
+{
+    Graphics *g = Data_Ptr<Graphics *>(self);
+    Check_NULL(g, "This Graphics object does not exist.");
+
+    Status status = g->ResetTransform();
+    Check_Status(status);
+
+    return self;
+}
+
+/**
+ * @overload MultiplyTransform(matrix, order=MatrixOrder.Prepend)
+ *   Multiplies the transformation matrix.
+ *   @param matrix [Matrix]
+ *   @param order [MatrixOrder]
+ *   @return [self]
+ */
+
+static VALUE
+gdip_graphics_multiply_transform(int argc, VALUE *argv, VALUE self)
+{
+    VALUE v_matrix, v_order;
+    rb_scan_args(argc, argv, "11", &v_matrix, &v_order);
+
+    if (!_KIND_OF(v_matrix, &tMatrix)) {
+        rb_raise(rb_eTypeError, "The first argument should be Matrix.");
+    }
+
+    Graphics *g = Data_Ptr<Graphics *>(self);
+    Check_NULL(g, "This Graphics object does not exist.");
+    Matrix *matrix = Data_Ptr<Matrix *>(v_matrix);
+    MatrixOrder order = MatrixOrderPrepend;
+
+    if (!RB_NIL_P(v_order)) {
+        gdip_arg_to_enumint(cMatrixOrder, v_order, &order, "The second argument should be MatrixOrder.");
+    }
+
+    Status status = g->MultiplyTransform(matrix, order);
+    Check_Status(status);
+    
+    return self;
+}
+
+/**
+ * @overload TranslateTransform(dx, dy, order=MatrixOrder.Prepend)
+ *   Translates.
+ *   @param dx [Integer or Float]
+ *   @param dy [Integer or Float]
+ *   @param order [MatrixOrder]
+ *   @return [self]
+ */
+static VALUE
+gdip_graphics_translate_transform(int argc, VALUE *argv, VALUE self)
+{
+    VALUE v_dx, v_dy, v_order;
+    rb_scan_args(argc, argv, "21", &v_dx, &v_dy, &v_order);
+
+    Graphics *g = Data_Ptr<Graphics *>(self);
+    Check_NULL(g, "This Graphics object does not exist.");
+    MatrixOrder order = MatrixOrderPrepend;
+
+    if (!RB_NIL_P(v_order)) {
+        gdip_arg_to_enumint(cMatrixOrder, v_order, &order, "The third argument should be MatrixOrder.");
+    }
+
+    float dx = 0.0f;
+    float dy = 0.0f;
+    Status status = g->TranslateTransform(dx, dy, order);
+    Check_Status(status);
+    
+    return self;
+}
+
+/**
+ * @overload ScaleTransform(sx, sy, order=MatrixOrder.Prepend)
+ *   Scales.
+ *   @param sx [Integer or Float]
+ *   @param sy [Integer or Float]
+ *   @param order [MatrixOrder]
+ *   @return [self]
+ */
+static VALUE
+gdip_graphics_scale_transform(int argc, VALUE *argv, VALUE self)
+{
+    VALUE v_sx, v_sy, v_order;
+    rb_scan_args(argc, argv, "21", &v_sx, &v_sy, &v_order);
+
+    Graphics *g = Data_Ptr<Graphics *>(self);
+    Check_NULL(g, "This Graphics object does not exist.");
+    float sx = 0.0f;
+    float sy = 0.0f;
+    MatrixOrder order = MatrixOrderPrepend;
+
+    gdip_arg_to_single(v_sx, &sx, "The first argument should be Float.");
+    gdip_arg_to_single(v_sy, &sy, "The second argument should be Float.");
+
+    if (!RB_NIL_P(v_order)) {
+        gdip_arg_to_enumint(cMatrixOrder, v_order, &order, "The third argument should be MatrixOrder.");
+    }
+    
+    Status status = g->ScaleTransform(sx, sy, order);
+    Check_Status(status);
+    
+    return self;
+}
+
+/**
+ * @overload RotateTransform(angle, order=MatrixOrder.Prepend)
+ *   Scales.
+ *   @param angle [Float]
+ *   @param order [MatrixOrder]
+ *   @return [self]
+ */
+static VALUE
+gdip_graphics_rotate_transform(int argc, VALUE *argv, VALUE self)
+{
+    VALUE v_angle, v_order;
+    rb_scan_args(argc, argv, "11", &v_angle, &v_order);
+
+    Graphics *g = Data_Ptr<Graphics *>(self);
+    Check_NULL(g, "This Graphics object does not exist.");
+    float angle = 0.0f;
+    MatrixOrder order = MatrixOrderPrepend;
+
+    gdip_arg_to_single(v_angle, &angle, "The first argument should be Float.");
+
+    if (!RB_NIL_P(v_order)) {
+        gdip_arg_to_enumint(cMatrixOrder, v_order, &order, "The second argument should be MatrixOrder.");
+    }
+
+    Status status = g->RotateTransform(angle, order);
+    Check_Status(status);
+    
     return self;
 }
 
@@ -2890,5 +3264,28 @@ Init_graphics()
     rb_define_method(cGraphics, "DrawImage", RUBY_METHOD_FUNC(gdip_graphics_draw_image), -1);
     rb_define_alias(cGraphics, "draw_image", "DrawImage");
 
-    
+    rb_define_method(cGraphics, "SetClip", RUBY_METHOD_FUNC(gdip_graphics_m_set_clip), -1);
+    rb_define_alias(cGraphics, "set_clip", "SetClip");
+    rb_define_method(cGraphics, "ExcludeClip", RUBY_METHOD_FUNC(gdip_graphics_exclude_clip), 1);
+    rb_define_alias(cGraphics, "exclude_clip", "ExcludeClip");
+    rb_define_method(cGraphics, "IntersectClip", RUBY_METHOD_FUNC(gdip_graphics_intersect_clip), 1);
+    rb_define_alias(cGraphics, "intersect_clip", "IntersectClip");
+    rb_define_method(cGraphics, "ResetClip", RUBY_METHOD_FUNC(gdip_graphics_reset_clip), 0);
+    rb_define_alias(cGraphics, "reset_clip", "ResetClip");
+    rb_define_method(cGraphics, "TranslateClip", RUBY_METHOD_FUNC(gdip_graphics_translate_clip), 2);
+    rb_define_alias(cGraphics, "translate_clip", "TranslateClip");
+
+    rb_define_method(cGraphics, "IsVisible", RUBY_METHOD_FUNC(gdip_graphics_is_visible), -1);
+    rb_define_alias(cGraphics, "is_visible", "IsVisible");
+
+    rb_define_method(cGraphics, "ResetTransform", RUBY_METHOD_FUNC(gdip_graphics_reset_transform), 0);
+    rb_define_alias(cGraphics, "reset_transform", "ResetTransform");
+    rb_define_method(cGraphics, "MultiplyTransform", RUBY_METHOD_FUNC(gdip_graphics_multiply_transform), -1);
+    rb_define_alias(cGraphics, "multiply_transform", "MultiplyTransform");
+    rb_define_method(cGraphics, "TranslateTransform", RUBY_METHOD_FUNC(gdip_graphics_translate_transform), -1);
+    rb_define_alias(cGraphics, "translate_transform", "TranslateTransform");
+    rb_define_method(cGraphics, "ScaleTransform", RUBY_METHOD_FUNC(gdip_graphics_scale_transform), -1);
+    rb_define_alias(cGraphics, "scale_transform", "ScaleTransform");
+    rb_define_method(cGraphics, "RotateTransform", RUBY_METHOD_FUNC(gdip_graphics_rotate_transform), -1);
+    rb_define_alias(cGraphics, "rotate_transform", "RotateTransform");
 }

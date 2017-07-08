@@ -13,7 +13,9 @@ if gdiplus_debug
   $defs << "-DGDIPLUS_DEBUG=1"
 end
 
-if $mingw
+if $mswin
+  $defs << "-DGDIPVER=0x0110"
+elsif $mingw
   #$CXXFLAGS += " -std=c++11 "
   if gdiplus_debug # DEBUG
     
@@ -22,7 +24,7 @@ if $mingw
       $libs += " -static-libgcc -static-libstdc++ -Wl,-Bstatic,--whole-archive -lwinpthread -Wl,--no-whole-archive "
 #    elsif RUBY_VERSION_NUM >= 20300 # for 2.3
 #      $libs += " -static-libgcc -static-libstdc++ "
-    elsif RUBY_VERSION_NUM >= 20000 # for 2.0-2.2
+    elsif RUBY_VERSION_NUM >= 20000 # for 2.0-2.2, 2.3
       $libs += " -static-libgcc -static-libstdc++ "
     elsif RUBY_VERSION_NUM < 10900 # for 1.8
       #have_library('stdc++')

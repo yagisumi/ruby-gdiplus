@@ -103,7 +103,7 @@ gdip_region_clone(VALUE self)
     Check_NULL(region, "This Region object does not exist.");
 
     VALUE r = typeddata_alloc_null<&tRegion>(cRegion);
-    _DATA_PTR(r) = gdip_obj_create(region->Clone());
+    _DATA_PTR(r) = gdip_obj_create(region->Clone(), IFVC);
 
     return r;
 }

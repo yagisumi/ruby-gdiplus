@@ -342,7 +342,7 @@ gdip_icinfo_get_signature_patterns(VALUE self)
     VALUE v = rb_ary_new();
     if (icinfo->SigPattern != NULL) {
         for (unsigned int i = 0; i < icinfo->SigCount; i++) {
-            VALUE s = rb_str_new(reinterpret_cast<char *>(&(icinfo->SigPattern[icinfo->SigSize * i])), icinfo->SigSize);
+            VALUE s = rb_str_new(reinterpret_cast<const char *>(&(icinfo->SigPattern[icinfo->SigSize * i])), icinfo->SigSize);
             RB_OBJ_FREEZE(s);
             rb_ary_push(v, s);
         }
@@ -365,7 +365,7 @@ gdip_icinfo_get_signature_masks(VALUE self)
     VALUE v = rb_ary_new();
     if (icinfo->SigMask != NULL) {
         for (unsigned int i = 0; i < icinfo->SigCount; i++) {
-            VALUE s = rb_str_new(reinterpret_cast<char *>(&(icinfo->SigMask[icinfo->SigSize * i])), icinfo->SigSize);
+            VALUE s = rb_str_new(reinterpret_cast<const char *>(&(icinfo->SigMask[icinfo->SigSize * i])), icinfo->SigSize);
             RB_OBJ_FREEZE(s);
             rb_ary_push(v, s);
         }
