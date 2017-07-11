@@ -1,19 +1,7 @@
-/*
- * ruby_compatible.h
- * Copyright (c) 2017 Yagi Sumiya 
- * Released under the MIT License.
- */
-/**********************************************************************
-  Ruby's license
-  ruby/ruby.h
-  Copyright (C) 1993-2008 Yukihiro Matsumoto
-  Copyright (C) 2000  Network Applied Communication Laboratory, Inc.
-  Copyright (C) 2000  Information-technology Promotion Agency, Japan
-**********************************************************************/
-
 #ifndef RUBY_COMPATIBLE_H_
 #define RUBY_COMPATIBLE_H_ 1
 
+#include <ruby.h>
 #ifdef HAVE_RUBY_VERSION_H
 #include <ruby/version.h>
 #else
@@ -81,8 +69,9 @@
 #ifndef RB_SYM2ID
 #define RB_SYM2ID(x) SYM2ID(x)
 #endif
+
 #ifdef FIX2SHORT
-  #ifndef RB_FIX2SHORT
+    #ifndef RB_FIX2SHORT
 #ifndef RB_NUM2SHORT
 #define RB_NUM2SHORT(x) NUM2SHORT(x)
 #endif
@@ -92,10 +81,11 @@
 #ifndef RB_FIX2SHORT
 #define RB_FIX2SHORT(x) FIX2SHORT(x)
 #endif
-  #endif /* RB_FIX2SHORT */
+    #endif /* RB_FIX2SHORT */
 #else
 /* not yet */
 #endif /* FIX2SHORT */
+
 #ifndef DBL2NUM
 #define DBL2NUM(dbl)  rb_float_new(dbl)
 #endif
@@ -104,6 +94,7 @@
 #elif SIZEOF_LONG_LONG == SIZEOF_VOIDP
 #define _RB_NUM2ID(x) RB_NUM2ULL(x)
 #endif
+
 #ifndef RB_TEST
 #define RB_TEST(v) RTEST(v)
 #endif
@@ -232,13 +223,13 @@
 
 #ifndef RB_INTEGER_TYPE_P
 #define RB_INTEGER_TYPE_P(obj) rb_integer_type_p(obj)
-  static inline int
-  rb_integer_type_p(VALUE obj)
-  {
-      return (RB_FIXNUM_P(obj) ||
-              (!RB_SPECIAL_CONST_P(obj) &&
-               RB_BUILTIN_TYPE(obj) == RUBY_T_BIGNUM));
-  }
+    static inline int
+    rb_integer_type_p(VALUE obj)
+    {
+        return (RB_FIXNUM_P(obj) ||
+                (!RB_SPECIAL_CONST_P(obj) &&
+                 RB_BUILTIN_TYPE(obj) == RUBY_T_BIGNUM));
+    }
 #endif /* RB_INTEGER_TYPE_P */
 
 #ifndef RB_FLOAT_TYPE_P
@@ -267,29 +258,29 @@
 #endif
 
 #ifndef HAVE_TYPE_RB_DATA_TYPE_T
-  typedef struct rb_data_type_struct rb_data_type_t;
-  
-  struct rb_data_type_struct {
-      const char *wrap_struct_name;
-      struct {
-          void (*dmark)(void*);
-          void (*dfree)(void*);
-          size_t (*dsize)(const void *);
-          void *reserved[2]; /* For future extension.
-                                This array *must* be filled with ZERO. */
-      } function;
-      const rb_data_type_t *parent;
-      void *data;        /* This area can be used for any purpose
-                            by a programmer who define the type. */
-  };  
-  static inline int rb_typeddata_is_kind_of(VALUE obj, const rb_data_type_t *data_type)
-  {
-    VALUE *klass_ptr = (VALUE *)data_type->data;
-    if (RB_TYPE_P(obj, RUBY_T_DATA) && klass_ptr && RB_TYPE_P(*klass_ptr, RUBY_T_CLASS)) {
-      return RB_TEST(rb_obj_is_kind_of(obj, *klass_ptr));
+    typedef struct rb_data_type_struct rb_data_type_t;
+    
+    struct rb_data_type_struct {
+        const char *wrap_struct_name;
+        struct {
+            void (*dmark)(void*);
+            void (*dfree)(void*);
+            size_t (*dsize)(const void *);
+            void *reserved[2]; /* For future extension.
+                                  This array *must* be filled with ZERO. */
+        } function;
+        const rb_data_type_t *parent;
+        void *data;        /* This area can be used for any purpose
+                              by a programmer who define the type. */
+    };  
+    static inline int rb_typeddata_is_kind_of(VALUE obj, const rb_data_type_t *data_type)
+    {
+        VALUE *klass_ptr = (VALUE *)data_type->data;
+        if (RB_TYPE_P(obj, RUBY_T_DATA) && klass_ptr && RB_TYPE_P(*klass_ptr, RUBY_T_CLASS)) {
+            return RB_TEST(rb_obj_is_kind_of(obj, *klass_ptr));
+        }
+        else { return 0; }
     }
-    else { return 0; }
-  }
 #define TypedData_Wrap_Struct(klass,data_type,sval) Data_Wrap_Struct(klass, (data_type)->function.dmark, (data_type)->function.dfree, sval)
 #define TypedData_Get_Struct(obj,type,data_type,sval) Data_Get_Struct(obj,type,sval)
 #define RTYPEDDATA_DATA(v) DATA_PTR(v)
@@ -300,24 +291,24 @@
 #define _KIND_OF(obj, data_type) rb_typeddata_is_kind_of(obj, data_type)
 
 #if RUBY_API_VERSION_CODE < 20200
-#define _MAKE_DATA_TYPE(name, mark, free, size, parent_type_ptr, klass_ptr) {\
-    name,\
-    {mark, free, size,},\
-    parent_type_ptr, klass_ptr\
-  }
+    #define _MAKE_DATA_TYPE(name, mark, free, size, parent_type_ptr, klass_ptr) {\
+        name,\
+        {mark, free, size,},\
+        parent_type_ptr, klass_ptr\
+    }
 #else
-#define _MAKE_DATA_TYPE(name, mark, free, size, parent_type_ptr, klass_ptr) {\
-    name,\
-    {mark, free, size,},\
-    parent_type_ptr, klass_ptr,\
-    RUBY_TYPED_FREE_IMMEDIATELY\
-  }
+    #define _MAKE_DATA_TYPE(name, mark, free, size, parent_type_ptr, klass_ptr) {\
+        name,\
+        {mark, free, size,},\
+        parent_type_ptr, klass_ptr,\
+        RUBY_TYPED_FREE_IMMEDIATELY\
+    }
 #endif /* RUBY_API_VERSION_CODE < 20200 */
-  static inline VALUE
-  _KLASS(const rb_data_type_t *type)
-  {
-      return *(VALUE *)(type->data);
-  }
+    static inline VALUE
+    _KLASS(const rb_data_type_t *type)
+    {
+        return *(VALUE *)(type->data);
+    }
 #define _Data_Wrap_Struct(klass,data_type,sval) TypedData_Wrap_Struct(klass,data_type,sval)
 #define _Data_Get_Struct(obj,type,data_type,sval) TypedData_Get_Struct(obj,type,data_type,sval)
 #ifndef RUBY_DEFAULT_FREE
@@ -355,7 +346,6 @@
 #define RB_REALLOC_N(var,type,n) REALLOC_N(var,type,n)
 #endif
 
-
 #ifndef rb_ary_new2
 #define rb_ary_new_capa rb_ary_new2
 #endif
@@ -389,11 +379,11 @@
 #endif
 
 #if RUBY_API_VERSION_CODE < 10900
-  static inline VALUE
-  rb_str_length(VALUE str)
-  {
-    return LONG2NUM(RSTRING(str)->len);
-  }
+    static inline VALUE
+    rb_str_length(VALUE str)
+    {
+        return LONG2NUM(RSTRING(str)->len);
+    }
 #endif
 
 #if !defined(HAVE_RUBY_ENCODING_H)
@@ -404,18 +394,18 @@
 #define rb_enc_reg_new(s, len, enc, options) rb_reg_new(s, len, options)
 #elif RUBY_API_VERSION_CODE < 20200
 #include <ruby/encoding.h>
-  //#define rb_utf8_str_new(ptr, len) rb_enc_str_new(ptr, len, rb_utf8_encoding())
-  static inline VALUE 
-  rb_utf8_str_new(const char *ptr, long len)
-  {
-      return rb_enc_str_new(ptr, len, rb_utf8_encoding());
-  }
-  //#define rb_utf8_str_new_cstr(ptr) rb_enc_str_new(ptr, strlen(ptr), rb_utf8_encoding())
-  static inline VALUE
-  rb_utf8_str_new_cstr(const char *ptr)
-  {
-      return rb_enc_str_new(ptr, strlen(ptr), rb_utf8_encoding());
-  }
+    //#define rb_utf8_str_new(ptr, len) rb_enc_str_new(ptr, len, rb_utf8_encoding())
+    static inline VALUE 
+    rb_utf8_str_new(const char *ptr, long len)
+    {
+        return rb_enc_str_new(ptr, len, rb_utf8_encoding());
+    }
+    //#define rb_utf8_str_new_cstr(ptr) rb_enc_str_new(ptr, strlen(ptr), rb_utf8_encoding())
+    static inline VALUE
+    rb_utf8_str_new_cstr(const char *ptr)
+    {
+        return rb_enc_str_new(ptr, strlen(ptr), rb_utf8_encoding());
+    }
 #endif /* HAVE_RUBY_ENCODING_H */
 
 #ifdef HAVE_RUBY_ONIGURUMA_H
@@ -438,20 +428,20 @@
 #endif /* HAVE_RUBY_ONIGURUMA_H */
 
 #if RUBY_API_VERSION_CODE < 10900
-  #if defined(__cplusplus)
-  extern "C" { 
-  #endif
-    #include <st.h>
-  #if defined(__cplusplus)
-  }
-  #endif
-  typedef int st_index_t;
-  static inline st_index_t
-  rb_memhash(const void *ptr, long len)
-  {
-      VALUE str = rb_str_new((const char *)ptr, len);
-      return rb_str_hash(str);
-  }
+    #if defined(__cplusplus)
+    extern "C" { 
+    #endif
+        #include <st.h>
+    #if defined(__cplusplus)
+    }
+    #endif
+    typedef int st_index_t;
+    static inline st_index_t
+    rb_memhash(const void *ptr, long len)
+    {
+        VALUE str = rb_str_new((const char *)ptr, len);
+        return rb_str_hash(str);
+    }
 #endif /* RUBY_API_VERSION_CODE < 10900 */
 #define _FOREACH_FUNC(func) ((int (*)(ANYARGS))(func))
 
@@ -459,101 +449,116 @@
 
 #if RUBY_API_VERSION_CODE < 10900
   
-  static inline VALUE rb_rational_new(VALUE x, VALUE y)
-  {
-    rb_f_require(rb_mKernel, rb_str_new_cstr("rational"));
-    return rb_funcall(rb_mKernel, rb_intern("Rational"), 2, x, y);
-  }
-  #include <string.h>
-  static inline int _RB_RATIONAL_P(VALUE x)
-  {
-    VALUE path = rb_class_path(CLASS_OF(x));
-    if (strcmp("Rational", RSTRING_PTR(path)) == 0) {
-      return 1;
+    static inline VALUE rb_rational_new(VALUE x, VALUE y)
+    {
+      rb_f_require(rb_mKernel, rb_str_new_cstr("rational"));
+      return rb_funcall(rb_mKernel, rb_intern("Rational"), 2, x, y);
     }
-    else {
-      return 0;
+    #include <string.h>
+    static inline int _RB_RATIONAL_P(VALUE x)
+    {
+        VALUE path = rb_class_path(CLASS_OF(x));
+        if (strcmp("Rational", RSTRING_PTR(path)) == 0) {
+            return 1;
+        }
+        else {
+            return 0;
+        }
     }
-  }
-  static inline VALUE rb_rational_den(VALUE x)
-  {
-    return rb_funcall(x, rb_intern("denominator"), 0);
-  }
-  static inline VALUE rb_rational_num(VALUE x)
-  {
-    return rb_funcall(x, rb_intern("numerator"), 0);
-  }
-#else
-  static inline int _RB_RATIONAL_P(VALUE x)
-  {
-    return rb_cRational == CLASS_OF(x);
-  }
-  #if RUBY_API_VERSION_CODE < 20200
     static inline VALUE rb_rational_den(VALUE x)
     {
-      return ((struct RRational *)(x))->den;
+        return rb_funcall(x, rb_intern("denominator"), 0);
     }
     static inline VALUE rb_rational_num(VALUE x)
     {
-      return ((struct RRational *)(x))->num;
+        return rb_funcall(x, rb_intern("numerator"), 0);
     }
-  #endif
+#else
+    static inline int _RB_RATIONAL_P(VALUE x)
+    {
+        return rb_cRational == CLASS_OF(x);
+    }
+    #if RUBY_API_VERSION_CODE < 20200
+        static inline VALUE rb_rational_den(VALUE x)
+        {
+            return ((struct RRational *)(x))->den;
+        }
+        static inline VALUE rb_rational_num(VALUE x)
+        {
+            return ((struct RRational *)(x))->num;
+        }
+    #endif
 #endif
 
 #if RUBY_API_VERSION_CODE >= 10900 && RUBY_API_VERSION_CODE < 20100
-  #define RSTRUCT_GET(st, idx)    rb_struct_aref(st, INT2NUM(idx))
+    #define RSTRUCT_GET(st, idx)    rb_struct_aref(st, INT2NUM(idx))
 #endif
 
 #if RUBY_API_VERSION_CODE < 10900
-  static inline VALUE
-  _rb_range_beg(VALUE range)
-  {
-    return rb_iv_get(range, "begin");
-  }
-  static inline VALUE
-  _rb_range_end(VALUE range)
-  {
-    return rb_iv_get(range, "end");
-  }
-  static inline int
-  _rb_range_excl_p(VALUE range)
-  {
-    return RB_TEST(rb_iv_get(range, "excl"));
-  }
+    static inline VALUE
+    _rb_range_beg(VALUE range)
+    {
+        return rb_iv_get(range, "begin");
+    }
+    static inline VALUE
+    _rb_range_end(VALUE range)
+    {
+        return rb_iv_get(range, "end");
+    }
+    static inline int
+    _rb_range_excl_p(VALUE range)
+    {
+        return RB_TEST(rb_iv_get(range, "excl"));
+    }
 #else
-  static inline VALUE
-  _rb_range_beg(VALUE range)
-  {
-    return RSTRUCT_GET(range, 0);
-  }
-  static inline VALUE
-  _rb_range_end(VALUE range)
-  {
-    return RSTRUCT_GET(range, 1);
-  }
-  static inline int
-  _rb_range_excl_p(VALUE range)
-  {
-    return RB_TEST(RSTRUCT_GET(range, 2));
-  }
+    static inline VALUE
+    _rb_range_beg(VALUE range)
+    {
+        return RSTRUCT_GET(range, 0);
+    }
+    static inline VALUE
+    _rb_range_end(VALUE range)
+    {
+        return RSTRUCT_GET(range, 1);
+    }
+    static inline int
+    _rb_range_excl_p(VALUE range)
+    {
+        return RB_TEST(RSTRUCT_GET(range, 2));
+    }
 #endif
 
 #if RUBY_API_VERSION_CODE < 20000
-  static inline void
-  rb_error_frozen_object(VALUE frozen_obj)
-  {
-    rb_error_frozen(rb_class2name(CLASS_OF(frozen_obj)));
-  }
+    static inline void
+    rb_error_frozen_object(VALUE frozen_obj)
+    {
+        rb_error_frozen(rb_class2name(CLASS_OF(frozen_obj)));
+    }
 #elif RUBY_API_VERSION_CODE < 20200
-  static inline void
-  rb_error_frozen_object(VALUE frozen_obj)
-  {
-    rb_raise(rb_eRuntimeError, "can't modify frozen %"PRIsVALUE, CLASS_OF(frozen_obj));
-  }
+    static inline void
+    rb_error_frozen_object(VALUE frozen_obj)
+    {
+        rb_raise(rb_eRuntimeError, "can't modify frozen %"PRIsVALUE, CLASS_OF(frozen_obj));
+    }
 #endif
 
 #define _PROTECT_FUNC(func) ((VALUE (*)(VALUE))(func))
 
+/* Utils */
+#define _VERBOSE(...) rb_warning(__VA_ARGS__)
+#define _WARNING(...) rb_warn(__VA_ARGS__)
+#define _RB_ARRAY_P(v) RB_TYPE_P(v, RUBY_T_ARRAY)
+#define _RB_STRING_P(v) RB_TYPE_P(v, RUBY_T_STRING)
+#define _RB_INTEGER_P(v) RB_INTEGER_TYPE_P(v)
+#define _RB_FLOAT_P(v) RB_TYPE_P(v, RUBY_T_FLOAT)
+#define _RB_SYMBOL_P(v) RB_SYMBOL_P(v)
+#define _RB_HASH_P(v) RB_TYPE_P(v, RUBY_T_HASH)
+
+#if SIZEOF_LONG_LONG == SIZEOF_VOIDP
+#define _RB_ID2NUM(v) ULL2NUM(v)
+#else
+#define _RB_ID2NUM(v) RB_ULONG2NUM(v)
+#endif
 
 #endif /* RUBY_COMPATIBLE_H_ */
 

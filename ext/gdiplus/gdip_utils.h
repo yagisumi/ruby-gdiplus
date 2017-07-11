@@ -4,20 +4,6 @@
  * Released under the MIT License.
  */
 
-#define _VERBOSE(...) rb_warning(__VA_ARGS__)
-#define _WARNING(...) rb_warn(__VA_ARGS__)
-#define _RB_ARRAY_P(v) RB_TYPE_P(v, RUBY_T_ARRAY)
-#define _RB_STRING_P(v) RB_TYPE_P(v, RUBY_T_STRING)
-#define _RB_INTEGER_P(v) RB_INTEGER_TYPE_P(v)
-#define _RB_FLOAT_P(v) RB_TYPE_P(v, RUBY_T_FLOAT)
-#define _RB_SYMBOL_P(v) RB_SYMBOL_P(v)
-#define _RB_HASH_P(v) RB_TYPE_P(v, RUBY_T_HASH)
-
-#if SIZEOF_LONG_LONG == SIZEOF_VOIDP
-#define _RB_ID2NUM(v) ULL2NUM(v)
-#else
-#define _RB_ID2NUM(v) RB_ULONG2NUM(v)
-#endif
 
 static inline int
 _RB_RANGE_P(VALUE v)

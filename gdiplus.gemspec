@@ -33,6 +33,7 @@ Gem::Specification.new do |spec|
 
   spec.add_development_dependency "bundler", "~> 1.14"
   spec.add_development_dependency "rake", "~> 10.0"
-  spec.add_development_dependency "rake-compiler"
+  spec.add_development_dependency "rake-compiler", ">= 1.0.4"
   spec.add_development_dependency "test-unit", "~> 3.2"  
+  spec.add_development_dependency "yard", ">= 0.9.9"  
 end

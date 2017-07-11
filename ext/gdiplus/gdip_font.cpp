@@ -544,6 +544,7 @@ test_font()
     }
 }
 
+
 static VALUE
 gdip_instfontcol_s_broken(VALUE self)
 {
@@ -602,9 +603,10 @@ Init_font()
 
     if (test_font() == false) {
         _WARNING(
-            "\nIt seems that Font of gdiplus extension does not work properly on the combination of this ruby and windows.\n"
-            "It will fail to load installed fonts.\n"
-            "Use PrivateFontCollection#AddFontFile to get FontFamily.\n"
-            "And someone please fix this problem.");
+            "\n"
+            "Because of 'AddDllDirectory' or 'SetDefaultDllDirectories' on windows 7, \n"
+            "You can not get installed fonts. (The functions is used by rubyinstaller2.)\n"
+            "Please use PrivateFontCollection#AddFontFile(path_to_font) to get FontFamily.\n"
+            );
     }
 }

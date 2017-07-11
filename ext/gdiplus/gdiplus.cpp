@@ -157,7 +157,7 @@ gdiplus_init()
 
 void
 gdiplus_shutdown(){
-    dp("%s (gdip_refcount: %d)", __func__, gdip_refcount);
+    dp("%s (gdip_refcount: %d)", __FUNCTION__, gdip_refcount);
     if (gdip_end_flag && gdip_refcount == 0) {
         dp("GdiplusShutdown");
         GdiplusShutdown(gdiplus_token);

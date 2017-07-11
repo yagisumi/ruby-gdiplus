@@ -168,9 +168,6 @@ extern GUID _EncoderSaveAsCMYK;
 extern GUID _ImageFormatEXIF;
 extern GUID _ImageFormatUndefined;
 
-#if !defined(__func__)
-#define __func__ __FUNCTION__
-#endif
 #ifdef _MSC_VER
 #define IFVC 1
 #else
