@@ -538,11 +538,54 @@
     static inline void
     rb_error_frozen_object(VALUE frozen_obj)
     {
-        rb_raise(rb_eRuntimeError, "can't modify frozen %"PRIsVALUE, CLASS_OF(frozen_obj));
+        rb_raise(rb_eRuntimeError, "can't modify frozen %" PRIsVALUE, CLASS_OF(frozen_obj));
     }
 #endif
 
 #define _PROTECT_FUNC(func) ((VALUE (*)(VALUE))(func))
+
+static inline VALUE
+_wrap_tmp_buffer(void *ptr)
+{
+    return Data_Wrap_Struct(rb_cObject, 0, RUBY_DEFAULT_FREE, ptr);
+}
+
+static inline void *
+_rb_alloc_tmp_buffer(volatile VALUE *store, long len)
+{
+    void *ptr;
+    ptr = ruby_xmalloc(len);
+    *store = Data_Wrap_Struct(rb_cObject, 0, RUBY_DEFAULT_FREE, ptr);
+    return ptr;
+}
+
+static inline void
+_rb_free_tmp_buffer(volatile VALUE *store)
+{
+    VALUE s = *store;
+    *store = 0;
+    if (RB_TYPE_P(s, RUBY_T_DATA)) {
+        void *ptr = DATA_PTR(s);
+        if (ptr) {
+            ruby_xfree(ptr);
+            DATA_PTR(s) = ((void*)0);
+        }
+    }
+}
+
+#if RUBY_API_VERSION_CODE < 10900
+    static inline void *
+    rb_alloc_tmp_buffer(volatile VALUE *store, long len)
+    {
+        _rb_alloc_tmp_buffer(store, len);
+    }
+
+    static inline void
+    rb_free_tmp_buffer(volatile VALUE *store)
+    {
+        _rb_free_tmp_buffer(store);
+    }
+#endif
 
 /* Utils */
 #define _VERBOSE(...) rb_warning(__VA_ARGS__)

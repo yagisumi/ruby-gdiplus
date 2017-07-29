@@ -6,6 +6,8 @@
 #ifndef RUBY_GDIPLUS_H
 #define RUBY_GDIPLUS_H
 
+#include <functional>
+#include "ruby_ext_utils.hpp"
 #include <ruby.h>
 #include "ruby_compatible.h"
 #include "gdip_utils.h"
@@ -173,6 +175,11 @@ extern GUID _ImageFormatUndefined;
 #else
 #define IFVC 0
 #endif
+
+#if RUBY_API_VERSION_CODE < 20000
+#define UINT16 ::UINT16
+#endif
+
 /* gdiplus.cpp */
 
 enum ArgOption {
@@ -311,43 +318,9 @@ bool util_extname(VALUE str, char (&ext)[6]);
 #define GDIPLUS_DEBUG 0
 #endif
 #if GDIPLUS_DEBUG
-    #include <typeinfo>
-    #if defined(__MINGW32__) || defined(__MINGW64__)
-        #define GDIPLUS_MINGW 1
-        #include <cxxabi.h>
-    #else
-        #define GDIPLUS_MINGW 0
-    #endif
     void dp(const char *fmt, ...);
 #else
     #define dp(...)
-#endif
-
-#if GDIPLUS_DEBUG
-template <typename T>
-static inline void
-dp_type(const char *msg)
-{
-    #if GDIPLUS_MINGW
-        const std::type_info& id = typeid(T);
-        int status;
-        char *name = abi::__cxa_demangle(id.name(), NULL, 0, &status);
-        if (name != NULL) {
-            if (status == 0) {
-                dp("%s: %s", name, msg);
-            }
-            else {
-                dp("%s: %s", id.name(), msg);
-            }
-            free(name);
-        }
-    #else
-        dp("%s: %s", typeid(T).name(), msg);
-    #endif /* GDIPLUS_MINGW */
-}
-#define DPT(msg) dp_type<T>(msg);
-#else
-#define DPT(msg)
 #endif
 
 template<typename T>
@@ -413,7 +386,7 @@ typeddata_alloc(VALUE klass=Qnil)
 {
     if (RB_NIL_P(klass)) klass = *static_cast<VALUE *>(type->data);
     void *ptr = RB_ZALLOC(T);
-    DPT("RData alloc");
+    dp("<%s> alloc", type_name<T>());
     VALUE r = _Data_Wrap_Struct(klass, type, ptr);
     return r;
 }
@@ -423,7 +396,7 @@ static VALUE
 typeddata_alloc_null(VALUE klass=Qnil)
 {
     if (RB_NIL_P(klass)) klass = *static_cast<VALUE *>(type->data);
-    dp("%s: RData alloc", type->wrap_struct_name);
+    dp("<%s> null", type->wrap_struct_name);
     VALUE r = _Data_Wrap_Struct(klass, type, NULL);
     return r;
 }
@@ -461,7 +434,7 @@ template<typename T>
 static void
 gdip_default_free(void *ptr)
 {
-    DPT("RData free");
+    dp("<%s> free", type_name<T>());
     ruby_xfree(ptr);
 }
 #if GDIPLUS_DEBUG
@@ -475,17 +448,17 @@ static inline T
 gdip_obj_create(T obj, bool ignore_status=false)
 {
     if (obj == NULL) {
-        DPT("error obj == NULL");
+        dp("<%s> error (obj == NULL)", type_name<T>());
         rb_raise(eGdiplus, "Object creation error");
         return NULL;
     }
     Status status = obj->GetLastStatus();
     if (status == Ok || ignore_status) {
-        DPT("new");
+        dp("<%s> new", type_name<T>());
         GdiplusAddRef();
         return obj;
     }
-    DPT("new error and delete");
+    dp("<%s> error (status: %d)", type_name<T>(), status);
     delete obj;
     if (status < 22) {
         rb_raise(eGdiplus, "Status.%s, Some error occurred.", GpStatusStrs[status]);
@@ -502,7 +475,7 @@ gdip_obj_free(void *ptr)
 {
     T obj = static_cast<T>(ptr);
     if (obj != NULL) {
-        DPT("delete");
+        dp("<%s> delete", type_name<T>());
         delete obj;
         GdiplusRelease();
     }

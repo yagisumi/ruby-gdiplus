@@ -551,7 +551,24 @@ gdip_instfontcol_s_broken(VALUE self)
     return test_font() ? Qfalse : Qtrue;
 }
 
-
+/**
+ * Document-class: Gdiplus::InstalledFontCollection
+ * To use FontFamily correctly with RubyInstaller 2.4 on Windows 7, You should avoid using 'AddDllDirectory' or 'SetDefaultDllDirectories'.
+ * So, You need to modify the following file.
+ * + lib/ruby/2.4.0/rubygems/defaults/operating_system.rb
+ * 
+ * ```ruby
+ *   #RubyInstaller::Runtime.enable_dll_search_paths
+ * ```
+ * or
+ * ```ruby
+ *   if ENV['RUBY_DLL_PATH'].to_s != ""
+ *     RubyInstaller::Runtime.enable_dll_search_paths
+ *   end
+ * ```
+ * After all, you can not use RUBY_DLL_PATH.
+ *
+ */
 void
 Init_font()
 {

@@ -15,7 +15,7 @@ static const rb_data_type_t tColorMatrix = _MAKE_DATA_TYPE(
 static VALUE
 gdip_colormatrix_alloc(VALUE klass)
 {
-    dp("ColorMatrix: RData alloc");
+    dp("<%s> alloc", type_name<ColorMatrix *>());
     ColorMatrix *ptr = static_cast<ColorMatrix *>(RB_ZALLOC(ColorMatrix));
     for (int row = 0; row < 5; ++row) {
         for (int column = 0; column < 5; ++ column) {
@@ -680,20 +680,6 @@ private:
     int size;
 };
 
-static int
-foreach_remap_table_i(VALUE key, VALUE val, VALUE arg)
-{
-    GdipColorMaps *cmaps = reinterpret_cast<GdipColorMaps *>(arg);
-    Color old_color;
-    Color new_color;
-    if (gdip_arg_to_color(key, &old_color, NULL, ArgOptionAcceptInt) &&
-        gdip_arg_to_color(val, &new_color, NULL, ArgOptionAcceptInt)) {
-            bool success = cmaps->add_map(old_color, new_color);
-            if (!success) return ST_STOP;
-    }
-    return ST_CONTINUE;
-}
-
 /**
  * @overload SetRemapTable(color_map, type=ColorAdjustType.Default)
  *   @param color_map [Hash]
@@ -726,14 +712,24 @@ gdip_imgattrs_set_remap_table(int argc, VALUE *argv, VALUE self)
         rb_raise(rb_eTypeError, "The key and value of Hash should be Color.");
     }
     GdipColorMaps *cmaps = new GdipColorMaps(size);
+    VALUE v_cmaps = wrap_tmp_obj(cmaps);
     
-    rb_hash_foreach(argv[0], _FOREACH_FUNC(foreach_remap_table_i), reinterpret_cast<VALUE>(cmaps));
+    _rb_hash_foreach(argv[0], [&cmaps](VALUE key, VALUE val) -> int {
+        Color old_color;
+        Color new_color;
+        if (gdip_arg_to_color(key, &old_color, NULL, ArgOptionAcceptInt) &&
+            gdip_arg_to_color(val, &new_color, NULL, ArgOptionAcceptInt)) {
+                bool success = cmaps->add_map(old_color, new_color);
+                if (!success) return ST_STOP;
+        }
+        return ST_CONTINUE;
+    });
 
     if (cmaps->count == 0) {
         rb_raise(rb_eTypeError, "The key and value of Hash should be Color.");
     }
     Status status = attrs->SetRemapTable(cmaps->count, cmaps->map, type);
-    delete cmaps;
+    delete_tmp_obj(&v_cmaps);
     Check_Status(status);
 
     return self;
@@ -786,14 +782,25 @@ gdip_imgattrs_set_brush_remap_table(VALUE self, VALUE color_map)
 
     int size = RHASH_SIZE(color_map);
     GdipColorMaps *cmaps = new GdipColorMaps(size);
+    VALUE v_cmaps = wrap_tmp_obj(cmaps);
     
-    rb_hash_foreach(color_map, _FOREACH_FUNC(foreach_remap_table_i), reinterpret_cast<VALUE>(cmaps));
+    _rb_hash_foreach(color_map, [&cmaps](VALUE key, VALUE val) -> int {
+        Color old_color;
+        Color new_color;
+        if (gdip_arg_to_color(key, &old_color, NULL, ArgOptionAcceptInt) &&
+            gdip_arg_to_color(val, &new_color, NULL, ArgOptionAcceptInt)) {
+                bool success = cmaps->add_map(old_color, new_color);
+                if (!success) return ST_STOP;
+        }
+        return ST_CONTINUE;
+    });
+
     if (cmaps->count == 0) {
         rb_raise(rb_eTypeError, "The key and value of Hash should be Color.");
     }
 
     Status status = attrs->SetBrushRemapTable(cmaps->count, cmaps->map);
-    delete cmaps;
+    delete_tmp_obj(&v_cmaps);
     Check_Status(status);
 
     return self;

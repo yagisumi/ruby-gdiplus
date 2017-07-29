@@ -14,3 +14,4 @@ gdip_stringformat.o: gdip_stringformat.cpp ruby_gdiplus.h ruby_compatible.h
 gdip_graphicspath.o: gdip_graphicspath.cpp ruby_gdiplus.h ruby_compatible.h
 gdip_region.o: gdip_region.cpp ruby_gdiplus.h ruby_compatible.h
 gdip_image_attrs.o: gdip_image_attrs.cpp ruby_gdiplus.h ruby_compatible.h
+ruby_ext_utils.o: ruby_ext_utils.cpp

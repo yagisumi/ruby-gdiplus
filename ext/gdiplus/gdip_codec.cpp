@@ -494,7 +494,7 @@ const rb_data_type_t tEncoderParameter = _MAKE_DATA_TYPE(
 static VALUE
 gdip_encprm_alloc(VALUE klass)
 {
-    dp("gdipEncoderParameter: alloc");
+    dp("<gdipEncoderParameter> alloc");
     gdipEncoderParameter *ptr = RB_ZALLOC(gdipEncoderParameter);
     ptr->values = Qnil;
     VALUE r = _Data_Wrap_Struct(klass, &tEncoderParameter, ptr);
@@ -1175,13 +1175,13 @@ gdip_encprms_free_data(EncoderParameters *ptr)
         }
     }
     ruby_xfree(ptr);
-    dp("EncoderParameters: free");
+    dp("<EncoderParameters> free");
 }
 
 static void
 gdip_encprms_free(gdipEncoderParameters *ptr)
 {
-    dp("gdipEncoderParameters: free");
+    dp("<gdipEncoderParameters> free");
     if (ptr->data) {
         gdip_encprms_free_data(ptr->data);
         ptr->data = NULL;
@@ -1321,7 +1321,7 @@ gdip_encprms_build_struct(VALUE v)
     }
     EncoderParameters *data = static_cast<EncoderParameters *>(ruby_xcalloc(1, sizeof(UINT) + sizeof(EncoderParameter) * RARRAY_LEN(params)));
     encprms->data = data;
-    dp("EncoderParameters: malloc");
+    dp("<EncoderParameters> alloc");
 
     data->Count = RARRAY_LEN(params);
     for (int i = 0; i < RARRAY_LEN(params); ++i) {

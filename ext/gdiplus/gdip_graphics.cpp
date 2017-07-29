@@ -2187,7 +2187,7 @@ gdip_graphics_draw_image_point_rect(int argc, VALUE *argv, VALUE self)
         if (Integer_p(6, &argv[1])) {
             status = g->DrawImage(image, RB_NUM2INT(argv[1]), RB_NUM2INT(argv[2]), RB_NUM2INT(argv[3]), RB_NUM2INT(argv[4]), RB_NUM2INT(argv[5]), RB_NUM2INT(argv[6]), unit);
         }
-        else if (Integer_p(6, &argv[1])) {
+        else if (Float_p(6, &argv[1])) {
             status = g->DrawImage(image, NUM2SINGLE(argv[1]), NUM2SINGLE(argv[2]), NUM2SINGLE(argv[3]), NUM2SINGLE(argv[4]), NUM2SINGLE(argv[5]), NUM2SINGLE(argv[6]), unit);
         }
         else {
@@ -2210,7 +2210,7 @@ gdip_graphics_draw_image_point_rect(int argc, VALUE *argv, VALUE self)
         if (Integer_p(6, &argv[1])) {
             status = g->DrawImage(image, RB_NUM2INT(argv[1]), RB_NUM2INT(argv[2]), RB_NUM2INT(argv[3]), RB_NUM2INT(argv[4]), RB_NUM2INT(argv[5]), RB_NUM2INT(argv[6]), unit);
         }
-        else if (Integer_p(6, &argv[1])) {
+        else if (Float_p(6, &argv[1])) {
             status = g->DrawImage(image, NUM2SINGLE(argv[1]), NUM2SINGLE(argv[2]), NUM2SINGLE(argv[3]), NUM2SINGLE(argv[4]), NUM2SINGLE(argv[5]), NUM2SINGLE(argv[6]), unit);
         }
         else {
@@ -3107,6 +3107,8 @@ gdip_graphics_translate_transform(int argc, VALUE *argv, VALUE self)
 
     float dx = 0.0f;
     float dy = 0.0f;
+    gdip_arg_to_single(v_dx, &dx, "The first argument should be Integer or Float.");
+    gdip_arg_to_single(v_dy, &dy, "The second argument should be Integer or Float.");
     Status status = g->TranslateTransform(dx, dy, order);
     Check_Status(status);
     
@@ -3149,7 +3151,7 @@ gdip_graphics_scale_transform(int argc, VALUE *argv, VALUE self)
 /**
  * @overload RotateTransform(angle, order=MatrixOrder.Prepend)
  *   Scales.
- *   @param angle [Float]
+ *   @param angle [Integer or Float]
  *   @param order [MatrixOrder]
  *   @return [self]
  */
@@ -3164,7 +3166,7 @@ gdip_graphics_rotate_transform(int argc, VALUE *argv, VALUE self)
     float angle = 0.0f;
     MatrixOrder order = MatrixOrderPrepend;
 
-    gdip_arg_to_single(v_angle, &angle, "The first argument should be Float.");
+    gdip_arg_to_single(v_angle, &angle, "The first argument should be Integer or Float.");
 
     if (!RB_NIL_P(v_order)) {
         gdip_arg_to_enumint(cMatrixOrder, v_order, &order, "The second argument should be MatrixOrder.");
