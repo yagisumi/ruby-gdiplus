@@ -3178,6 +3178,261 @@ gdip_graphics_rotate_transform(int argc, VALUE *argv, VALUE self)
     return self;
 }
 
+/**
+ * @overload TransformPoints(dest, src, points)
+ *   Transforms an array of points.
+ *   @param dest [CoordinateSpace]
+ *   @param src [CoordinateSpace]
+ *   @param points [Array<Point or PointF>]
+ *   @return [self]
+ */
+static VALUE
+gdip_graphics_transform_points(VALUE self, VALUE v_dest, VALUE v_src, VALUE v_points)
+{
+    if (!_RB_ARRAY_P(v_points) || RARRAY_LEN(v_points) <= 0) {
+        rb_raise(rb_eArgError, "The third argument should be Array of Point or PointF.");
+    }
+
+    CoordinateSpace dest, src;
+    gdip_arg_to_enumint(cCoordinateSpace, v_dest, &dest, "The first arugment should be CoodinateSpace.");
+    gdip_arg_to_enumint(cCoordinateSpace, v_src, &src, "The second arugment should be CoodinateSpace.");
+
+    Graphics *g = Data_Ptr<Graphics *>(self);
+    Check_NULL(g, "This Graphics object does not exist.");
+
+    VALUE first = rb_ary_entry(v_points, 0);
+    Status status = Ok;
+    VALUE r = Qnil;
+
+    if (_KIND_OF(first, &tPoint)) {
+        int count = 0;
+        Point *points = alloc_array_of<Point, &tPoint>(v_points, count);
+        VALUE tmp = _wrap_tmp_buffer(points);
+        status = g->TransformPoints(dest, src, points, count);
+        Check_Status(status);
+        r = rb_ary_new_capa(count);
+        for (int i = 0; i < count; ++i) {
+            rb_ary_push(r, gdip_point_create(points[i].X, points[i].Y));
+        }
+        _rb_free_tmp_buffer(&tmp);
+    }
+    else if (_KIND_OF(first, &tPointF)) {
+        int count = 0;
+        PointF *points = alloc_array_of<PointF, &tPointF>(v_points, count);
+        VALUE tmp = _wrap_tmp_buffer(points);
+        status = g->TransformPoints(dest, src, points, count);
+        Check_Status(status);
+        r = rb_ary_new_capa(count);
+        for (int i = 0; i < count; ++i) {
+            rb_ary_push(r, gdip_pointf_create(points[i].X, points[i].Y));
+        }
+        _rb_free_tmp_buffer(&tmp);
+    }
+    else {
+        rb_raise(rb_eArgError, "The third argument should be Array of Point or PointF.");
+    }
+
+    return r;
+}
+
+/**
+ * Measures the size of the string to be drawn.
+ * @overload MeasureString(str, font)
+ *   @param str [String]
+ *   @param font [Font]
+ *   @return [SizeF]
+ * @overload MeasureString(str, font, width, format=nil)
+ *   @param str [String]
+ *   @param font [Font]
+ *   @param width [Integer or Float]
+ *   @param format [StringFormat]
+ *   @return [SizeF]
+ * @overload MeasureString(str, font, origin, format=nil)
+ *   @param str [String]
+ *   @param font [Font]
+ *   @param origin [PointF]
+ *   @param format [StringFormat]
+ *   @return [SizeF]
+ * @overload MeasureString(str, font, area, format=nil, info=nil)
+ *   @param str [String]
+ *   @param font [Font]
+ *   @param area [SizeF]
+ *   @param format [StringFormat]
+ *   @param info [Hash]
+ *   @return [SizeF]
+ * @example
+ *   bmp.draw { |g|
+ *     font = Font.new("MS Gothic", 16)
+ *     area = SizeF.new(80.0, 1000.0)
+ *     info = {}
+ *     p g.MeasureString("The quick brown fox jumps over the lazy dog", font, area, nil, info)
+ *     p info # => {"charactersFitted"=>43, "linesFilled"=>5}
+ *   }
+ */
+static VALUE
+gdip_graphics_measure_string(int argc, VALUE *argv, VALUE self)
+{
+    if (argc < 2 || 5 < argc) {
+        rb_raise(rb_eArgError, "wrong number of arguments (%d for 2..5)", argc);
+    }
+    
+    if (!_RB_STRING_P(argv[0])) {
+        rb_raise(rb_eArgError, "The first argument should be String.");
+    }
+
+    if (!_KIND_OF(argv[1], &tFont)) {
+        rb_raise(rb_eArgError, "The second argument should be Font.");
+    }
+
+    Graphics *g = Data_Ptr<Graphics *>(self);
+    Check_NULL(g, "This Graphics object does not exist.");
+
+    VALUE wstr = util_utf16_str_new(argv[0]);
+    int length = RSTRING_LEN(wstr) / 2 - 1;
+    if (length <= 0) {
+        return gdip_sizef_create(0.0f, 0.0f);
+    }
+
+    Font *font = Data_Ptr<Font *>(argv[1]);
+    Check_NULL(font, "The Font object does not exist.");
+
+    SizeF size;
+    Status status = Ok;
+
+    if (argc == 2) {
+        SizeF layout;
+        status = g->MeasureString(RString_Ptr<WCHAR *>(wstr), length, font, layout, NULL, &size);
+    }
+    else if (argc == 3 || argc == 4) {
+        StringFormat *format = NULL;
+        if (argc == 4) {
+            if (_KIND_OF(argv[3], &tStringFormat)) {
+                format = Data_Ptr<StringFormat *>(argv[3]);
+            }
+            else {
+                rb_raise(rb_eArgError, "The fourth argument should be StringFormat.");
+            }
+        }
+
+        if (Integer_p(argv[2]) || Float_p(argv[2])) {
+            float width = 0.0f;
+            gdip_arg_to_single(argv[2], &width);
+            SizeF layout(width, 1000000.0f);
+            status = g->MeasureString(RString_Ptr<WCHAR *>(wstr), length, font, layout, format, &size);
+        }
+        else if (_KIND_OF(argv[2], &tSizeF)) {
+            SizeF *p_layout = Data_Ptr<SizeF *>(argv[2]);
+            status = g->MeasureString(RString_Ptr<WCHAR *>(wstr), length, font, *p_layout, format, &size);
+        }
+        else if (_KIND_OF(argv[2], &tPointF)) {
+            PointF *origin = Data_Ptr<PointF *>(argv[2]);
+            RectF box;
+            status = g->MeasureString(RString_Ptr<WCHAR *>(wstr), length, font, *origin, format, &box);
+            size.Width = box.Width;
+            size.Height = box.Height;
+        }
+        else {
+            rb_raise(rb_eArgError, "invalid type of argument 3");
+        }
+    }
+    else if (argc == 5) {
+        if (!_KIND_OF(argv[2], &tSizeF)) {
+            rb_raise(rb_eArgError, "The third argument should be SizeF.");
+        }
+        
+        if (!_KIND_OF(argv[3], &tStringFormat) && !RB_NIL_P(argv[3])) {
+            rb_raise(rb_eArgError, "The fourth argument should be StringFormat.");
+        }
+
+        if (!_RB_HASH_P(argv[4]) && !RB_NIL_P(argv[4])) {
+            rb_raise(rb_eArgError, "The fifth argument should be Hash.");
+        }
+
+        StringFormat *format = NULL;
+        if (_KIND_OF(argv[3], &tStringFormat)) {
+            format = Data_Ptr<StringFormat *>(argv[3]);
+        }
+
+        SizeF *p_layout = Data_Ptr<SizeF *>(argv[2]);
+        int charactersFitted = 0;
+        int linesFilled = 0;
+        status = g->MeasureString(RString_Ptr<WCHAR *>(wstr), length, font, *p_layout, format, &size, &charactersFitted, &linesFilled);
+
+        if (_RB_HASH_P(argv[4])) {
+            rb_hash_aset(argv[4], rb_str_new_cstr("charactersFitted"), RB_INT2NUM(charactersFitted));
+            rb_hash_aset(argv[4], rb_str_new_cstr("linesFilled"), RB_INT2NUM(linesFilled));
+        }
+    }
+    RB_GC_GUARD(wstr);
+    Check_Status(status);
+
+    return gdip_sizef_create(size.Width, size.Height);
+}
+
+static VALUE
+gdip_graphics_measure_character_ranges(VALUE self, VALUE str, VALUE v_font, VALUE v_rect, VALUE v_format)
+{
+    if (!_RB_STRING_P(str)) {
+        rb_raise(rb_eArgError, "The first argument should be String.");
+    }
+
+    if (!_KIND_OF(v_font, &tFont)) {
+        rb_raise(rb_eArgError, "The second argument should be Font.");
+    }
+
+    if (!_KIND_OF(v_rect, &tRectangleF)) {
+        rb_raise(rb_eArgError, "The third argument should be RectangleF.");
+    }
+
+    if (!_KIND_OF(v_format, &tStringFormat)) {
+        rb_raise(rb_eArgError, "The fourth argument should be StringFormat.");
+    }
+
+    Graphics *g = Data_Ptr<Graphics *>(self);
+    Check_NULL(g, "This Graphics object does not exist.");
+
+    VALUE wstr = util_utf16_str_new(str);
+    int length = RSTRING_LEN(wstr) / 2 - 1;
+
+    Font *font = Data_Ptr<Font *>(v_font);
+    Check_NULL(font, "The Font object does not exist.");
+    RectF *rect = Data_Ptr<RectF *>(v_rect);
+    StringFormat *format = Data_Ptr<StringFormat *>(v_format);
+    Check_NULL(format, "The StringFormat object does not exist.");
+
+    int count = format->GetMeasurableCharacterRangeCount();
+    if (count <= 0) {
+        return rb_ary_new();
+    }
+
+    Region *regions = new Region[count];
+    Status status = g->MeasureCharacterRanges(RString_Ptr<WCHAR *>(wstr), length, font, *rect, format, count, regions);
+    RB_GC_GUARD(wstr);
+    if (status != Ok) {
+        delete[] regions;
+        Check_Status(status);
+    }
+
+    VALUE r = rb_ary_new_capa(count);
+    int state = 0;
+    _rb_protect([&count, &r, &regions]() -> VALUE {
+        for (int i = 0; i < count; ++i) {
+            VALUE tmp = typeddata_alloc_null<&tRegion>(cRegion);
+            DATA_PTR(tmp) = gdip_obj_create(regions[i].Clone());
+            rb_ary_push(r, tmp);
+        }
+
+        return Qnil;
+    }, &state);
+
+    delete[] regions;
+    if (state != 0) {
+        rb_jump_tag(state);
+    }
+    
+    return r;
+}
+
 void
 Init_graphics()
 {
@@ -3290,4 +3545,12 @@ Init_graphics()
     rb_define_alias(cGraphics, "scale_transform", "ScaleTransform");
     rb_define_method(cGraphics, "RotateTransform", RUBY_METHOD_FUNC(gdip_graphics_rotate_transform), -1);
     rb_define_alias(cGraphics, "rotate_transform", "RotateTransform");
+
+    rb_define_method(cGraphics, "TransformPoints", RUBY_METHOD_FUNC(gdip_graphics_transform_points), 3);
+    rb_define_alias(cGraphics, "transform_points", "TransformPoints");
+
+    rb_define_method(cGraphics, "MeasureString", RUBY_METHOD_FUNC(gdip_graphics_measure_string), -1);
+    rb_define_alias(cGraphics, "measure_string", "MeasureString");
+    rb_define_method(cGraphics, "MeasureCharacterRanges", RUBY_METHOD_FUNC(gdip_graphics_measure_character_ranges), 4);
+    rb_define_alias(cGraphics, "measure_character_ranges", "MeasureCharacterRanges");
 }

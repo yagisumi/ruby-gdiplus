@@ -48,7 +48,6 @@ tmp_obj_free(void *ptr)
 {
     if (ptr) {
         T obj = static_cast<T>(ptr);
-        //printf("_tmp_obj_free: %s\n", type_name<T>());
         delete obj;
     }
 }
@@ -57,7 +56,6 @@ template<typename T>
 static inline VALUE
 wrap_tmp_obj(T ptr)
 {
-    //printf("_wrap_tmp_obj: %s\n", type_name<T>());
     return Data_Wrap_Struct(rb_cObject, 0, tmp_obj_free<T>, ptr);
 }
 

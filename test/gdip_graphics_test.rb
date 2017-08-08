@@ -1051,6 +1051,21 @@ class GdiplusGraphicsTest < Test::Unit::TestCase
       assert_same(g, g.ResetTransform)
       g.DrawImage(bmp2, 0, 0)
     }
+    
+    # TransformPoints
+    points = [Point.new(10, 10), Point.new(20, 20), Point.new(30, 30)]
+    points2 = [Point.new(110, 110), Point.new(120, 120), Point.new(130, 130)]
+    draw { |g|
+      g.TranslateTransform(100, 100)
+      assert_equal(points2, g.TransformPoints(CoordinateSpace.Page, :World, points))
+    }
+    pointsF = [PointF.new(10.0, 10.0), PointF.new(20.0, 20.0), PointF.new(30.0, 30.0)]
+    pointsF2 = [PointF.new(110.0, 110.0), PointF.new(120.0, 120.0), PointF.new(130.0, 130.0)]
+    draw { |g|
+      g.TranslateTransform(100, 100)
+      assert_equal(pointsF2, g.TransformPoints(:Page, :World, pointsF))
+    }
+    
   end
   
   def test_other_methods

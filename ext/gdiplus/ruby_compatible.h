@@ -133,93 +133,39 @@
 #define RB_ALLOC(type) ALLOC(type)
 #endif
 
-#if T_MASK == 0x3f
-#ifndef RUBY_Qfalse
-#define RUBY_Qfalse Qfalse
-#endif
-#ifndef RUBY_Qtrue
-#define RUBY_Qtrue Qtrue
-#endif
-#ifndef RUBY_Qnil
-#define RUBY_Qnil Qnil
-#endif
-#ifndef RUBY_Qundef
-#define RUBY_Qundef Qundef
-#endif
-#ifndef RUBY_T_NONE
-#define RUBY_T_NONE T_NONE
-#endif
-#ifndef RUBY_T_NIL
-#define RUBY_T_NIL T_NIL
-#endif
-#ifndef RUBY_T_OBJECT
+#if RUBY_API_VERSION_CODE < 10900
+#define RUBY_Qfalse   Qfalse
+#define RUBY_Qtrue    Qtrue
+#define RUBY_Qnil     Qnil
+#define RUBY_Qundef   Qundef
+#define RUBY_T_NONE   T_NONE
+#define RUBY_T_NIL    T_NIL
 #define RUBY_T_OBJECT T_OBJECT
-#endif
-#ifndef RUBY_T_CLASS
-#define RUBY_T_CLASS T_CLASS
-#endif
-#ifndef RUBY_T_ICLASS
+#define RUBY_T_CLASS  T_CLASS
 #define RUBY_T_ICLASS T_ICLASS
-#endif
-#ifndef RUBY_T_MODULE
 #define RUBY_T_MODULE T_MODULE
-#endif
-#ifndef RUBY_T_FLOAT
-#define RUBY_T_FLOAT T_FLOAT
-#endif
-#ifndef RUBY_T_STRING
+#define RUBY_T_FLOAT  T_FLOAT
 #define RUBY_T_STRING T_STRING
-#endif
-#ifndef RUBY_T_REGEXP
 #define RUBY_T_REGEXP T_REGEXP
-#endif
-#ifndef RUBY_T_ARRAY
-#define RUBY_T_ARRAY T_ARRAY
-#endif
-#ifndef RUBY_T_HASH
-#define RUBY_T_HASH T_HASH
-#endif
-#ifndef RUBY_T_STRUCT
+#define RUBY_T_ARRAY  T_ARRAY
+#define RUBY_T_HASH   T_HASH
 #define RUBY_T_STRUCT T_STRUCT
-#endif
-#ifndef RUBY_T_BIGNUM
 #define RUBY_T_BIGNUM T_BIGNUM
-#endif
-#ifndef RUBY_T_FILE
-#define RUBY_T_FILE T_FILE
-#endif
-#ifndef RUBY_T_FIXNUM
+#define RUBY_T_FILE   T_FILE
 #define RUBY_T_FIXNUM T_FIXNUM
-#endif
-#ifndef RUBY_T_TRUE
-#define RUBY_T_TRUE T_TRUE
-#endif
-#ifndef RUBY_T_FALSE
-#define RUBY_T_FALSE T_FALSE
-#endif
-#ifndef RUBY_T_DATA
-#define RUBY_T_DATA T_DATA
-#endif
-#ifndef RUBY_T_MATCH
-#define RUBY_T_MATCH T_MATCH
-#endif
-#ifndef RUBY_T_SYMBOL
+#define RUBY_T_TRUE   T_TRUE
+#define RUBY_T_FALSE  T_FALSE
+#define RUBY_T_DATA   T_DATA
+#define RUBY_T_MATCH  T_MATCH
 #define RUBY_T_SYMBOL T_SYMBOL
-#endif
 /* RUBY_T_RATIONAL */
 /* RUBY_T_COMPLEX */
 /* RUBY_T_IMEMO */
-#ifndef RUBY_T_UNDEF
-#define RUBY_T_UNDEF T_UNDEF
-#endif
-#ifndef RUBY_T_NODE
-#define RUBY_T_NODE T_NODE
-#endif
+#define RUBY_T_UNDEF  T_UNDEF
+#define RUBY_T_NODE   T_NODE
 /* RUBY_T_ZOMBIE */
-#ifndef RUBY_T_MASK
-#define RUBY_T_MASK T_MASK
-#endif
-#endif /* T_MASK == 0x3f */
+#define RUBY_T_MASK   T_MASK
+#endif /* RUBY_API_VERSION_CODE < 10900 */
 
 #ifndef RB_INTEGER_TYPE_P
 #define RB_INTEGER_TYPE_P(obj) rb_integer_type_p(obj)
@@ -577,7 +523,7 @@ _rb_free_tmp_buffer(volatile VALUE *store)
     static inline void *
     rb_alloc_tmp_buffer(volatile VALUE *store, long len)
     {
-        _rb_alloc_tmp_buffer(store, len);
+        return _rb_alloc_tmp_buffer(store, len);
     }
 
     static inline void

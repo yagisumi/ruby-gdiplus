@@ -383,6 +383,7 @@ gdip_strfmt_set_measurable_character_ranges(VALUE self, VALUE ranges)
         }
         if (count > 0) {
             CharacterRange *cranges = static_cast<CharacterRange *>(RB_ZALLOC_N(CharacterRange, count));
+            VALUE tmp = _wrap_tmp_buffer(cranges);
             int idx = 0;
             for (int i = 0; i < ranges_len; ++i) {
                 VALUE range = rb_ary_entry(ranges, i);
@@ -392,14 +393,15 @@ gdip_strfmt_set_measurable_character_ranges(VALUE self, VALUE ranges)
                     if (Integer_p(beg, end)) {
                         int n_beg = RB_NUM2INT(beg);
                         int n_end = RB_NUM2INT(end);
-                        CharacterRange cr(n_beg, n_end - n_beg + _rb_range_excl_p(range) ? 0 : 1);
-                        cranges[idx] = cr;
+                        cranges[idx].First = n_beg;
+                        cranges[idx].Length = n_end - n_beg + (_rb_range_excl_p(range) ? 0 : 1);
                         idx += 1;
                     }
                 }
             }
             Status status = format->SetMeasurableCharacterRanges(count, cranges);
-            ruby_xfree(cranges);
+            // ruby_xfree(cranges);
+            _rb_free_tmp_buffer(&tmp);
             Check_Status(status);
         }
     }
