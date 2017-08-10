@@ -3,7 +3,7 @@ require 'test_helper'
 
 class GdiplusLangIdTest < Test::Unit::TestCase
   include Gdiplus
-  
+
   def test_langid
     assert_equal(0x0036, LangId.af.to_i)
     assert_equal(LangId.af, LangId.new("af"))
@@ -1415,5 +1415,5 @@ class GdiplusLangIdTest < Test::Unit::TestCase
     assert_equal(0x0004, LangId.new("zh-CHS").to_i)
     assert_equal(0x7c04, LangId.new("zh-CHT").to_i)
   end
-  
+
 end

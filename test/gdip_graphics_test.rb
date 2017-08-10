@@ -3,7 +3,7 @@ require 'test_helper'
 
 class GdiplusGraphicsTest < Test::Unit::TestCase
   include Gdiplus
-  
+
   def draw(name = nil)
     bmp = Bitmap.new(400, 400)
     bmp.draw { |g|
@@ -11,7 +11,7 @@ class GdiplusGraphicsTest < Test::Unit::TestCase
       yield g
     }
   end
-  
+
   def bmp2
     bmp = Bitmap.new(512, 512)
     bmp.draw { |g|
@@ -19,7 +19,7 @@ class GdiplusGraphicsTest < Test::Unit::TestCase
     }
     bmp
   end
-  
+
   def test_properties
     # Clip
     draw { |g|
@@ -27,11 +27,11 @@ class GdiplusGraphicsTest < Test::Unit::TestCase
       region = Region.new(rect)
       assert_nothing_raised { g.Clip = region }
       assert_equal(true, g.clip.Equals(region, g))
-      
+
       # ClipBounds
       assert_equal(rect, g.ClipBounds)
     }
-    
+
     # CompositingMode
     draw { |g|
       assert_instance_of(CompositingMode, g.CompositingMode)
@@ -39,7 +39,7 @@ class GdiplusGraphicsTest < Test::Unit::TestCase
       assert_nothing_raised { g.CompositingMode = :SourceOver }
       assert_equal(CompositingMode.SourceOver, g.CompositingMode)
     }
-    
+
     # CompositingQuality
     draw { |g|
       assert_instance_of(CompositingQuality, g.CompositingQuality)
@@ -47,13 +47,13 @@ class GdiplusGraphicsTest < Test::Unit::TestCase
       assert_nothing_raised { g.CompositingQuality = :GammaCorrected }
       assert_equal(CompositingQuality.GammaCorrected, g.CompositingQuality)
     }
-    
+
     # DpiX, DpiY
     draw { |g|
       assert_instance_of(Float, g.DpiX)
       assert_instance_of(Float, g.DpiY)
     }
-    
+
     # InterpolationMode
     draw { |g|
       assert_instance_of(InterpolationMode, g.InterpolationMode)
@@ -61,7 +61,7 @@ class GdiplusGraphicsTest < Test::Unit::TestCase
       assert_nothing_raised { g.InterpolationMode = :Bicubic }
       assert_equal(InterpolationMode.Bicubic, g.InterpolationMode)
     }
-    
+
     # IsClipEmpty, #IsVisibleClipEmpty
     draw { |g|
       assert_equal(false, g.IsClipEmpty)
@@ -72,7 +72,7 @@ class GdiplusGraphicsTest < Test::Unit::TestCase
       assert_equal(true, g.IsClipEmpty)
       assert_equal(true, g.IsVisibleClipEmpty)
     }
-    
+
     # PageScale
     draw { |g|
       assert_instance_of(Float, g.PageScale)
@@ -80,7 +80,7 @@ class GdiplusGraphicsTest < Test::Unit::TestCase
       assert_equal(2.0, g.page_scale)
       assert_nothing_raised { g.PageScale = 1.0 }
     }
-    
+
     # PageUnit
     draw { |g|
       assert_instance_of(GraphicsUnit, g.PageUnit)
@@ -88,7 +88,7 @@ class GdiplusGraphicsTest < Test::Unit::TestCase
       assert_nothing_raised { g.PageUnit = :Pixel }
       assert_equal(GraphicsUnit.Pixel, g.PageUnit)
     }
-    
+
     # PixelOffsetMode
     draw { |g|
       assert_instance_of(PixelOffsetMode, g.PixelOffsetMode)
@@ -96,7 +96,7 @@ class GdiplusGraphicsTest < Test::Unit::TestCase
       assert_nothing_raised { g.PixelOffsetMode = :HighSpeed }
       assert_equal(PixelOffsetMode.HighSpeed, g.PixelOffsetMode)
     }
-    
+
     # RenderingOrigin
     draw { |g|
       point = Point.new(2, 2)
@@ -104,7 +104,7 @@ class GdiplusGraphicsTest < Test::Unit::TestCase
       assert_nothing_raised { g.RenderingOrigin = point }
       assert_equal(point, g.rendering_origin)
     }
-    
+
     # SmoothingMode
     draw { |g|
       assert_instance_of(SmoothingMode, g.SmoothingMode)
@@ -112,14 +112,14 @@ class GdiplusGraphicsTest < Test::Unit::TestCase
       assert_nothing_raised { g.SmoothingMode = :AntiAlias }
       assert_equal(SmoothingMode.AntiAlias, g.SmoothingMode)
     }
-    
+
     # TextContrast
     draw { |g|
       assert_kind_of(Integer, g.TextContrast)
       assert_nothing_raised { g.text_contrast = 6 }
       assert_equal(6, g.TextContrast)
     }
-    
+
     # TextRenderingHint
     draw { |g|
       assert_instance_of(TextRenderingHint, g.TextRenderingHint)
@@ -127,7 +127,7 @@ class GdiplusGraphicsTest < Test::Unit::TestCase
       assert_nothing_raised { g.TextRenderingHint = :AntiAlias }
       assert_equal(TextRenderingHint.AntiAlias, g.TextRenderingHint)
     }
-    
+
     # Transform
     draw { |g|
       assert_instance_of(Matrix, g.Transform)
@@ -137,7 +137,7 @@ class GdiplusGraphicsTest < Test::Unit::TestCase
       assert_equal(matrix, g.transform)
       assert_nothing_raised { g.transform = Matrix.new }
     }
-    
+
     # VisibleClipBounds
     draw { |g|
       rect = RectangleF.new(100.0, 100.0, 400.0, 400.0)
@@ -145,14 +145,14 @@ class GdiplusGraphicsTest < Test::Unit::TestCase
       g.PageUnit = :Pixel
       g.Clip = region
       assert_equal(RectangleF.new(100.0, 100.0, 300.0, 300.0), g.VisibleClipBounds)
-      
+
       region = Region.new
       region.MakeEmpty
       g.Clip = region
       assert_equal(RectangleF.new(0.0, 0.0, 0.0, 0.0), g.VisibleClipBounds)
     }
   end
-  
+
   def test_drawing_methods
     # DrawArc
     draw("DrawArcI1") { |g|
@@ -167,7 +167,7 @@ class GdiplusGraphicsTest < Test::Unit::TestCase
     draw("DrawArcF2") { |g|
       assert_same(g, g.DrawArc(Pens.Black, 0.0, 0.0, 300.0, 300.0, 30, 60))
     }
-    
+
     # DrawBezier
     draw("DrawBezierI1") { |g|
       assert_same(g, g.DrawBezier(Pens.Black, Point.new(50, 50), Point.new(150, 50), Point.new(150, 150), Point.new(50, 150)))
@@ -181,7 +181,7 @@ class GdiplusGraphicsTest < Test::Unit::TestCase
     draw("DrawBezierF2") { |g|
       assert_same(g, g.DrawBezier(Pens.Black, 50.0, 50.0, 150.0, 50.0, 150.0, 150.0, 50.0, 150.0))
     }
-    
+
     # DrawBeziers
     points = []
     points << Point.new(1, 2)
@@ -205,7 +205,7 @@ class GdiplusGraphicsTest < Test::Unit::TestCase
     draw("DrawBeziersF") { |g|
       assert_same(g, g.DrawBeziers(Pens.Black, pointsF))
     }
-    
+
     # DrawClosedCurve
     draw("DrawClosedCurveI1") { |g|
       assert_same(g, g.DrawClosedCurve(Pens.Black, pointsI))
@@ -219,7 +219,7 @@ class GdiplusGraphicsTest < Test::Unit::TestCase
     draw("DrawClosedCurveF2") { |g|
       assert_same(g, g.DrawClosedCurve(Pens.Black, pointsF, 0.7))
     }
-    
+
     # DrawCurve
     draw("DrawCurveI1") { |g|
       assert_same(g, g.DrawCurve(Pens.Black, pointsI))
@@ -245,7 +245,7 @@ class GdiplusGraphicsTest < Test::Unit::TestCase
     draw("DrawCurveF4") { |g|
       assert_same(g, g.DrawCurve(Pens.Black, pointsF, 3, 8, 0.3))
     }
-    
+
     # DrawEllipse
     draw("DrawEllipseI1") { |g|
       assert_same(g, g.DrawEllipse(Pens.Black, Rectangle.new(30, 30, 300, 200)))
@@ -259,7 +259,7 @@ class GdiplusGraphicsTest < Test::Unit::TestCase
     draw("DrawEllipseF2") { |g|
       assert_same(g, g.DrawEllipse(Pens.Black, 30.0, 30.0, 300.0, 200.0))
     }
-    
+
     # DrawLine
     draw("DrawLineI1") { |g|
       assert_same(g, g.DrawLine(Pens.Black, Point.new(30, 30), Point.new(300, 200)))
@@ -273,7 +273,7 @@ class GdiplusGraphicsTest < Test::Unit::TestCase
     draw("DrawLineF2") { |g|
       assert_same(g, g.DrawLine(Pens.Black, 30.0, 30.0, 300.0, 200.0))
     }
-    
+
     # DrawLines
     draw("DrawLinesI") { |g|
       assert_same(g, g.DrawLines(Pens.Black, pointsI))
@@ -281,14 +281,14 @@ class GdiplusGraphicsTest < Test::Unit::TestCase
     draw("DrawLinesF") { |g|
       assert_same(g, g.DrawLines(Pens.Black, pointsF))
     }
-    
+
     # DrawPath
     path = GraphicsPath.new
     path.AddEllipse(100, 100, 100, 100)
     draw("DrawPath") { |g|
       assert_same(g, g.DrawPath(Pens.Black, path))
     }
-    
+
     # DrawPie
     draw("DrawPieI1") { |g|
       assert_same(g, g.DrawPie(Pens.Black, Rectangle.new(0, 0, 300, 300), 30, 60))
@@ -302,7 +302,7 @@ class GdiplusGraphicsTest < Test::Unit::TestCase
     draw("DrawPieF2") { |g|
       assert_same(g, g.DrawPie(Pens.Black, 0.0, 0.0, 300.0, 300.0, 30, 60))
     }
-    
+
     # DrawPolygon
     draw("DrawPolygonI") { |g|
       assert_same(g, g.DrawPolygon(Pens.Black, pointsI))
@@ -310,7 +310,7 @@ class GdiplusGraphicsTest < Test::Unit::TestCase
     draw("DrawPolygonF") { |g|
       assert_same(g, g.DrawPolygon(Pens.Black, pointsF))
     }
-    
+
     # DrawRectangle
     draw("DrawRectangleI1") { |g|
       assert_same(g, g.DrawRectangle(Pens.Black, Rectangle.new(30, 30, 300, 200)))
@@ -324,7 +324,7 @@ class GdiplusGraphicsTest < Test::Unit::TestCase
     draw("DrawRectangleF2") { |g|
       assert_same(g, g.DrawRectangle(Pens.Black, 30.0, 30.0, 300.0, 200.0))
     }
-    
+
     # DrawRectangles
     rectsI = []
     rectsF = []
@@ -338,7 +338,7 @@ class GdiplusGraphicsTest < Test::Unit::TestCase
     draw("DrawRectanglesF") { |g|
       assert_same(g, g.DrawRectangles(Pens.Black, rectsF))
     }
-    
+
     # DrawString
     unless InstalledFontCollection.broken?
       draw("DrawStringI") { |g|
@@ -351,7 +351,7 @@ class GdiplusGraphicsTest < Test::Unit::TestCase
         assert_same(g, g.DrawString("TEST5", font, Brushes.Black, Rectangle.new(20, 100, 300, 20)))
         assert_same(g, g.DrawString("TEST6", font, Brushes.Black, Rectangle.new(20, 120, 300, 20)), fmt)
       }
-      
+
       draw("DrawStringF") { |g|
         font = Font.new("Arial", 20)
         fmt = StringFormat.new(StringFormatFlags.NoWrap)
@@ -363,7 +363,7 @@ class GdiplusGraphicsTest < Test::Unit::TestCase
         assert_same(g, g.DrawString("TEST6", font, Brushes.Black, RectangleF.new(20.0, 120.0, 300.0, 20.0)), fmt)
       }
     end
-    
+
     # FillClosedCurve
     draw("FillClosedCurveI1") { |g|
       assert_same(g, g.FillClosedCurve(Brushes.Black, pointsI))
@@ -377,7 +377,7 @@ class GdiplusGraphicsTest < Test::Unit::TestCase
     draw("FillClosedCurveF2") { |g|
       assert_same(g, g.FillClosedCurve(Brushes.Black, pointsF, :Winding, 0.7))
     }
-    
+
     # FillEllipse
     draw("FillEllipseI1") { |g|
       assert_same(g, g.FillEllipse(Brushes.Black, Rectangle.new(30, 30, 300, 200)))
@@ -391,14 +391,14 @@ class GdiplusGraphicsTest < Test::Unit::TestCase
     draw("FillEllipseF2") { |g|
       assert_same(g, g.FillEllipse(Brushes.Black, 30.0, 30.0, 300.0, 200.0))
     }
-    
+
     # FillPath
     path = GraphicsPath.new
     path.AddEllipse(100, 100, 100, 100)
     draw("FillPath") { |g|
       assert_same(g, g.FillPath(Brushes.Black, path))
     }
-    
+
     # FillPie
     draw("FillPieI1") { |g|
       assert_same(g, g.FillPie(Brushes.Black, Rectangle.new(0, 0, 300, 300), 30, 60))
@@ -412,7 +412,7 @@ class GdiplusGraphicsTest < Test::Unit::TestCase
     draw("FillPieF2") { |g|
       assert_same(g, g.FillPie(Brushes.Black, 0.0, 0.0, 300.0, 300.0, 30, 60))
     }
-    
+
     # FillPolygon
     draw("FillPolygonI1") { |g|
       assert_same(g, g.FillPolygon(Brushes.Black, pointsI))
@@ -426,7 +426,7 @@ class GdiplusGraphicsTest < Test::Unit::TestCase
     draw("FillPolygonF2") { |g|
       assert_same(g, g.FillPolygon(Brushes.Black, pointsF, :Winding))
     }
-    
+
     # FillRectangle
     draw("FillRectangleI1") { |g|
       assert_same(g, g.FillRectangle(Brushes.Black, Rectangle.new(30, 30, 300, 200)))
@@ -440,7 +440,7 @@ class GdiplusGraphicsTest < Test::Unit::TestCase
     draw("FillRectangleF2") { |g|
       assert_same(g, g.FillRectangle(Brushes.Black, 30.0, 30.0, 300.0, 200.0))
     }
-    
+
     # FillRectangles
     rectsI = []
     rectsF = []
@@ -454,7 +454,7 @@ class GdiplusGraphicsTest < Test::Unit::TestCase
     draw("FillRectanglesF") { |g|
       assert_same(g, g.FillRectangles(Brushes.Black, rectsF))
     }
-    
+
     # FillRegion
     path = GraphicsPath.new
     path.AddEllipse(100, 100, 100, 100)
@@ -462,7 +462,7 @@ class GdiplusGraphicsTest < Test::Unit::TestCase
     draw("FillRegion") { |g|
       assert_same(g, g.FillRegion(Brushes.Black, region))
     }
-    
+
     # DrawImage
     # DrawImagePoint
     draw("DrawImagePointI1") { |g|
@@ -477,7 +477,7 @@ class GdiplusGraphicsTest < Test::Unit::TestCase
     draw("DrawImagePointF2") { |g|
       assert_same(g, g.DrawImagePoint(bmp2, PointF.new(100.0, 100.0)))
     }
-    
+
     draw("DrawImage_DrawImagePointI1") { |g|
       assert_same(g, g.DrawImage(bmp2, 100, 100))
     }
@@ -490,7 +490,7 @@ class GdiplusGraphicsTest < Test::Unit::TestCase
     draw("DrawImage_DrawImagePointF2") { |g|
       assert_same(g, g.DrawImage(bmp2, PointF.new(100.0, 100.0)))
     }
-    
+
     # DrawImageRect
     draw("DrawImageRectI1") { |g|
       assert_same(g, g.DrawImageRect(bmp2, 100, 100, 200, 200))
@@ -504,7 +504,7 @@ class GdiplusGraphicsTest < Test::Unit::TestCase
     draw("DrawImageRectF2") { |g|
       assert_same(g, g.DrawImageRect(bmp2, RectangleF.new(100.0, 100.0, 200.0, 200.0)))
     }
-    
+
     draw("DrawImage_DrawImageRectI1") { |g|
       assert_same(g, g.DrawImage(bmp2, 100, 100, 200, 200))
     }
@@ -517,7 +517,7 @@ class GdiplusGraphicsTest < Test::Unit::TestCase
     draw("DrawImage_DrawImageRectF2") { |g|
       assert_same(g, g.DrawImage(bmp2, RectangleF.new(100.0, 100.0, 200.0, 200.0)))
     }
-    
+
     # DrawImagePoints
     points3I = [Point.new(130, 100), Point.new(330, 100), Point.new(100, 300)]
     draw("DrawImagePointsI") { |g|
@@ -527,20 +527,20 @@ class GdiplusGraphicsTest < Test::Unit::TestCase
     draw("DrawImagePointsF") { |g|
       assert_same(g, g.DrawImagePoints(bmp2, points3F))
     }
-    
+
     draw("DrawImage_DrawImagePointsI") { |g|
       assert_same(g, g.DrawImage(bmp2, points3I))
     }
     draw("DrawImage_DrawImagePointsF") { |g|
       assert_same(g, g.DrawImage(bmp2, points3F))
     }
-    
+
     # DrawImagePointRect
     rect_numsI = [181, 181, 208, 208]
     rectI = Rectangle.new(*rect_numsI)
     rect_numsF = [181.0, 181.0, 208.0, 208.0]
     rectF = RectangleF.new(*rect_numsF)
-    
+
     draw("DrawImagePointRectI1") { |g|
       assert_same(g, g.DrawImagePointRect(bmp2, Point.new(100, 100), rectI))
     }
@@ -567,7 +567,7 @@ class GdiplusGraphicsTest < Test::Unit::TestCase
     draw("DrawImagePointRectI8") { |g|
       assert_same(g, g.DrawImagePointRect(bmp2, 100, 100, 181, 181, 208, 208, GraphicsUnit.Pixel))
     }
-    
+
     draw("DrawImage_DrawImagePointRectI1") { |g|
       assert_same(g, g.DrawImage(bmp2, Point.new(100, 100), rectI))
     }
@@ -592,7 +592,7 @@ class GdiplusGraphicsTest < Test::Unit::TestCase
     draw("DrawImage_DrawImagePointRectI8") { |g|
       assert_same(g, g.DrawImage(bmp2, 100, 100, 181, 181, 208, 208, GraphicsUnit.Pixel))
     }
-    
+
     draw("DrawImagePointRectF1") { |g|
       assert_same(g, g.DrawImagePointRect(bmp2, PointF.new(100.0, 100.0), rectF))
     }
@@ -617,7 +617,7 @@ class GdiplusGraphicsTest < Test::Unit::TestCase
     draw("DrawImagePointRectF8") { |g|
       assert_same(g, g.DrawImagePointRect(bmp2, 100.0, 100.0, 181.0, 181.0, 208.0, 208.0, GraphicsUnit.Pixel))
     }
-    
+
     draw("DrawImage_DrawImagePointRectF1") { |g|
       assert_same(g, g.DrawImage(bmp2, PointF.new(100.0, 100.0), rectF))
     }
@@ -642,14 +642,14 @@ class GdiplusGraphicsTest < Test::Unit::TestCase
     draw("DrawImage_DrawImagePointRectF8") { |g|
       assert_same(g, g.DrawImage(bmp2, 100.0, 100.0, 181.0, 181.0, 208.0, 208.0, GraphicsUnit.Pixel))
     }
-    
+
     # DrawImageRectRect
     dest_rect_numsI = [100, 100, 200, 200]
     dest_rectI = Rectangle.new(*dest_rect_numsI)
     dest_rect_numsF = [100.0, 100.0, 200.0, 200.0]
     dest_rectF = RectangleF.new(*dest_rect_numsF)
-    
-    
+
+
     draw("DrawImageRectRectI1A") { |g|
       assert_same(g, g.DrawImageRectRect(bmp2, dest_rectI, rectI))
     }
@@ -686,7 +686,7 @@ class GdiplusGraphicsTest < Test::Unit::TestCase
     draw("DrawImageRectRectI4C") { |g|
       assert_same(g, g.DrawImageRectRect(bmp2, 100, 100, 200, 200, 181, 181, 208, 208, GraphicsUnit.Pixel, ImageAttributes.new))
     }
-    
+
     draw("DrawImageRectRectF1A") { |g|
       assert_same(g, g.DrawImageRectRect(bmp2, dest_rectF, rectF))
     }
@@ -723,7 +723,7 @@ class GdiplusGraphicsTest < Test::Unit::TestCase
     draw("DrawImageRectRectF4C") { |g|
       assert_same(g, g.DrawImageRectRect(bmp2, 100.0, 100.0, 200.0, 200.0, 181.0, 181.0, 208.0, 208.0, GraphicsUnit.Pixel, ImageAttributes.new))
     }
-    
+
     draw("DrawImage_DrawImageRectRectI1A") { |g|
       assert_same(g, g.DrawImage(bmp2, dest_rectI, rectI))
     }
@@ -760,7 +760,7 @@ class GdiplusGraphicsTest < Test::Unit::TestCase
     draw("DrawImage_DrawImageRectRectI4C") { |g|
       assert_same(g, g.DrawImage(bmp2, 100, 100, 200, 200, 181, 181, 208, 208, GraphicsUnit.Pixel, ImageAttributes.new))
     }
-    
+
     draw("DrawImage_DrawImageRectRectF1A") { |g|
       assert_same(g, g.DrawImage(bmp2, dest_rectF, rectF))
     }
@@ -797,7 +797,7 @@ class GdiplusGraphicsTest < Test::Unit::TestCase
     draw("DrawImage_DrawImageRectRectF4C") { |g|
       assert_same(g, g.DrawImage(bmp2, 100.0, 100.0, 200.0, 200.0, 181.0, 181.0, 208.0, 208.0, GraphicsUnit.Pixel, ImageAttributes.new))
     }
-    
+
     # DrawImagePointsRect
     draw("DrawImagePointsRectI1A") { |g|
       assert_same(g, g.DrawImagePointsRect(bmp2, points3I, rectI))
@@ -808,7 +808,7 @@ class GdiplusGraphicsTest < Test::Unit::TestCase
     draw("DrawImagePointsRectI1C") { |g|
       assert_same(g, g.DrawImagePointsRect(bmp2, points3I, rectI, GraphicsUnit.Pixel, ImageAttributes.new))
     }
-    
+
     draw("DrawImagePointsRectI2A") { |g|
       assert_same(g, g.DrawImagePointsRect(bmp2, points3I, *rect_numsI))
     }
@@ -818,7 +818,7 @@ class GdiplusGraphicsTest < Test::Unit::TestCase
     draw("DrawImagePointsRectI2C") { |g|
       assert_same(g, g.DrawImagePointsRect(bmp2, points3I, 181, 181, 208, 208, GraphicsUnit.Pixel, ImageAttributes.new))
     }
-    
+
     draw("DrawImagePointsRectF1A") { |g|
       assert_same(g, g.DrawImagePointsRect(bmp2, points3F, rectF))
     }
@@ -828,7 +828,7 @@ class GdiplusGraphicsTest < Test::Unit::TestCase
     draw("DrawImagePointsRectF1C") { |g|
       assert_same(g, g.DrawImagePointsRect(bmp2, points3F, rectF, GraphicsUnit.Pixel, ImageAttributes.new))
     }
-    
+
     draw("DrawImagePointsRectF2A") { |g|
       assert_same(g, g.DrawImagePointsRect(bmp2, points3F, *rect_numsF))
     }
@@ -838,7 +838,7 @@ class GdiplusGraphicsTest < Test::Unit::TestCase
     draw("DrawImagePointsRectF2C") { |g|
       assert_same(g, g.DrawImagePointsRect(bmp2, points3F, 181.0, 181.0, 208.0, 208.0, GraphicsUnit.Pixel, ImageAttributes.new))
     }
-    
+
     draw("DrawImage_DrawImagePointsRectI1A") { |g|
       assert_same(g, g.DrawImage(bmp2, points3I, rectI))
     }
@@ -848,7 +848,7 @@ class GdiplusGraphicsTest < Test::Unit::TestCase
     draw("DrawImage_DrawImagePointsRectI1C") { |g|
       assert_same(g, g.DrawImage(bmp2, points3I, rectI, GraphicsUnit.Pixel, ImageAttributes.new))
     }
-    
+
     draw("DrawImage_DrawImagePointsRectI2A") { |g|
       assert_same(g, g.DrawImage(bmp2, points3I, *rect_numsI))
     }
@@ -858,7 +858,7 @@ class GdiplusGraphicsTest < Test::Unit::TestCase
     draw("DrawImage_DrawImagePointsRectI2C") { |g|
       assert_same(g, g.DrawImage(bmp2, points3I, 181, 181, 208, 208, GraphicsUnit.Pixel, ImageAttributes.new))
     }
-    
+
     draw("DrawImage_DrawImagePointsRectF1A") { |g|
       assert_same(g, g.DrawImage(bmp2, points3F, rectF))
     }
@@ -868,7 +868,7 @@ class GdiplusGraphicsTest < Test::Unit::TestCase
     draw("DrawImage_DrawImagePointsRectF1C") { |g|
       assert_same(g, g.DrawImage(bmp2, points3F, rectF, GraphicsUnit.Pixel, ImageAttributes.new))
     }
-    
+
     draw("DrawImage_DrawImagePointsRectF2A") { |g|
       assert_same(g, g.DrawImage(bmp2, points3F, *rect_numsF))
     }
@@ -879,7 +879,7 @@ class GdiplusGraphicsTest < Test::Unit::TestCase
       assert_same(g, g.DrawImage(bmp2, points3F, 181.0, 181.0, 208.0, 208.0, GraphicsUnit.Pixel, ImageAttributes.new))
     }
   end
-  
+
   def test_clip_methods
     # SetClip
     draw("SetClip_rect1") { |g|
@@ -900,10 +900,10 @@ class GdiplusGraphicsTest < Test::Unit::TestCase
       assert_same(g, g.SetClip(RectangleF.new(100.0, 100.0, 200.0, 200.0), :Exclude))
       g.DrawImagePoint(bmp2, 0, 0)
     }
-    
+
     clip_path = GraphicsPath.new
     clip_path.AddEllipse(100, 100, 200, 200)
-    
+
     draw("SetClip_path1") { |g|
       assert_same(g, g.SetClip(clip_path))
       g.DrawImagePoint(bmp2, 0, 0)
@@ -912,9 +912,9 @@ class GdiplusGraphicsTest < Test::Unit::TestCase
       assert_same(g, g.SetClip(clip_path, CombineMode.Xor))
       g.DrawImagePoint(bmp2, 0, 0)
     }
-    
+
     clip_region = Region.new(clip_path)
-    
+
     draw("SetClip_region1") { |g|
       assert_same(g, g.SetClip(clip_region))
       g.DrawImagePoint(bmp2, 0, 0)
@@ -923,7 +923,7 @@ class GdiplusGraphicsTest < Test::Unit::TestCase
       assert_same(g, g.SetClip(clip_region, CombineMode.Xor))
       g.DrawImagePoint(bmp2, 0, 0)
     }
-    
+
     draw("SetClip_graphics1") { |g|
       draw { |g2|
         g2.SetClip(clip_path)
@@ -938,7 +938,7 @@ class GdiplusGraphicsTest < Test::Unit::TestCase
         g.DrawImagePoint(bmp2, 0, 0)
       }
     }
-    
+
     # ExcludeClip
     draw("ExcludeClip_rect1") { |g|
       g.SetClip(Rectangle.new(0, 0, 200, 400))
@@ -950,13 +950,13 @@ class GdiplusGraphicsTest < Test::Unit::TestCase
       assert_same(g, g.ExcludeClip(RectangleF.new(100.0, 100.0, 200.0, 200.0)))
       g.DrawImagePoint(bmp2, 0, 0)
     }
-    
+
     draw("ExcludeClip_region") { |g|
       g.SetClip(Rectangle.new(0, 0, 200, 400))
       assert_same(g, g.ExcludeClip(clip_region))
       g.DrawImagePoint(bmp2, 0, 0)
     }
-    
+
     # IntersectClip
     draw("IntersectClip_rect1") { |g|
       g.SetClip(Rectangle.new(0, 0, 200, 400))
@@ -968,20 +968,20 @@ class GdiplusGraphicsTest < Test::Unit::TestCase
       assert_same(g, g.IntersectClip(RectangleF.new(100.0, 100.0, 200.0, 200.0)))
       g.DrawImagePoint(bmp2, 0, 0)
     }
-    
+
     draw("IntersectClip_region") { |g|
       g.SetClip(Rectangle.new(0, 0, 200, 400))
       assert_same(g, g.IntersectClip(clip_region))
       g.DrawImagePoint(bmp2, 0, 0)
     }
-    
+
     # ResetClip
     draw("ResetClip") { |g|
       g.SetClip(Rectangle.new(100, 100, 200, 200))
       assert_same(g, g.ResetClip)
       g.DrawImagePoint(bmp2, 0, 0)
     }
-    
+
     # TranslateClip
     draw("TranslateClip1") { |g|
       g.SetClip(clip_region)
@@ -994,7 +994,7 @@ class GdiplusGraphicsTest < Test::Unit::TestCase
       g.DrawImagePoint(bmp2, 0, 0)
     }
   end
-  
+
   def test_transform_methods
     # TranslateTransform
     draw("TranslateTransformI1") { |g|
@@ -1013,7 +1013,7 @@ class GdiplusGraphicsTest < Test::Unit::TestCase
       assert_same(g, g.TranslateTransform(100.0, 100.0, :Append))
       g.DrawImage(bmp2, 0.0, 0.0)
     }
-    
+
     # ScaleTransform
     draw("ScaleTransform1") { |g|
       assert_same(g, g.ScaleTransform(2, 0.5))
@@ -1023,7 +1023,7 @@ class GdiplusGraphicsTest < Test::Unit::TestCase
       assert_same(g, g.ScaleTransform(0.5, 2.0, MatrixOrder.Append))
       g.DrawImage(bmp2, 0, 0)
     }
-    
+
     # RotateTransform
     draw("RotateTransform1") { |g|
       assert_same(g, g.RotateTransform(45))
@@ -1033,7 +1033,7 @@ class GdiplusGraphicsTest < Test::Unit::TestCase
       assert_same(g, g.RotateTransform(45.0, MatrixOrder.Append))
       g.DrawImage(bmp2, 0, 0)
     }
-    
+
     # MultiplyTransform
     matrix = Matrix.new
     matrix.Rotate(45)
@@ -1046,14 +1046,14 @@ class GdiplusGraphicsTest < Test::Unit::TestCase
       g.DrawImage(bmp2, 0, 0)
       assert_equal(matrix, g.Transform)
     }
-    
+
     # ResetTransform
     draw("ResetTransform") { |g|
       g.TranslateTransform(100, 100)
       assert_same(g, g.ResetTransform)
       g.DrawImage(bmp2, 0, 0)
     }
-    
+
     # TransformPoints
     points = [Point.new(10, 10), Point.new(20, 20), Point.new(30, 30)]
     points2 = [Point.new(110, 110), Point.new(120, 120), Point.new(130, 130)]
@@ -1067,9 +1067,9 @@ class GdiplusGraphicsTest < Test::Unit::TestCase
       g.TranslateTransform(100, 100)
       assert_equal(pointsF2, g.TransformPoints(:Page, :World, pointsF))
     }
-    
+
   end
-  
+
   def test_other_methods
     #IsVisible
     draw { |g|
@@ -1077,13 +1077,13 @@ class GdiplusGraphicsTest < Test::Unit::TestCase
       assert_equal(true, g.IsVisible(100.0, 100.0))
       assert_equal(false, g.IsVisible(-100, -100))
       assert_equal(false, g.IsVisible(-100.0, -100.0))
-      
+
       assert_equal(true, g.IsVisible(100, 100, 100, 100))
       assert_equal(true, g.IsVisible(100, 100, 1000, 1000))
       assert_equal(true, g.IsVisible(100.0, 100.0, 100.0, 100.0))
       assert_equal(false, g.IsVisible(-100, -100, 50, 50))
       assert_equal(false, g.IsVisible(-100.0, -100.0, -50.0, -50.0))
-      
+
       g.TranslateTransform(100, 100)
       assert_equal(true, g.IsVisible(-50, -50))
       assert_equal(false, g.IsVisible(350, 350))
@@ -1107,7 +1107,7 @@ class GdiplusGraphicsTest < Test::Unit::TestCase
         assert_not_equal(0.0, size2.Width)
         assert_not_equal(0.0, size2.Height)
         assert_not_equal(size1, size2)
-        
+
         size3 = g.MeasureString(str, font, 100.0, format)
         assert_instance_of(SizeF, size3)
 
@@ -1118,7 +1118,7 @@ class GdiplusGraphicsTest < Test::Unit::TestCase
         assert_not_equal(0.0, size4.Width)
         assert_not_equal(0.0, size4.Height)
         assert_equal(size1, size4)
-        
+
         size5 = g.MeasureString(str, font, origin, format)
         assert_instance_of(SizeF, size5)
 
@@ -1129,7 +1129,7 @@ class GdiplusGraphicsTest < Test::Unit::TestCase
         assert_not_equal(0.0, size6.Width)
         assert_not_equal(0.0, size6.Height)
         assert_not_equal(size1, size6)
-        
+
         size7 = g.MeasureString(str, font, area, format)
         assert_instance_of(SizeF, size7)
 
@@ -1157,11 +1157,11 @@ class GdiplusGraphicsTest < Test::Unit::TestCase
         rect = RectangleF.new(20.0, 20.0, 200.0, 200.0)
         g.DrawString(str, font, Brushes.Black, rect, format)
         regions = g.MeasureCharacterRanges(str, font, rect, format)
-        
+
         assert_equal(ranges.size, regions.size)
         assert_instance_of(Region, regions.first)
         assert_equal(false, regions.first.IsEmpty?(g))
-        
+
         regions.each.with_index { |region, idx|
           bound = region.GetBounds(g)
           g.DrawRectangle(Pens.Red, bound)
@@ -1170,7 +1170,7 @@ class GdiplusGraphicsTest < Test::Unit::TestCase
     end
 
   end
-  
+
 end
 
 __END__

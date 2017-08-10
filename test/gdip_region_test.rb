@@ -3,7 +3,7 @@ require 'test_helper'
 
 class GdiplusRegionTest < Test::Unit::TestCase
   include Gdiplus
-  
+
   def test_constructor
     assert_instance_of(Region, Region.new)
     assert_instance_of(Region, Region.new(GraphicsPath.new))
@@ -12,19 +12,19 @@ class GdiplusRegionTest < Test::Unit::TestCase
     data = Region.new(Rectangle.new(0, 0, 100, 100)).GetData
     assert_instance_of(Region, Region.new(data))
   end
-  
+
   def region_circle
     path = GraphicsPath.new
     path.AddEllipse(0, 0, 200, 200)
     return Region.new(path)
   end
-  
+
   def region_square
     path = GraphicsPath.new
     path.AddRectangle(100, 100, 200, 200)
     return Region.new(path)
   end
-  
+
   def test_methods
     # Clone Equals
     region = Region.new(Rectangle.new(0, 0, 100, 100))
@@ -35,114 +35,114 @@ class GdiplusRegionTest < Test::Unit::TestCase
     bmp.draw { |g|
       assert_equal(true, region.Equals(region2, g))
     }
-    
+
     # Complement(Region)
     r1 = region_circle
     r2 = region_square
     assert_same(r1, r1.Complement(r2))
-    
+
     # Complement(GraphicsPath)
     r1 = region_circle
     path = GraphicsPath.new
     path.AddRectangle(100, 100, 200, 200)
     assert_same(r1, r1.Complement(path))
-    
+
     # Complement(Rectangle)
     r1 = region_circle
     assert_same(r1, r1.Complement(Rectangle.new(100, 100, 200, 200)))
-    
+
     # Complement(RectangleF)
     r1 = region_circle
     assert_same(r1, r1.Complement(RectangleF.new(100.0, 100.0, 200.0, 200.0)))
-    
+
     # Exclude(Region)
     r1 = region_circle
     r2 = region_square
     assert_same(r1, r1.Exclude(r2))
-    
+
     # Exclude(GraphicsPath)
     r1 = region_circle
     path = GraphicsPath.new
     path.AddRectangle(100, 100, 200, 200)
     assert_same(r1, r1.Exclude(path))
-    
+
     # Exclude(Rectangle)
     r1 = region_circle
     assert_same(r1, r1.Exclude(Rectangle.new(100, 100, 200, 200)))
-    
+
     # Exclude(RectangleF)
     r1 = region_circle
     assert_same(r1, r1.Exclude(RectangleF.new(100.0, 100.0, 200.0, 200.0)))
-    
+
     # Intersect(Region)
     r1 = region_circle
     r2 = region_square
     assert_same(r1, r1.Intersect(r2))
-    
+
     # Intersect(GraphicsPath)
     r1 = region_circle
     path = GraphicsPath.new
     path.AddRectangle(100, 100, 200, 200)
     assert_same(r1, r1.Intersect(path))
-    
+
     # Intersect(Rectangle)
     r1 = region_circle
     assert_same(r1, r1.Intersect(Rectangle.new(100, 100, 200, 200)))
-    
+
     # Intersect(RectangleF)
     r1 = region_circle
     assert_same(r1, r1.Intersect(RectangleF.new(100.0, 100.0, 200.0, 200.0)))
-    
+
     # Union(Region)
     r1 = region_circle
     r2 = region_square
     assert_same(r1, r1.Union(r2))
-    
+
     # Union(GraphicsPath)
     r1 = region_circle
     path = GraphicsPath.new
     path.AddRectangle(100, 100, 200, 200)
     assert_same(r1, r1.Union(path))
-    
+
     # Union(Rectangle)
     r1 = region_circle
     assert_same(r1, r1.Union(Rectangle.new(100, 100, 200, 200)))
-    
+
     # Union(RectangleF)
     r1 = region_circle
     assert_same(r1, r1.Union(RectangleF.new(100.0, 100.0, 200.0, 200.0)))
-    
+
     # Xor(Region)
     r1 = region_circle
     r2 = region_square
     assert_same(r1, r1.Xor(r2))
-    
+
     # Xor(GraphicsPath)
     r1 = region_circle
     path = GraphicsPath.new
     path.AddRectangle(100, 100, 200, 200)
     assert_same(r1, r1.Xor(path))
-    
+
     # Xor(Rectangle)
     r1 = region_circle
     assert_same(r1, r1.Xor(Rectangle.new(100, 100, 200, 200)))
-    
+
     # Xor(RectangleF)
     r1 = region_circle
     assert_same(r1, r1.Xor(RectangleF.new(100.0, 100.0, 200.0, 200.0)))
-    
+
     # GetBounds
     r1 = region_circle
     bmp.draw {|g|
       assert_equal(RectangleF.new(0.0, 0.0, 200.0, 200.0), r1.GetBounds(g))
     }
-    
+
     # GetRegionScans
     region = Region.new(Rectangle.new(0, 0, 30, 30))
     ary = region.GetRegionScans(Matrix.new)
     assert_instance_of(Array, ary)
     assert_instance_of(RectangleF, ary.first)
-    
+
     # IsEmpty, IsInfinite, MakeEmpty, MakeInfinite
     bmp.draw { |g|
       r1 = region_circle
@@ -153,7 +153,7 @@ class GdiplusRegionTest < Test::Unit::TestCase
       r1.MakeInfinite
       assert_equal(true, r1.IsInfinite(g))
     }
-    
+
     # Transform, Translate
     bmp.draw { |g|
       r1 = region_square
@@ -166,8 +166,8 @@ class GdiplusRegionTest < Test::Unit::TestCase
       assert((r1.GetBounds(g).X + n).abs < 0.001)
     }
   end
-  
-  
+
+
 end
 
 __END__

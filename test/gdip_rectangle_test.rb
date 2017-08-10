@@ -3,7 +3,7 @@ require 'test_helper'
 
 class GdiplusRectangleTest < Test::Unit::TestCase
   include Gdiplus
-  
+
   def test_Point
     assert_instance_of(Point, Point.new)
     assert_instance_of(Point, Point.new(100, -100))
@@ -19,7 +19,7 @@ class GdiplusRectangleTest < Test::Unit::TestCase
     assert_equal(Point.new, po + po2)
     assert_not_equal(0, po)
   end
-  
+
   def test_PointF
     assert_instance_of(PointF, PointF.new)
     assert_instance_of(PointF, PointF.new(100.0, -100.0))
@@ -36,7 +36,7 @@ class GdiplusRectangleTest < Test::Unit::TestCase
     assert_equal(PointF.new, po + po2)
     assert_not_equal(0, po)
   end
-  
+
   def test_Size
     assert_instance_of(Size, Size.new)
     assert_instance_of(Size, Size.new(100, -100))
@@ -52,7 +52,7 @@ class GdiplusRectangleTest < Test::Unit::TestCase
     assert_equal(Size.new, size + size2)
     assert_not_equal(0.0, size)
   end
-  
+
   def test_SizeF
     assert_instance_of(SizeF, SizeF.new)
     assert_instance_of(SizeF, SizeF.new(100.0, -100.0))
@@ -68,7 +68,7 @@ class GdiplusRectangleTest < Test::Unit::TestCase
     assert_equal(SizeF.new, size + size2)
     assert_not_equal(0.0, size)
   end
-  
+
   def test_Rectangle_properties
     assert_instance_of(Rectangle, Rectangle.new)
     assert_instance_of(Rectangle, Rectangle.new(100, 200, 300, 400))
@@ -76,7 +76,7 @@ class GdiplusRectangleTest < Test::Unit::TestCase
     assert_raise(ArgumentError) { Rectangle.new(1, 2) }
     assert_raise(ArgumentError) { Rectangle.new(1, 2, 3) }
     assert_raise(TypeError) { Rectangle.new("1", "2", "3", "4") }
-    
+
     rect = Rectangle.new
     rect.X = 100
     rect.Y = 200
@@ -99,10 +99,10 @@ class GdiplusRectangleTest < Test::Unit::TestCase
     assert_equal(Size.new(30, 50), rect.Size)
     assert_equal(Rectangle.new(0, 0, 30, 50), rect)
   end
-  
+
   def test_Rectangle_methods
     assert_equal(Rectangle.new(100, 100, 100, 100), Rectangle.FromLTRB(100, 100, 200, 200))
-    
+
     rect1 = Rectangle.new(0, 0, 100, 100)
     assert_equal(true, rect1.contains?(50, 50))
     assert_equal(true, rect1.contains?(Point.new(30, 30)))
@@ -112,17 +112,17 @@ class GdiplusRectangleTest < Test::Unit::TestCase
     assert_equal(Rectangle.new(-100, -100, 300, 300), rect1.inflate(Size.new(100, 100)))
     rect1.Inflate(100, 100) # inflate!
     assert_equal(Rectangle.new(-100, -100, 300, 300), rect1)
-    
+
     rect2 = Rectangle.new(0, 0, 100, 100)
     assert_equal(true, rect2.IntersectsWith(Rectangle.new(-10, -10, 20, 20)))
     assert_equal(false, rect2.IntersectsWith(Rectangle.new(100, 100, 20, 20)))
-    
+
     assert_equal(Rectangle.new(0, 0, 10, 10), rect2.intersect(Rectangle.new(-10, -10, 20, 20)))
     rect2.Intersect(Rectangle.new(-10, -10, 20, 20)) # intersect!
     assert_equal(Rectangle.new(0, 0, 10, 10), rect2)
     assert_equal(Rectangle.new(0, 0, 200, 200), rect2.union(Rectangle.new(100, 100, 100, 100)))
   end
-  
+
   def test_RectangleF_properties
     assert_instance_of(RectangleF, RectangleF.new)
     assert_instance_of(RectangleF, RectangleF.new(100.0, 200.0, 300.0, 400.0))
@@ -130,7 +130,7 @@ class GdiplusRectangleTest < Test::Unit::TestCase
     assert_raise(ArgumentError) { RectangleF.new(1.0, 2.0) }
     assert_raise(ArgumentError) { RectangleF.new(1.0, 2.0, 3.0) }
     assert_raise(TypeError) { RectangleF.new("1.0", "2.0", "3.0", "4.0") }
-    
+
     rect = RectangleF.new
     rect.X = 100.0
     rect.Y = 200.0
@@ -153,7 +153,7 @@ class GdiplusRectangleTest < Test::Unit::TestCase
     assert_equal(SizeF.new(30.0, 50.0), rect.Size)
     assert_equal(RectangleF.new(0.0, 0.0, 30.0, 50.0), rect)
   end
-  
+
   def test_RectangleF_methods
     assert_equal(RectangleF.new(100.0, 100.0, 100.0, 100.0), RectangleF.FromLTRB(100.0, 100.0, 200.0, 200.0))
     rect1 = RectangleF.new(0.0, 0.0, 100.0, 100.0)
@@ -165,11 +165,11 @@ class GdiplusRectangleTest < Test::Unit::TestCase
     assert_equal(RectangleF.new(-100.0, -100.0, 300.0, 300.0), rect1.inflate(SizeF.new(100.0, 100.0)))
     rect1.Inflate(100.0, 100.0) # inflate!
     assert_equal(RectangleF.new(-100.0, -100.0, 300.0, 300.0), rect1)
-    
+
     rect2 = RectangleF.new(0.0, 0.0, 100.0, 100.0)
     assert_equal(true, rect2.IntersectsWith(RectangleF.new(-10.0, -10.0, 20.0, 20.0)))
     assert_equal(false, rect2.IntersectsWith(RectangleF.new(100.0, 100.0, 20.0, 20.0)))
-    
+
     assert_equal(RectangleF.new(0.0, 0.0, 10.0, 10.0), rect2.intersect(RectangleF.new(-10.0, -10.0, 20.0, 20.0)))
     rect2.Intersect(RectangleF.new(-10.0, -10.0, 20.0, 20.0)) # intersect!
     assert_equal(RectangleF.new(0.0, 0.0, 10.0, 10.0), rect2)

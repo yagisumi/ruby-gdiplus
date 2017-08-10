@@ -3,7 +3,7 @@ require 'test_helper'
 
 class GdiplusImageTest < Test::Unit::TestCase
   include Gdiplus
-  
+
   IMGFMT_SIGPAT_MAP = {
     ImageFormat.Bmp => ["BM"],
     ImageFormat.Jpeg => ["\xFF\xD8"],
@@ -11,7 +11,7 @@ class GdiplusImageTest < Test::Unit::TestCase
     ImageFormat.Tiff => ["II", "MM"],
     ImageFormat.Png => ["\x89PNG\r\n\x1A\n"],
   }
-  
+
   EXT_SIGPAT_MAP = {
     ".bmp" => ["BM"],
     ".dib" => ["BM"],
@@ -25,7 +25,7 @@ class GdiplusImageTest < Test::Unit::TestCase
     ".tiff" => ["II", "MM"],
     ".png" => ["\x89PNG\r\n\x1A\n"],
   }
-  
+
   if "string".respond_to?(:encoding)
     EXT_SIGPAT_MAP.each {|ext, patterns|
       patterns.each {|pat|
@@ -38,7 +38,7 @@ class GdiplusImageTest < Test::Unit::TestCase
       }
     }
   end
-  
+
   def test_image_save1
     EXT_SIGPAT_MAP.each {|ext, patterns|
       savename = "test_image_save#{ext}"
@@ -53,7 +53,7 @@ class GdiplusImageTest < Test::Unit::TestCase
       end
     }
   end
-  
+
   def test_image_save2_imgfmt
     IMGFMT_SIGPAT_MAP.each {|imgfmt, patterns|
       savename = "test_image_save.img"
@@ -68,7 +68,7 @@ class GdiplusImageTest < Test::Unit::TestCase
       end
     }
   end
-  
+
   def test_image_save2_encprms
     bmp = Bitmap.new(1, 1)
     savename = "test_image_save.png"
@@ -79,7 +79,7 @@ class GdiplusImageTest < Test::Unit::TestCase
     ensure
       File.delete(savename)
     end
-    
+
     bmp = Bitmap.new(1, 1)
     savename = "test_image_save.jpg"
     encprms = EncoderParameters.new
@@ -91,7 +91,7 @@ class GdiplusImageTest < Test::Unit::TestCase
       File.delete(savename)
     end
   end
-  
+
   def test_image_properties
     bmp = Bitmap.new(40, 30)
     assert_equal(40, bmp.Width)
@@ -101,9 +101,9 @@ class GdiplusImageTest < Test::Unit::TestCase
     assert_equal(PixelFormat.Format32bppARGB, bmp.PixelFormat)
     assert_equal(ImageFormat.MemoryBmp, bmp.RawFormat)
   end
-  
-  
-  
+
+
+
 end
 
 __END__

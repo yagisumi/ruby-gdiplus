@@ -3,7 +3,7 @@ require 'test_helper'
 
 class GdiplusTest < Test::Unit::TestCase
   include Gdiplus
-  
+
   def test_that_it_has_a_version_number
     assert_not_nil(::Gdiplus::VERSION)
   end

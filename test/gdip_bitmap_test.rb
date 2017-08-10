@@ -3,7 +3,7 @@ require 'test_helper'
 
 class GdiplusBitmapTest < Test::Unit::TestCase
   include Gdiplus
-  
+
   def test_bitmap
     #bmp = Bitmap.new(1, 1)
     assert_kind_of(Bitmap, Bitmap.new(1, 1))

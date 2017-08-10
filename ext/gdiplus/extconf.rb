@@ -16,7 +16,7 @@ end
 if $mswin
   $defs << "-DGDIPVER=0x0110"
 elsif $mingw
-  
+
   # std=c++
   if RUBY_VERSION_NUM < 20000
     unless CONFIG['CXXFLAGS']
@@ -41,7 +41,7 @@ elsif $mingw
     $warnflags = $warnflags.sub(/-Wdeclaration-after-statement/, '') # is valid for C/ObjC but not for C++
     $warnflags = $warnflags.sub(/-Wimplicit-function-declaration/, '') # is valid for C/ObjC but not for C++
   end
-  
+
 end # $mingw
 
 

@@ -3,7 +3,7 @@ require 'test_helper'
 
 class GdiplusColorTest < Test::Unit::TestCase
   include Gdiplus
-  
+
   def test_color_args
     assert_instance_of(Color, Color.new())
     assert_instance_of(Color, Color.new(0xff000000))
@@ -19,7 +19,7 @@ class GdiplusColorTest < Test::Unit::TestCase
     assert_raise(TypeError) { Color.new("1", Color.new) }
     assert_raise(TypeError) { Color.new(1, 2, "3") }
     assert_raise(TypeError) { Color.new(1, 2, 3, "4") }
-    
+
     assert_instance_of(Color, Color.FromArgb())
     assert_instance_of(Color, Color.from_argb())
     assert_instance_of(Color, Color.FromArgb(0xff000000))
@@ -35,7 +35,7 @@ class GdiplusColorTest < Test::Unit::TestCase
     assert_raise(TypeError) { Color.FromArgb(1, 2, "3") }
     assert_raise(TypeError) { Color.FromArgb(1, 2, 3, "4") }
   end
-  
+
   def test_color_int
     assert_equal(0xff000000, Color.new.to_i)
     assert_equal(0xff112233, Color.new(0xff112233).to_i)
@@ -53,7 +53,7 @@ class GdiplusColorTest < Test::Unit::TestCase
     assert_equal(0x88112233, Color.FromArgb(0x88, Color.FromArgb(0xff112233)).to_i)
     assert_equal(0xff112233, Color.FromArgb(0x111, 0x222, 0x333).to_i)
   end
-  
+
   def test_color_equal
     assert_equal(true, Color.new == Color.new)
     assert_equal(true, Color.new(255, 255, 255) == Color.new(255, 255, 255, 255))
@@ -62,7 +62,7 @@ class GdiplusColorTest < Test::Unit::TestCase
     assert_equal(false, Color.new == "1")
     assert_equal(Color.Blue, Color.new(:Blue))
   end
-  
+
   def test_color_property
     color = Color.new(0xff113355)
     assert_equal(0xff, color.A)
@@ -74,8 +74,8 @@ class GdiplusColorTest < Test::Unit::TestCase
     assert_equal(0x55, color.B)
     assert_equal(0x55, color.b)
   end
-  
-  
+
+
   def test_color_constants
     assert_equal(0xFFF0F8FF, Color::AliceBlue.to_i)
     assert_equal(0xFFF0F8FF, Color.AliceBlue.to_i)
@@ -360,8 +360,8 @@ class GdiplusColorTest < Test::Unit::TestCase
     assert_equal(0xFF9ACD32, Color::YellowGreen.to_i)
     assert_equal(0xFF9ACD32, Color.YellowGreen.to_i)
   end
-  
-  
+
+
 end
 
 __END__

@@ -5,7 +5,7 @@ class GdiplusEnumHandler < YARD::Handlers::C::Base
   MATCH_ENUM_1 = /(define_enumint|define_enumflags)\((\w+), \w+, "(\w+)", (-?\w+)\)/
   MATCH_ENUM_2 = /gdip_enum_define<[^>]+>\((\w+), \w+, "(\w+)"/
   MATCH_ENUM_3 = /define_enumint_alias\((\w+), "(\w+)", (-?\w+)\)/
-  
+
   handles MATCH_ENUM_1
   handles MATCH_ENUM_2
   handles MATCH_ENUM_3
@@ -27,12 +27,12 @@ class GdiplusEnumHandler < YARD::Handlers::C::Base
       handle_enum_method(klass, const_name)
     end
   end
-  
+
   def handle_enum_method(var_name, name, is_enumflags=false)
     namespace = namespace_for_variable(var_name)
     register MethodObject.new(namespace, name, :class) do |obj|
       register_visibility(obj, :public)
-      
+
       klass = var_name.sub(/^c/, '')
       obj.add_tag(YARD::Tags::Tag.new(:return, "{Gdiplus::#{klass}::#{name}}", klass))
       obj.explicit = true
@@ -40,7 +40,7 @@ class GdiplusEnumHandler < YARD::Handlers::C::Base
     if is_enumflags
       register MethodObject.new(namespace, name, :instance) do |obj|
         register_visibility(obj, :public)
-        
+
         klass = var_name.sub(/^c/, '')
         obj.docstring = "Returns +self | #{name}+."
         t = YARD::Tags::Tag.new(:return, "{Gdiplus::#{klass}}", klass)
@@ -49,7 +49,7 @@ class GdiplusEnumHandler < YARD::Handlers::C::Base
         obj.explicit = true
       end
     end
-    
+
   end
 end
 
@@ -76,7 +76,7 @@ class GdiplusAttrHandler < YARD::Handlers::C::Base
   MATCH_ATTR_R5 = /(CLASS_)?ATTR_R\((\w+), (\w+), (\w+), (\w+), (\w+)\)/
   MATCH_ATTR_R_Q = /(CLASS_)?ATTR_R_Q\((\w+), (\w+), (\w+), (\w+)\)/
   MATCH_ATTR_RW = /(CLASS_)?ATTR_RW\((\w+), (\w+), (\w+), (\w+)\)/
- 
+
   handles MATCH_ATTR_R4
   handles MATCH_ATTR_R5
   handles MATCH_ATTR_R_Q
@@ -94,7 +94,7 @@ class GdiplusAttrHandler < YARD::Handlers::C::Base
         handle_attribute(klass, name1, 1, 0)
         handle_alias(klass, name2, name1)
       end
-      
+
     end
     statement.source.scan(MATCH_ATTR_R5) do |class_scope, klass, name1, name2, prefix, name3|
       if class_scope
@@ -129,9 +129,9 @@ class GdiplusAttrHandler < YARD::Handlers::C::Base
         handle_alias(klass, name2, name1)
       end
     end
-    
+
   end
-  
+
 end
 
 
@@ -178,7 +178,7 @@ module YARD
             register_file_info(obj, statement.file, statement.line)
           end
         end
-        
+
         ### modified the condition of @return insertion
         def handle_method(scope, var_name, name, func_name, _source_file = nil)
           visibility = :public
@@ -211,7 +211,7 @@ module YARD
             end
           end
         end
-        
+
         ### modified to accept a scope parameter
         def handle_attribute(var_name, name, read, write, scope = :instance)
           values = {:read => read.to_i, :write => write.to_i}
@@ -223,7 +223,7 @@ module YARD
             obj.namespace.attributes[scope][name][type] = obj
           end
         end
-        
+
         ### modified to accept a scope parameter
         def handle_alias(var_name, new_name, old_name, scope = :instance)
           namespace = namespace_for_variable(var_name)
@@ -248,10 +248,10 @@ module YARD
           namespace.aliases[new_obj] = old_meth
         end
       end
-      
+
     end
   end
-  
+
   # @private
   ### modified to link types with not method but class in tags
   module Templates::Helpers
@@ -267,7 +267,7 @@ module YARD
         @in_format_types = false
         list.empty? ? "" : (brackets ? "(#{list.join(", ")})" : list.join(", "))
       end
-      
+
       def link_object(obj, title = nil, anchor = nil, relative = true)
         return title if obj.nil?
         obj = Registry.resolve(object, obj, true, true, @in_format_types ? :class : nil) if obj.is_a?(String)
@@ -294,7 +294,7 @@ module YARD
         link = link ? link_url(link, title, :title => h("#{obj.title} (#{obj.type})")) : title
         "<span class='object_link'>" + link + "</span>"
       end
-      
+
     end
   end
 end

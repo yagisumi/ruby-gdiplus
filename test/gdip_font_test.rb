@@ -3,17 +3,17 @@ require 'test_helper'
 
 class GdiplusFontTest < Test::Unit::TestCase
   include Gdiplus
-  
+
   def test_FontFamily
     return if InstalledFontCollection.broken?
-    
+
     assert_instance_of(FontFamily, FontFamily.GenericSansSerif)
     assert_instance_of(FontFamily, FontFamily.GenericSerif)
     assert_instance_of(FontFamily, FontFamily.GenericMonospace)
-    
+
     assert_instance_of(String, FontFamily.GenericSansSerif.name)
     assert_instance_of(String, FontFamily.GenericSansSerif.Name)
-    
+
     assert_instance_of(FontFamily, FontFamily.new(GenericFontFamilies.SansSerif))
     assert_instance_of(FontFamily, FontFamily.new(GenericFontFamilies.Serif))
     assert_instance_of(FontFamily, FontFamily.new(GenericFontFamilies.Monospace))
@@ -25,7 +25,7 @@ class GdiplusFontTest < Test::Unit::TestCase
     assert_instance_of(FontFamily, FontFamily.new(FontFamily.GenericMonospace.name))
     assert_instance_of(FontFamily, FontFamily.new(FontFamily.GenericSansSerif.name, InstalledFontCollection.new))
     assert_raise(GdiplusError) { FontFamily.new("jkjagsljslkdjfljaslgrfjds") }
-    
+
     fontfamily = FontFamily.new("Times New Roman")
     assert_kind_of(Integer, fontfamily.GetEmHeight())
     assert_kind_of(Integer, fontfamily.GetCellAscent())
@@ -36,7 +36,7 @@ class GdiplusFontTest < Test::Unit::TestCase
     assert_kind_of(Integer, fontfamily.get_cell_descent())
     assert_kind_of(Integer, fontfamily.get_line_spacing())
   end
-  
+
 end
 
 __END__

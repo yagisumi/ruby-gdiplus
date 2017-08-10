@@ -17,13 +17,13 @@ module Test::Unit::Assertions
       $VERBOSE = _v
     end
   end
-  
+
   def _capture_output(verbose=nil, &block)
     _v = $VERBOSE
     unless verbose.nil?
       $VERBOSE = verbose
     end
-    
+
     sio_out = StringIO.new
     sio_err = StringIO.new
     _stdout = $stdout
@@ -39,10 +39,10 @@ module Test::Unit::Assertions
       $VERBOSE = _v
     end
   end
-  
+
   def _assert_output(stdout=nil, stderr=nil, verbose=nil, &block)
     out, err = _capture_output(verbose, &block)
-    
+
     x = true
     case stdout
     when Regexp
@@ -54,7 +54,7 @@ module Test::Unit::Assertions
     else
       assert(false, "The first parameter should be a Regexp, String or nil.")
     end
-    
+
     y = true
     case stderr
     when Regexp
@@ -66,17 +66,17 @@ module Test::Unit::Assertions
     else
       assert(false, "The second parameter should be a Regexp or String.")
     end
-    
+
     x && y
   end
-  
+
   def _assert_silent(verbose=nil)
     _assert_output("", "", verbose) { yield }
   end
-  
+
   def _assert_stderr(stderr, verbose=nil, &block)
     err = _capture_output(verbose, &block).last
-    
+
     y = true
     case stderr
     when Regexp
@@ -88,17 +88,17 @@ module Test::Unit::Assertions
     else
       assert(false, "The first parameter should be a Regexp, String or nil.")
     end
-    
+
     y
   end
-  
+
   def _assert_stderr_silent(verbose=nil)
     _assert_stderr("", verbose) { yield }
   end
-  
+
   def _assert_stdout(stdout, verbose=nil, &block)
     out = _capture_output(verbose, &block).first
-    
+
     x = true
     case stdout
     when Regexp
@@ -110,12 +110,12 @@ module Test::Unit::Assertions
     else
       assert(false, "The first parameter should be a Regexp, String or nil.")
     end
-    
+
     x
   end
-  
+
   def _assert_stdout_silent(verbose=nil)
     _assert_stdout("", verbose) { yield }
   end
-  
+
 end
