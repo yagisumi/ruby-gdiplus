@@ -1,4 +1,5 @@
 #include "ruby_ext_utils.hpp"
+#include "ruby_compatible.h"
 
 void
 delete_tmp_obj(volatile VALUE *store)

@@ -3261,11 +3261,13 @@ gdip_graphics_transform_points(VALUE self, VALUE v_dest, VALUE v_src, VALUE v_po
  *   @param info [Hash]
  *   @return [SizeF]
  * @example
+ *   bmp = Bitmap.new(400, 400)
  *   bmp.draw { |g|
  *     font = Font.new("MS Gothic", 16)
  *     area = SizeF.new(80.0, 1000.0)
  *     info = {}
- *     p g.MeasureString("The quick brown fox jumps over the lazy dog", font, area, nil, info)
+ *     size = g.MeasureString("The quick brown fox jumps over the lazy dog", font, area, nil, info)
+ *     p size => #<Gdiplus::SizeF Width=79.507812, Height=82.000000>
  *     p info # => {"charactersFitted"=>43, "linesFilled"=>5}
  *   }
  */
@@ -3369,6 +3371,33 @@ gdip_graphics_measure_string(int argc, VALUE *argv, VALUE self)
     return gdip_sizef_create(size.Width, size.Height);
 }
 
+/**
+ * @overload MeasureCharacterRanges(str, font, rect, format)
+ *   @param str [String]
+ *   @param font [Font]
+ *   @param rect [RectangleF]
+ *   @param format [StringFormat]
+ *   @return [Array<Region>]
+ * @example
+ *   bmp.draw { |g|
+ *     g.Clear(:White)
+ *
+ *     #      0123456789012345678901234567890123456789012
+ *     str = "The quick brown fox jumps over the lazy dog"
+ *     font = Font.new("MS Gothic", 16)
+ *     format = StringFormat.new
+ *     format.SetMeasurableCharacterRanges(
+ *       [0..2, 4..8, 10..14, 16..18, 20..24, 26..29, 31..33, 35..38, 40..42])
+ *     rect = RectangleF.new(20.0, 20.0, 200.0, 200.0)
+ *     g.DrawString(str, font, Brushes.Black, rect, format)
+ *     regions = g.MeasureCharacterRanges(str, font, rect, format)
+ *     regions.each.with_index { |region, idx|
+ *       bound = region.GetBounds(g)
+ *       g.DrawRectangle(Pens.Red, bound)
+ *     }
+ *   }
+ *
+ */
 static VALUE
 gdip_graphics_measure_character_ranges(VALUE self, VALUE str, VALUE v_font, VALUE v_rect, VALUE v_format)
 {
@@ -3406,6 +3435,7 @@ gdip_graphics_measure_character_ranges(VALUE self, VALUE str, VALUE v_font, VALU
     }
 
     Region *regions = new Region[count];
+    VALUE tmp = wrap_tmp_ary(regions);
     Status status = g->MeasureCharacterRanges(RString_Ptr<WCHAR *>(wstr), length, font, *rect, format, count, regions);
     RB_GC_GUARD(wstr);
     if (status != Ok) {
@@ -3414,21 +3444,14 @@ gdip_graphics_measure_character_ranges(VALUE self, VALUE str, VALUE v_font, VALU
     }
 
     VALUE r = rb_ary_new_capa(count);
-    int state = 0;
-    _rb_protect([&count, &r, &regions]() -> VALUE {
-        for (int i = 0; i < count; ++i) {
-            VALUE tmp = typeddata_alloc_null<&tRegion>(cRegion);
-            DATA_PTR(tmp) = gdip_obj_create(regions[i].Clone());
-            rb_ary_push(r, tmp);
-        }
-
-        return Qnil;
-    }, &state);
-
-    delete[] regions;
-    if (state != 0) {
-        rb_jump_tag(state);
+    for (int i = 0; i < count; ++i) {
+        VALUE tmp = typeddata_alloc_null<&tRegion>(cRegion);
+        DATA_PTR(tmp) = gdip_obj_create(regions[i].Clone());
+        rb_ary_push(r, tmp);
     }
+
+    // delete[] regions;
+    delete_tmp_ary(&tmp);
     
     return r;
 }

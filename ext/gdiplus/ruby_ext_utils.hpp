@@ -41,6 +41,26 @@ type_name()
 #endif
 }
 
+/* 
+ * undefined reference to ... [g++ (tdm-1) 4.5.2]
+ */
+// template<typename T>
+// static void
+// tmp_obj_free(T ptr)
+// {
+//     if (ptr) {
+//         delete ptr;
+//     }
+// }
+
+// template<typename T>
+// static void
+// tmp_ary_free(T ptr)
+// {
+//     if (ptr) {
+//         delete[] ptr;
+//     }
+// }
 
 template<typename T>
 static void
@@ -53,14 +73,32 @@ tmp_obj_free(void *ptr)
 }
 
 template<typename T>
+static void
+tmp_ary_free(void *ptr)
+{
+    if (ptr) {
+        T obj = static_cast<T>(ptr);
+        delete[] obj;
+    }
+}
+
+
+template<typename T>
 static inline VALUE
 wrap_tmp_obj(T ptr)
 {
     return Data_Wrap_Struct(rb_cObject, 0, tmp_obj_free<T>, ptr);
 }
 
-void delete_tmp_obj(volatile VALUE *store);
+template<typename T>
+static inline VALUE
+wrap_tmp_ary(T ptr)
+{
+    return Data_Wrap_Struct(rb_cObject, 0, tmp_ary_free<T>, ptr);
+}
 
+void delete_tmp_obj(volatile VALUE *store);
+#define delete_tmp_ary(x) delete_tmp_obj(x)
 
 /*
  * http://masamitsu-murase.blogspot.jp/2013/12/sevenzipruby-2-c-ruby.html

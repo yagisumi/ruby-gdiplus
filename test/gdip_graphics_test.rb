@@ -551,7 +551,9 @@ class GdiplusGraphicsTest < Test::Unit::TestCase
       assert_same(g, g.DrawImagePointRect(bmp2, Point.new(100, 100), *rect_numsI))
     }
     draw("DrawImagePointRectI4") { |g|
-      assert_same(g, g.DrawImagePointRect(bmp2, Point.new(100, 100), *rect_numsI, GraphicsUnit.Pixel))
+      # syntax error in 1.8
+      # assert_same(g, g.DrawImagePointRect(bmp2, Point.new(100, 100), *rect_numsI, GraphicsUnit.Pixel))
+      assert_same(g, g.DrawImagePointRect(bmp2, Point.new(100, 100), 181, 181, 208, 208, GraphicsUnit.Pixel))
     }
     draw("DrawImagePointRectI5") { |g|
       assert_same(g, g.DrawImagePointRect(bmp2, 100, 100, rectI))
@@ -563,7 +565,7 @@ class GdiplusGraphicsTest < Test::Unit::TestCase
       assert_same(g, g.DrawImagePointRect(bmp2, 100, 100, *rect_numsI))
     }
     draw("DrawImagePointRectI8") { |g|
-      assert_same(g, g.DrawImagePointRect(bmp2, 100, 100, *rect_numsI, GraphicsUnit.Pixel))
+      assert_same(g, g.DrawImagePointRect(bmp2, 100, 100, 181, 181, 208, 208, GraphicsUnit.Pixel))
     }
     
     draw("DrawImage_DrawImagePointRectI1") { |g|
@@ -576,7 +578,7 @@ class GdiplusGraphicsTest < Test::Unit::TestCase
       assert_same(g, g.DrawImage(bmp2, Point.new(100, 100), *rect_numsI))
     }
     draw("DrawImage_DrawImagePointRectI4") { |g|
-      assert_same(g, g.DrawImage(bmp2, Point.new(100, 100), *rect_numsI, GraphicsUnit.Pixel))
+      assert_same(g, g.DrawImage(bmp2, Point.new(100, 100), 181, 181, 208, 208, GraphicsUnit.Pixel))
     }
     draw("DrawImage_DrawImagePointRectI5") { |g|
       assert_same(g, g.DrawImage(bmp2, 100, 100, rectI))
@@ -588,7 +590,7 @@ class GdiplusGraphicsTest < Test::Unit::TestCase
       assert_same(g, g.DrawImage(bmp2, 100, 100, *rect_numsI))
     }
     draw("DrawImage_DrawImagePointRectI8") { |g|
-      assert_same(g, g.DrawImage(bmp2, 100, 100, *rect_numsI, GraphicsUnit.Pixel))
+      assert_same(g, g.DrawImage(bmp2, 100, 100, 181, 181, 208, 208, GraphicsUnit.Pixel))
     }
     
     draw("DrawImagePointRectF1") { |g|
@@ -601,7 +603,7 @@ class GdiplusGraphicsTest < Test::Unit::TestCase
       assert_same(g, g.DrawImagePointRect(bmp2, PointF.new(100.0, 100.0), *rect_numsF))
     }
     draw("DrawImagePointRectF4") { |g|
-      assert_same(g, g.DrawImagePointRect(bmp2, PointF.new(100.0, 100.0), *rect_numsF, GraphicsUnit.Pixel))
+      assert_same(g, g.DrawImagePointRect(bmp2, PointF.new(100.0, 100.0), 181.0, 181.0, 208.0, 208.0, GraphicsUnit.Pixel))
     }
     draw("DrawImagePointRectF5") { |g|
       assert_same(g, g.DrawImagePointRect(bmp2, 100.0, 100.0, rectF))
@@ -613,7 +615,7 @@ class GdiplusGraphicsTest < Test::Unit::TestCase
       assert_same(g, g.DrawImagePointRect(bmp2, 100.0, 100.0, *rect_numsF))
     }
     draw("DrawImagePointRectF8") { |g|
-      assert_same(g, g.DrawImagePointRect(bmp2, 100.0, 100.0, *rect_numsF, GraphicsUnit.Pixel))
+      assert_same(g, g.DrawImagePointRect(bmp2, 100.0, 100.0, 181.0, 181.0, 208.0, 208.0, GraphicsUnit.Pixel))
     }
     
     draw("DrawImage_DrawImagePointRectF1") { |g|
@@ -626,7 +628,7 @@ class GdiplusGraphicsTest < Test::Unit::TestCase
       assert_same(g, g.DrawImage(bmp2, PointF.new(100.0, 100.0), *rect_numsF))
     }
     draw("DrawImage_DrawImagePointRectF4") { |g|
-      assert_same(g, g.DrawImage(bmp2, PointF.new(100.0, 100.0), *rect_numsF, GraphicsUnit.Pixel))
+      assert_same(g, g.DrawImage(bmp2, PointF.new(100.0, 100.0), 181.0, 181.0, 208.0, 208.0, GraphicsUnit.Pixel))
     }
     draw("DrawImage_DrawImagePointRectF5") { |g|
       assert_same(g, g.DrawImage(bmp2, 100.0, 100.0, rectF))
@@ -638,7 +640,7 @@ class GdiplusGraphicsTest < Test::Unit::TestCase
       assert_same(g, g.DrawImage(bmp2, 100.0, 100.0, *rect_numsF))
     }
     draw("DrawImage_DrawImagePointRectF8") { |g|
-      assert_same(g, g.DrawImage(bmp2, 100.0, 100.0, *rect_numsF, GraphicsUnit.Pixel))
+      assert_same(g, g.DrawImage(bmp2, 100.0, 100.0, 181.0, 181.0, 208.0, 208.0, GraphicsUnit.Pixel))
     }
     
     # DrawImageRectRect
@@ -661,28 +663,28 @@ class GdiplusGraphicsTest < Test::Unit::TestCase
       assert_same(g, g.DrawImageRectRect(bmp2, dest_rectI, *rect_numsI))
     }
     draw("DrawImageRectRectI2B") { |g|
-      assert_same(g, g.DrawImageRectRect(bmp2, dest_rectI, *rect_numsI, GraphicsUnit.Pixel))
+      assert_same(g, g.DrawImageRectRect(bmp2, dest_rectI, 181, 181, 208, 208, GraphicsUnit.Pixel))
     }
     draw("DrawImageRectRectI2C") { |g|
-      assert_same(g, g.DrawImageRectRect(bmp2, dest_rectI, *rect_numsI, GraphicsUnit.Pixel, ImageAttributes.new))
+      assert_same(g, g.DrawImageRectRect(bmp2, dest_rectI, 181, 181, 208, 208, GraphicsUnit.Pixel, ImageAttributes.new))
     }
     draw("DrawImageRectRectI3A") { |g|
-      assert_same(g, g.DrawImageRectRect(bmp2, *dest_rect_numsI, rectI))
+      assert_same(g, g.DrawImageRectRect(bmp2, 100, 100, 200, 200, rectI))
     }
     draw("DrawImageRectRectI3B") { |g|
-      assert_same(g, g.DrawImageRectRect(bmp2, *dest_rect_numsI, rectI, GraphicsUnit.Pixel))
+      assert_same(g, g.DrawImageRectRect(bmp2, 100, 100, 200, 200, rectI, GraphicsUnit.Pixel))
     }
     draw("DrawImageRectRectI3C") { |g|
-      assert_same(g, g.DrawImageRectRect(bmp2, *dest_rect_numsI, rectI, GraphicsUnit.Pixel, ImageAttributes.new))
+      assert_same(g, g.DrawImageRectRect(bmp2, 100, 100, 200, 200, rectI, GraphicsUnit.Pixel, ImageAttributes.new))
     }
     draw("DrawImageRectRectI4A") { |g|
-      assert_same(g, g.DrawImageRectRect(bmp2, *dest_rect_numsI, *rect_numsI))
+      assert_same(g, g.DrawImageRectRect(bmp2, 100, 100, 200, 200, *rect_numsI))
     }
     draw("DrawImageRectRectI4B") { |g|
-      assert_same(g, g.DrawImageRectRect(bmp2, *dest_rect_numsI, *rect_numsI, GraphicsUnit.Pixel))
+      assert_same(g, g.DrawImageRectRect(bmp2, 100, 100, 200, 200, 181, 181, 208, 208, GraphicsUnit.Pixel))
     }
     draw("DrawImageRectRectI4C") { |g|
-      assert_same(g, g.DrawImageRectRect(bmp2, *dest_rect_numsI, *rect_numsI, GraphicsUnit.Pixel, ImageAttributes.new))
+      assert_same(g, g.DrawImageRectRect(bmp2, 100, 100, 200, 200, 181, 181, 208, 208, GraphicsUnit.Pixel, ImageAttributes.new))
     }
     
     draw("DrawImageRectRectF1A") { |g|
@@ -698,28 +700,28 @@ class GdiplusGraphicsTest < Test::Unit::TestCase
       assert_same(g, g.DrawImageRectRect(bmp2, dest_rectF, *rect_numsF))
     }
     draw("DrawImageRectRectF2B") { |g|
-      assert_same(g, g.DrawImageRectRect(bmp2, dest_rectF, *rect_numsF, GraphicsUnit.Pixel))
+      assert_same(g, g.DrawImageRectRect(bmp2, dest_rectF, 181.0, 181.0, 208.0, 208.0, GraphicsUnit.Pixel))
     }
     draw("DrawImageRectRectF2C") { |g|
-      assert_same(g, g.DrawImageRectRect(bmp2, dest_rectF, *rect_numsF, GraphicsUnit.Pixel, ImageAttributes.new))
+      assert_same(g, g.DrawImageRectRect(bmp2, dest_rectF, 181.0, 181.0, 208.0, 208.0, GraphicsUnit.Pixel, ImageAttributes.new))
     }
     draw("DrawImageRectRectF3A") { |g|
-      assert_same(g, g.DrawImageRectRect(bmp2, *dest_rect_numsF, rectF))
+      assert_same(g, g.DrawImageRectRect(bmp2, 100.0, 100.0, 200.0, 200.0, rectF))
     }
     draw("DrawImageRectRectF3B") { |g|
-      assert_same(g, g.DrawImageRectRect(bmp2, *dest_rect_numsF, rectF, GraphicsUnit.Pixel))
+      assert_same(g, g.DrawImageRectRect(bmp2, 100.0, 100.0, 200.0, 200.0, rectF, GraphicsUnit.Pixel))
     }
     draw("DrawImageRectRectF3C") { |g|
-      assert_same(g, g.DrawImageRectRect(bmp2, *dest_rect_numsF, rectF, GraphicsUnit.Pixel, ImageAttributes.new))
+      assert_same(g, g.DrawImageRectRect(bmp2, 100.0, 100.0, 200.0, 200.0, rectF, GraphicsUnit.Pixel, ImageAttributes.new))
     }
     draw("DrawImageRectRectF4A") { |g|
-      assert_same(g, g.DrawImageRectRect(bmp2, *dest_rect_numsF, *rect_numsF))
+      assert_same(g, g.DrawImageRectRect(bmp2, 100.0, 100.0, 200.0, 200.0, *rect_numsF))
     }
     draw("DrawImageRectRectF4B") { |g|
-      assert_same(g, g.DrawImageRectRect(bmp2, *dest_rect_numsF, *rect_numsF, GraphicsUnit.Pixel))
+      assert_same(g, g.DrawImageRectRect(bmp2, 100.0, 100.0, 200.0, 200.0, 181.0, 181.0, 208.0, 208.0, GraphicsUnit.Pixel))
     }
     draw("DrawImageRectRectF4C") { |g|
-      assert_same(g, g.DrawImageRectRect(bmp2, *dest_rect_numsF, *rect_numsF, GraphicsUnit.Pixel, ImageAttributes.new))
+      assert_same(g, g.DrawImageRectRect(bmp2, 100.0, 100.0, 200.0, 200.0, 181.0, 181.0, 208.0, 208.0, GraphicsUnit.Pixel, ImageAttributes.new))
     }
     
     draw("DrawImage_DrawImageRectRectI1A") { |g|
@@ -735,28 +737,28 @@ class GdiplusGraphicsTest < Test::Unit::TestCase
       assert_same(g, g.DrawImage(bmp2, dest_rectI, *rect_numsI))
     }
     draw("DrawImage_DrawImageRectRectI2B") { |g|
-      assert_same(g, g.DrawImage(bmp2, dest_rectI, *rect_numsI, GraphicsUnit.Pixel))
+      assert_same(g, g.DrawImage(bmp2, dest_rectI, 181, 181, 208, 208, GraphicsUnit.Pixel))
     }
     draw("DrawImage_DrawImageRectRectI2C") { |g|
-      assert_same(g, g.DrawImage(bmp2, dest_rectI, *rect_numsI, GraphicsUnit.Pixel, ImageAttributes.new))
+      assert_same(g, g.DrawImage(bmp2, dest_rectI, 181, 181, 208, 208, GraphicsUnit.Pixel, ImageAttributes.new))
     }
     draw("DrawImage_DrawImageRectRectI3A") { |g|
-      assert_same(g, g.DrawImage(bmp2, *dest_rect_numsI, rectI))
+      assert_same(g, g.DrawImage(bmp2, 100, 100, 200, 200, rectI))
     }
     draw("DrawImage_DrawImageRectRectI3B") { |g|
-      assert_same(g, g.DrawImage(bmp2, *dest_rect_numsI, rectI, GraphicsUnit.Pixel))
+      assert_same(g, g.DrawImage(bmp2, 100, 100, 200, 200, rectI, GraphicsUnit.Pixel))
     }
     draw("DrawImage_DrawImageRectRectI3C") { |g|
-      assert_same(g, g.DrawImage(bmp2, *dest_rect_numsI, rectI, GraphicsUnit.Pixel, ImageAttributes.new))
+      assert_same(g, g.DrawImage(bmp2, 100, 100, 200, 200, rectI, GraphicsUnit.Pixel, ImageAttributes.new))
     }
     draw("DrawImage_DrawImageRectRectI4A") { |g|
-      assert_same(g, g.DrawImage(bmp2, *dest_rect_numsI, *rect_numsI))
+      assert_same(g, g.DrawImage(bmp2, 100, 100, 200, 200, *rect_numsI))
     }
     draw("DrawImage_DrawImageRectRectI4B") { |g|
-      assert_same(g, g.DrawImage(bmp2, *dest_rect_numsI, *rect_numsI, GraphicsUnit.Pixel))
+      assert_same(g, g.DrawImage(bmp2, 100, 100, 200, 200, 181, 181, 208, 208, GraphicsUnit.Pixel))
     }
     draw("DrawImage_DrawImageRectRectI4C") { |g|
-      assert_same(g, g.DrawImage(bmp2, *dest_rect_numsI, *rect_numsI, GraphicsUnit.Pixel, ImageAttributes.new))
+      assert_same(g, g.DrawImage(bmp2, 100, 100, 200, 200, 181, 181, 208, 208, GraphicsUnit.Pixel, ImageAttributes.new))
     }
     
     draw("DrawImage_DrawImageRectRectF1A") { |g|
@@ -772,28 +774,28 @@ class GdiplusGraphicsTest < Test::Unit::TestCase
       assert_same(g, g.DrawImage(bmp2, dest_rectF, *rect_numsF))
     }
     draw("DrawImage_DrawImageRectRectF2B") { |g|
-      assert_same(g, g.DrawImage(bmp2, dest_rectF, *rect_numsF, GraphicsUnit.Pixel))
+      assert_same(g, g.DrawImage(bmp2, dest_rectF, 181.0, 181.0, 208.0, 208.0, GraphicsUnit.Pixel))
     }
     draw("DrawImage_DrawImageRectRectF2C") { |g|
-      assert_same(g, g.DrawImage(bmp2, dest_rectF, *rect_numsF, GraphicsUnit.Pixel, ImageAttributes.new))
+      assert_same(g, g.DrawImage(bmp2, dest_rectF, 181.0, 181.0, 208.0, 208.0, GraphicsUnit.Pixel, ImageAttributes.new))
     }
     draw("DrawImage_DrawImageRectRectF3A") { |g|
-      assert_same(g, g.DrawImage(bmp2, *dest_rect_numsF, rectF))
+      assert_same(g, g.DrawImage(bmp2, 100.0, 100.0, 200.0, 200.0, rectF))
     }
     draw("DrawImage_DrawImageRectRectF3B") { |g|
-      assert_same(g, g.DrawImage(bmp2, *dest_rect_numsF, rectF, GraphicsUnit.Pixel))
+      assert_same(g, g.DrawImage(bmp2, 100.0, 100.0, 200.0, 200.0, rectF, GraphicsUnit.Pixel))
     }
     draw("DrawImage_DrawImageRectRectF3C") { |g|
-      assert_same(g, g.DrawImage(bmp2, *dest_rect_numsF, rectF, GraphicsUnit.Pixel, ImageAttributes.new))
+      assert_same(g, g.DrawImage(bmp2, 100.0, 100.0, 200.0, 200.0, rectF, GraphicsUnit.Pixel, ImageAttributes.new))
     }
     draw("DrawImage_DrawImageRectRectF4A") { |g|
-      assert_same(g, g.DrawImage(bmp2, *dest_rect_numsF, *rect_numsF))
+      assert_same(g, g.DrawImage(bmp2, 100.0, 100.0, 200.0, 200.0, *rect_numsF))
     }
     draw("DrawImage_DrawImageRectRectF4B") { |g|
-      assert_same(g, g.DrawImage(bmp2, *dest_rect_numsF, *rect_numsF, GraphicsUnit.Pixel))
+      assert_same(g, g.DrawImage(bmp2, 100.0, 100.0, 200.0, 200.0, 181.0, 181.0, 208.0, 208.0, GraphicsUnit.Pixel))
     }
     draw("DrawImage_DrawImageRectRectF4C") { |g|
-      assert_same(g, g.DrawImage(bmp2, *dest_rect_numsF, *rect_numsF, GraphicsUnit.Pixel, ImageAttributes.new))
+      assert_same(g, g.DrawImage(bmp2, 100.0, 100.0, 200.0, 200.0, 181.0, 181.0, 208.0, 208.0, GraphicsUnit.Pixel, ImageAttributes.new))
     }
     
     # DrawImagePointsRect
@@ -811,10 +813,10 @@ class GdiplusGraphicsTest < Test::Unit::TestCase
       assert_same(g, g.DrawImagePointsRect(bmp2, points3I, *rect_numsI))
     }
     draw("DrawImagePointsRectI2B") { |g|
-      assert_same(g, g.DrawImagePointsRect(bmp2, points3I, *rect_numsI, GraphicsUnit.Pixel))
+      assert_same(g, g.DrawImagePointsRect(bmp2, points3I, 181, 181, 208, 208, GraphicsUnit.Pixel))
     }
     draw("DrawImagePointsRectI2C") { |g|
-      assert_same(g, g.DrawImagePointsRect(bmp2, points3I, *rect_numsI, GraphicsUnit.Pixel, ImageAttributes.new))
+      assert_same(g, g.DrawImagePointsRect(bmp2, points3I, 181, 181, 208, 208, GraphicsUnit.Pixel, ImageAttributes.new))
     }
     
     draw("DrawImagePointsRectF1A") { |g|
@@ -831,10 +833,10 @@ class GdiplusGraphicsTest < Test::Unit::TestCase
       assert_same(g, g.DrawImagePointsRect(bmp2, points3F, *rect_numsF))
     }
     draw("DrawImagePointsRectF2B") { |g|
-      assert_same(g, g.DrawImagePointsRect(bmp2, points3F, *rect_numsF, GraphicsUnit.Pixel))
+      assert_same(g, g.DrawImagePointsRect(bmp2, points3F, 181.0, 181.0, 208.0, 208.0, GraphicsUnit.Pixel))
     }
     draw("DrawImagePointsRectF2C") { |g|
-      assert_same(g, g.DrawImagePointsRect(bmp2, points3F, *rect_numsF, GraphicsUnit.Pixel, ImageAttributes.new))
+      assert_same(g, g.DrawImagePointsRect(bmp2, points3F, 181.0, 181.0, 208.0, 208.0, GraphicsUnit.Pixel, ImageAttributes.new))
     }
     
     draw("DrawImage_DrawImagePointsRectI1A") { |g|
@@ -851,10 +853,10 @@ class GdiplusGraphicsTest < Test::Unit::TestCase
       assert_same(g, g.DrawImage(bmp2, points3I, *rect_numsI))
     }
     draw("DrawImage_DrawImagePointsRectI2B") { |g|
-      assert_same(g, g.DrawImage(bmp2, points3I, *rect_numsI, GraphicsUnit.Pixel))
+      assert_same(g, g.DrawImage(bmp2, points3I, 181, 181, 208, 208, GraphicsUnit.Pixel))
     }
     draw("DrawImage_DrawImagePointsRectI2C") { |g|
-      assert_same(g, g.DrawImage(bmp2, points3I, *rect_numsI, GraphicsUnit.Pixel, ImageAttributes.new))
+      assert_same(g, g.DrawImage(bmp2, points3I, 181, 181, 208, 208, GraphicsUnit.Pixel, ImageAttributes.new))
     }
     
     draw("DrawImage_DrawImagePointsRectF1A") { |g|
@@ -871,10 +873,10 @@ class GdiplusGraphicsTest < Test::Unit::TestCase
       assert_same(g, g.DrawImage(bmp2, points3F, *rect_numsF))
     }
     draw("DrawImage_DrawImagePointsRectF2B") { |g|
-      assert_same(g, g.DrawImage(bmp2, points3F, *rect_numsF, GraphicsUnit.Pixel))
+      assert_same(g, g.DrawImage(bmp2, points3F, 181.0, 181.0, 208.0, 208.0, GraphicsUnit.Pixel))
     }
     draw("DrawImage_DrawImagePointsRectF2C") { |g|
-      assert_same(g, g.DrawImage(bmp2, points3F, *rect_numsF, GraphicsUnit.Pixel, ImageAttributes.new))
+      assert_same(g, g.DrawImage(bmp2, points3F, 181.0, 181.0, 208.0, 208.0, GraphicsUnit.Pixel, ImageAttributes.new))
     }
   end
   
@@ -1070,7 +1072,7 @@ class GdiplusGraphicsTest < Test::Unit::TestCase
   
   def test_other_methods
     #IsVisible
-    draw {|g|
+    draw { |g|
       assert_equal(true, g.IsVisible(100, 100))
       assert_equal(true, g.IsVisible(100.0, 100.0))
       assert_equal(false, g.IsVisible(-100, -100))
@@ -1086,6 +1088,87 @@ class GdiplusGraphicsTest < Test::Unit::TestCase
       assert_equal(true, g.IsVisible(-50, -50))
       assert_equal(false, g.IsVisible(350, 350))
     }
+
+    unless InstalledFontCollection.broken?
+      # MeasureString
+      draw { |g|
+        str = "The quick brown fox jumps over the lazy dog"
+        font = Font.new("MS Gothic", 16)
+
+        size1 = g.MeasureString(str, font)
+        assert_instance_of(SizeF, size1)
+        assert_not_equal(0.0, size1.Width)
+        assert_not_equal(0.0, size1.Height)
+
+        format = StringFormat.new
+
+        size2 = g.MeasureString(str, font, 100.0)
+        assert_instance_of(SizeF, size2)
+        assert_not_equal(0.0, size2.Width)
+        assert_not_equal(0.0, size2.Height)
+        assert_not_equal(size1, size2)
+        
+        size3 = g.MeasureString(str, font, 100.0, format)
+        assert_instance_of(SizeF, size3)
+
+        origin = PointF.new(30.0, 30.0)
+
+        size4 = g.MeasureString(str, font, origin)
+        assert_instance_of(SizeF, size4)
+        assert_not_equal(0.0, size4.Width)
+        assert_not_equal(0.0, size4.Height)
+        assert_equal(size1, size4)
+        
+        size5 = g.MeasureString(str, font, origin, format)
+        assert_instance_of(SizeF, size5)
+
+        area = SizeF.new(80.0, 1000.0)
+
+        size6 = g.MeasureString(str, font, area)
+        assert_instance_of(SizeF, size6)
+        assert_not_equal(0.0, size6.Width)
+        assert_not_equal(0.0, size6.Height)
+        assert_not_equal(size1, size6)
+        
+        size7 = g.MeasureString(str, font, area, format)
+        assert_instance_of(SizeF, size7)
+
+        info = {}
+        size8 = g.MeasureString(str, font, area, nil, info)
+        assert_instance_of(SizeF, size8)
+        assert_kind_of(Integer, info["charactersFitted"])
+        assert_kind_of(Integer, info["linesFilled"])
+
+        info = {}
+        size9 = g.MeasureString(str, font, area, format, info)
+        assert_instance_of(SizeF, size9)
+        assert_kind_of(Integer, info["charactersFitted"])
+        assert_kind_of(Integer, info["linesFilled"])
+      }
+
+      # MeasureCharacterRanges
+      draw("MeasureCharacterRanges") { |g|
+        #      0123456789012345678901234567890123456789012
+        str = "The quick brown fox jumps over the lazy dog"
+        font = Font.new("MS Gothic", 16)
+        ranges = [0...3, 4..8, 10..14, 16..18, 20..24, 26..29, 31..33, 35..38, 40..42]
+        format = StringFormat.new
+        format.SetMeasurableCharacterRanges(ranges)
+        rect = RectangleF.new(20.0, 20.0, 200.0, 200.0)
+        g.DrawString(str, font, Brushes.Black, rect, format)
+        regions = g.MeasureCharacterRanges(str, font, rect, format)
+        
+        assert_equal(ranges.size, regions.size)
+        assert_instance_of(Region, regions.first)
+        assert_equal(false, regions.first.IsEmpty?(g))
+        
+        regions.each.with_index { |region, idx|
+          bound = region.GetBounds(g)
+          g.DrawRectangle(Pens.Red, bound)
+        }
+      }
+    end
+
   end
   
 end
